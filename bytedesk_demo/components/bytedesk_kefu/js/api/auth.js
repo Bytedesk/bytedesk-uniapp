@@ -1,0 +1,274 @@
+/* eslint-disable no-undef */
+import * as constants from '../constants.js'
+
+/**
+ * 匿名登录，首先检测本地是否以及存在用户，如果没有，则注册，否则直接登录
+ * @param {Object} subDomain 企业号，注：登录后台->客服管理->客服账号->企业号
+ * @param {Object} appKey 渠道管理-》uniapp中创建应用获取
+ * @param {Object} successcb 成功回调
+ * @param {Object} failedcb 失败回调
+ */
+export function anonymousLogin (subDomain, appKey, successcb, failedcb) {
+	console.log('anonymousLogin: ' + subDomain);
+	try {
+	    const username = uni.getStorageSync(constants.username);
+	    if (username != null && username.length > 0) {
+	        console.log(username);
+			// 登录
+			let password = username
+			login(username, password, subDomain, successcb, failedcb);
+	    } else {
+			// 注册
+			registerAnonymous(subDomain, function(result) {
+				//
+				let username = result.data.username;
+				let password = username
+				login(username, password, subDomain, successcb, failedcb);
+			}, function(error) {
+				// console.log('anonymousLogin:' + error)
+			})
+		}
+	} catch (e) {
+	    // error
+		console.log('anonymous storage error:' + e);
+	}
+}
+
+export function login (username, password, subDomain, successcb, failedcb) {
+	// console.log('login:', username, password, subDomain);
+	//
+	oauth(username, password, function (result) {
+		// TODO: 建立长连接
+		successcb(result.data)
+	}, function(error) {
+		failedcb(error.data)
+	})
+}
+
+export function code2Session (code, successcb, failedcb) {
+  uni.request({
+    url: constants.httpBaseUrl + '/visitors/api/v1/code2Session',
+    data: {
+      'code': code,
+    },
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+export function oauth (username, password, successcb, failedcb) {
+  // console.log('oauth/token: ', username, password)
+  //
+  uni.request({
+    url: constants.httpBaseUrl + '/oauth/token',
+    data: {
+      username: username,
+	  password: password,
+      grant_type: 'password',
+      scope: 'all'
+    },
+    header: {
+      'Authorization': 'Basic Y2xpZW50OnNlY3JldA==',
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    method: 'POST',
+    success(res) {
+	  // TODO: token 持久化
+	  // console.log('oauth:', res);
+	  // {
+	  // 	"data": {
+	  // 		"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDU4NTkxMDQsInVzZXJfbmFtZSI6IjIwMjAxMDIxMTU1ODIzMyIsImp0aSI6IjQwZTNlY2M1LWRmOGYtNGJjNi05NDIyLTdjNmQ4MGFiYTE5YSIsImNsaWVudF9pZCI6ImNsaWVudCIsInNjb3BlIjpbImFsbCJdfQ.yRR9Tk6blGLWuvHJw3pmZphdEVzvMrwjRmvgHZdMYVo",
+	  // 		"expires_in": 2591999,
+	  // 		"jti": "40e3ecc5-df8f-4bc6-9422-7c6d80aba19a",
+	  // 		"refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDU4NTkxMDQsInVzZXJfbmFtZSI6IjIwMjAxMDIxMTU1ODIzMyIsImp0aSI6ImRhNDlkMTE1LTU4MGYtNGNhZC04Y2ZhLWYyZjlkMjc0MWY3MSIsImNsaWVudF9pZCI6ImNsaWVudCIsInNjb3BlIjpbImFsbCJdLCJhdGkiOiI0MGUzZWNjNS1kZjhmLTRiYzYtOTQyMi03YzZkODBhYmExOWEifQ.15bidIWrFhIa-tdFZYsTdglJi61t9W0XCAlNy2Wka0w",
+	  // 		"scope": "all",
+	  // 		"token_type": "bearer"
+	  // 	},
+	  // 	"errMsg": "request:ok",
+	  // 	"statusCode": 200
+	  // }
+	  try {
+	      uni.setStorageSync(constants.isLogin, true);
+		  uni.setStorageSync(constants.accessToken, res.data.access_token)
+	  } catch (e) {
+	      // error
+	  }
+      successcb(res.data)
+    },
+    fail(res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+export function smsOauth (mobile, code, successcb, failedcb) {
+  // console.log('mobile/token: ', mobile)
+  uni.request({
+    url: constants.httpBaseUrl + '/mobile/token',
+    data: {
+      mobile: mobile,
+	  code: code,
+      grant_type: 'mobile',
+      scope: 'all'
+    },
+    header: {
+      'Authorization': 'Basic Y2xpZW50OnNlY3JldA==',
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    method: 'POST',
+    success(res) {
+      successcb(res.data)
+    },
+    fail(res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+export function wechatOauth (unionid, successcb, failedcb) {
+  // console.log('wechat/token: ', unionid)
+  uni.request({
+    url: constants.httpBaseUrl + '/wechat/token',
+    data: {
+      unionid: unionid,
+      grant_type: 'wechat',
+      scope: 'all'
+    },
+    header: {
+      'Authorization': 'Basic Y2xpZW50OnNlY3JldA==',
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    method: 'POST',
+    success(res) {
+      successcb(res.data)
+    },
+    fail(res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+export function register (mobile, password, successcb, failedcb) {
+  // console.log('register:', mobile, password)
+  uni.request({
+    url: constants.httpBaseUrl + '/visitors/api/v1/register/mobile',
+    data: {
+      'mobile': mobile,
+      'password': mobile,
+      'admin': false, // 学校端时，修改为true
+      'client': constants.client
+    },
+    method: 'POST',
+    header: {
+      'content-type': 'application/json' // 默认值
+    },
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+export function wechatRegister (openid, unionid, nickname, avatar, successcb, failedcb) {
+  // console.log('wechatRegister:', openid, unionid, nickname, avatar)
+  uni.request({
+    url: constants.httpBaseUrl + '/visitors/api/v1/register/wechat',
+    data: {
+      'openid': openid,
+      'unionid': unionid,
+      'nickname': nickname,
+      'avatar': avatar,
+      'client': constants.client
+    },
+    method: 'POST',
+    header: {
+      'content-type': 'application/json' // 默认值
+    },
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+export function registerAnonymous (subDomain, successcb, failedcb) {
+  // console.log('registerAnonymous:' + subDomain)
+  //
+  uni.request({
+    url: constants.httpBaseUrl + '/visitor/api/username',
+    data: {
+      'subDomain': subDomain,
+      'client': constants.client
+    },
+    method: 'GET',
+    header: {
+      'content-type': 'application/json' // 默认值
+    },
+    success (res) {
+	  console.log('registerAnonymous:' + res)
+	  // {
+	  // 	"data": {
+	  // 		"data": {
+	  // 			"acceptStatus": null,
+	  // 			"adminUid": "202010211558234",
+	  // 			"agent": false, //...更多字段
+	  // 		},
+	  // 		"message": "创建用户名成功",
+	  // 		"status_code": 200
+	  // 	},
+	  // 	"errMsg": "request:ok",
+	  // 	"statusCode": 200
+	  // }
+	  
+	  try {
+	      uni.setStorageSync(constants.uid, res.data.data.uid);
+		  uni.setStorageSync(constants.username, res.data.data.username);
+		  uni.setStorageSync(constants.nickname, res.data.data.nickname);
+		  uni.setStorageSync(constants.avatar, res.data.data.avatar);
+		  uni.setStorageSync(constants.description, res.data.data.description);
+		  uni.setStorageSync(constants.subDomain, res.data.data.subDomain);
+		  uni.setStorageSync(constants.role, constants.ROLE_VISITOR);
+	  } catch (e) {
+	      // error
+	  }
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+export function registerUser (username, nickname, password, subDomain, successcb, failedcb) {
+  // console.log('registerUser:' + username + nickname + password + subDomain)
+  //
+  uni.request({
+    url: constants.httpBaseUrl + '/visitor/api/username',
+    data: {
+	  'username': username,
+	  'nickname': nickname,
+	  'password': password,
+      'subDomain': subDomain,
+      'client': constants.client
+    },
+    method: 'POST',
+    header: {
+      'content-type': 'application/json' // 默认值
+    },
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
