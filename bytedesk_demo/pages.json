@@ -11,7 +11,14 @@
 			"style": {
 				"navigationBarTitleText": "萝卜丝智能客服"
 			}
+		},
+		{
+			"path": "components/bytedesk_kefu/webview",
+			"style": {
+				"navigationBarTitleText": "萝卜丝智能客服"
+			}
 		}
+		
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

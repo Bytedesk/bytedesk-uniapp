@@ -8,8 +8,8 @@ import * as constants from '../constants.js'
  * @param {Object} successcb 成功回调
  * @param {Object} failedcb 失败回调
  */
-export function anonymousLogin (subDomain, appKey, successcb, failedcb) {
-	console.log('anonymousLogin: ' + subDomain);
+export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
+	// console.log('anonymousLogin: ' + subDomain);
 	try {
 	    const username = uni.getStorageSync(constants.username);
 	    if (username != null && username.length > 0) {
@@ -34,7 +34,7 @@ export function anonymousLogin (subDomain, appKey, successcb, failedcb) {
 	}
 }
 
-export function login (username, password, subDomain, successcb, failedcb) {
+export function login(username, password, subDomain, successcb, failedcb) {
 	// console.log('login:', username, password, subDomain);
 	//
 	oauth(username, password, function (result) {
@@ -47,7 +47,7 @@ export function login (username, password, subDomain, successcb, failedcb) {
 
 export function code2Session (code, successcb, failedcb) {
   uni.request({
-    url: constants.httpBaseUrl + '/visitors/api/v1/code2Session',
+    url: constants.API_BASE_URL + '/visitors/api/v1/code2Session',
     data: {
       'code': code,
     },
@@ -61,11 +61,11 @@ export function code2Session (code, successcb, failedcb) {
   })
 }
 
-export function oauth (username, password, successcb, failedcb) {
+export function oauth(username, password, successcb, failedcb) {
   // console.log('oauth/token: ', username, password)
   //
   uni.request({
-    url: constants.httpBaseUrl + '/oauth/token',
+    url: constants.API_BASE_URL + '/oauth/token',
     data: {
       username: username,
 	  password: password,
@@ -106,10 +106,10 @@ export function oauth (username, password, successcb, failedcb) {
   })
 }
 
-export function smsOauth (mobile, code, successcb, failedcb) {
+export function smsOauth(mobile, code, successcb, failedcb) {
   // console.log('mobile/token: ', mobile)
   uni.request({
-    url: constants.httpBaseUrl + '/mobile/token',
+    url: constants.API_BASE_URL + '/mobile/token',
     data: {
       mobile: mobile,
 	  code: code,
@@ -130,10 +130,10 @@ export function smsOauth (mobile, code, successcb, failedcb) {
   })
 }
 
-export function wechatOauth (unionid, successcb, failedcb) {
+export function wechatOauth(unionid, successcb, failedcb) {
   // console.log('wechat/token: ', unionid)
   uni.request({
-    url: constants.httpBaseUrl + '/wechat/token',
+    url: constants.API_BASE_URL + '/wechat/token',
     data: {
       unionid: unionid,
       grant_type: 'wechat',
@@ -153,10 +153,10 @@ export function wechatOauth (unionid, successcb, failedcb) {
   })
 }
 
-export function register (mobile, password, successcb, failedcb) {
+export function register(mobile, password, successcb, failedcb) {
   // console.log('register:', mobile, password)
   uni.request({
-    url: constants.httpBaseUrl + '/visitors/api/v1/register/mobile',
+    url: constants.API_BASE_URL + '/visitors/api/v1/register/mobile',
     data: {
       'mobile': mobile,
       'password': mobile,
@@ -176,10 +176,10 @@ export function register (mobile, password, successcb, failedcb) {
   })
 }
 
-export function wechatRegister (openid, unionid, nickname, avatar, successcb, failedcb) {
+export function wechatRegister(openid, unionid, nickname, avatar, successcb, failedcb) {
   // console.log('wechatRegister:', openid, unionid, nickname, avatar)
   uni.request({
-    url: constants.httpBaseUrl + '/visitors/api/v1/register/wechat',
+    url: constants.API_BASE_URL + '/visitors/api/v1/register/wechat',
     data: {
       'openid': openid,
       'unionid': unionid,
@@ -200,11 +200,11 @@ export function wechatRegister (openid, unionid, nickname, avatar, successcb, fa
   })
 }
 
-export function registerAnonymous (subDomain, successcb, failedcb) {
+export function registerAnonymous(subDomain, successcb, failedcb) {
   // console.log('registerAnonymous:' + subDomain)
   //
   uni.request({
-    url: constants.httpBaseUrl + '/visitor/api/username',
+    url: constants.API_BASE_URL + '/visitor/api/username',
     data: {
       'subDomain': subDomain,
       'client': constants.client
@@ -219,7 +219,7 @@ export function registerAnonymous (subDomain, successcb, failedcb) {
 	  // 	"data": {
 	  // 		"data": {
 	  // 			"acceptStatus": null,
-	  // 			"adminUid": "202010211558234",
+	  // 			"uid": "202010211558234",
 	  // 			"agent": false, //...更多字段
 	  // 		},
 	  // 		"message": "创建用户名成功",
@@ -228,7 +228,6 @@ export function registerAnonymous (subDomain, successcb, failedcb) {
 	  // 	"errMsg": "request:ok",
 	  // 	"statusCode": 200
 	  // }
-	  
 	  try {
 	      uni.setStorageSync(constants.uid, res.data.data.uid);
 		  uni.setStorageSync(constants.username, res.data.data.username);
@@ -236,7 +235,6 @@ export function registerAnonymous (subDomain, successcb, failedcb) {
 		  uni.setStorageSync(constants.avatar, res.data.data.avatar);
 		  uni.setStorageSync(constants.description, res.data.data.description);
 		  uni.setStorageSync(constants.subDomain, res.data.data.subDomain);
-		  uni.setStorageSync(constants.role, constants.ROLE_VISITOR);
 	  } catch (e) {
 	      // error
 	  }
@@ -248,11 +246,11 @@ export function registerAnonymous (subDomain, successcb, failedcb) {
   })
 }
 
-export function registerUser (username, nickname, password, subDomain, successcb, failedcb) {
+export function registerUser(username, nickname, password, subDomain, successcb, failedcb) {
   // console.log('registerUser:' + username + nickname + password + subDomain)
   //
   uni.request({
-    url: constants.httpBaseUrl + '/visitor/api/username',
+    url: constants.API_BASE_URL + '/visitor/api/username',
     data: {
 	  'username': username,
 	  'nickname': nickname,
@@ -271,4 +269,100 @@ export function registerUser (username, nickname, password, subDomain, successcb
       failedcb(res.data)
     }
   })
+}
+
+// 请求客服会话
+export function requestThread(wid, type, aid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/thread/request',
+    data: {
+      wId: wid,
+      type: type,
+      aId: aid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  // console.log('request thread:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 请求人工客服，不管此工作组是否设置为默认机器人，只要有人工客服在线，则可以直接对接人工
+export function requestAgent(wid, type, aid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/thread/request/agent',
+    data: {
+      wId: wid,
+      type: type,
+      aId: aid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+//
+export function getVisitorThreads(page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/thread/visitor/history',
+    data: {
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+export function visitorApiHeader() {
+  let header = {}
+  let accessToken = uni.getStorageSync(constants.accessToken)
+  if (accessToken) {
+    header = {
+	  'content-type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken,
+    }
+  }
+  return header
 }

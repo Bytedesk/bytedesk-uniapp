@@ -1,5 +1,5 @@
 const constants = require('../constants.js')
-const Stomp = require('../vendor/stomp/1.2/stomp.min.js').Stomp;
+const Stomp = require('./stomp.min.js').Stomp;
 
 let stompClient;
 let stompReconnectTimes = 0;
@@ -8,16 +8,21 @@ let subscribedTopics = []
 let socketConnected = false;
 // 是否断线重连
 let reconnect = true;
+//
+let currentThread = {
+	tid: '',
+	topic: ''
+}
 
-var myStomp = {
+var stompApi = {
 
-  connect: function() {
+  connect: function(thread) {
     console.log('connect stomp')
-
-    // // socket是否连接
-    // let socketConnected = false;
-    // // 是否断线重连
-    // let reconnect = true;
+	currentThread = thread;
+	// 已经连接则无需重复连接
+	if (socketConnected) {
+		return
+	}
 
     // 发送消息
     function sendSocketMessage(msg) {
@@ -48,7 +53,7 @@ var myStomp = {
     // 创建一个 WebSocket 连接
     function connectWebSocket() {
       uni.connectSocket({
-        url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessKey),
+        url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessToken),
         header: {
           // access_token: app.globalData.token.access_token
         },
@@ -99,16 +104,7 @@ var myStomp = {
 
     //
     connectWebSocket();
-    myStomp.stompConnect(ws)
-  },
-
-  // 发送消息
-  sendTextMessage: function(topic, jsonString) {
-    console.log('sendTextMessage:', topic, jsonString)
-    //
-    stompClient.send("/app/" + topic, {},
-      jsonString
-    );
+    stompApi.stompConnect(ws)
   },
 
   /**
@@ -144,6 +140,9 @@ var myStomp = {
       // TODO: 断开重连成功之后，需要重新从服务器请求thread，然后添加sub订阅
       // 登录成功之后，尝试登录次数清零
       stompReconnectTimes = 0
+	  // 订阅topic
+	  let topic = currentThread.topic.replace(/\//, ".");
+	  stompApi.subscribeTopic(topic)
       // 更新连接状态：连接成功
       // let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTED
       // commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
@@ -170,6 +169,15 @@ var myStomp = {
       }, 5000)
     })
   },
+  
+  // 发送消息
+  sendMessage: function(topic, jsonString) {
+    console.log('sendMessage:', topic, jsonString)
+    //
+    stompClient.send("/app/" + topic, {},
+      jsonString
+    );
+  },
 
   /**
    * 添加订阅，必须添加前缀 '/topic/'
@@ -178,6 +186,7 @@ var myStomp = {
    */
   subscribeTopic: function(topic) {
     console.log('subscribeTopic:' + topic)
+	//
     let contains = subscribedTopics.some(tp => {
       return tp === topic
     })
@@ -190,6 +199,8 @@ var myStomp = {
       console.log('message :', message, 'body:', message.body);
       //
       var messageObject = JSON.parse(message.body);
+	  // uni.$emit('message', messageObject);
+	   
       if ((messageObject.type === 'text'
         || messageObject.type === 'image'
         || messageObject.type === 'file')
@@ -294,12 +305,12 @@ var myStomp = {
 
 module.exports = {
   // stompClient: stompClient,
-  connect: myStomp.connect,
-  subscribeTopic: myStomp.subscribeTopic,
-  sendTextMessage: myStomp.sendTextMessage
-  // sendImageMessage: myStomp.sendImageMessage,
-  // sendContactTextMessage: myStomp.sendContactTextMessage,
-  // sendContactImageMessage: myStomp.sendContactImageMessage,
-  // sendGroupTextMessage: myStomp.sendGroupTextMessage,
-  // sendGroupImageMessage: myStomp.sendGroupImageMessage
+  connect: stompApi.connect,
+  subscribeTopic: stompApi.subscribeTopic,
+  sendMessage: stompApi.sendMessage
+  // sendImageMessage: stompApi.sendImageMessage,
+  // sendContactTextMessage: stompApi.sendContactTextMessage,
+  // sendContactImageMessage: stompApi.sendContactImageMessage,
+  // sendGroupTextMessage: stompApi.sendGroupTextMessage,
+  // sendGroupImageMessage: stompApi.sendGroupImageMessage
 }
