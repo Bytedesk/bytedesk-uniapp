@@ -26,6 +26,7 @@ var stompApi = {
 
     // 发送消息
     function sendSocketMessage(msg) {
+	  // console.log('sendSocketMessage:', msg)
       // 如果socket已连接则发送消息
       if (socketConnected) {
         uni.sendSocketMessage({
@@ -33,21 +34,37 @@ var stompApi = {
         })
       } else {
         console.log('提示连接断开，无法发送消息')
+		// 重连
+		connectWebSocket();
       }
     }
 
     // 关闭连接
     function close() {
+	  console.log('close')
       if (socketConnected) {
         uni.closeSocket()
         socketConnected = false;
       }
     }
+	
+	//
+	function onopen() {
+		console.log('onopen');
+		// stompApi.stompConnect(webSocket)
+	}
+	
+	//
+	function onmessage(message) {
+		console.log('onmessage:', message)
+	}
 
     // 符合WebSocket定义的对象
-    var ws = {
+    var webSocket = {
       send: sendSocketMessage,
-      close: close
+      close: close,
+	  onopen: onopen,
+	  onmessage: onmessage
     }
 
     // 创建一个 WebSocket 连接
@@ -70,20 +87,20 @@ var stompApi = {
     }
 
     // 监听 WebSocket 连接打开事件
-    uni.onSocketOpen(function (res) {
-      console.log("WebSocket 连接成功:", res)
+    uni.onSocketOpen(function (result) {
+      console.log("SocketOpen:", result)
       socketConnected = true;
-      ws.onopen();
+      webSocket.onopen();
     })
 
     // 监听 WebSocket 接受到服务器的消息事件
-    uni.onSocketMessage(function (res) {
-      ws.onmessage(res);
+    uni.onSocketMessage(function (result) {
+      webSocket.onmessage(result);
     })
 
     // 监听 WebSocket 错误事件
-    uni.onSocketError(function (res) {
-      console.log("WebSocket 错误事件:", res)
+    uni.onSocketError(function (result) {
+      console.log("SocketError:", result)
       if (!socketConnected) {
         // 断线重连
         if (reconnect) {
@@ -93,8 +110,8 @@ var stompApi = {
     })
 
     // 监听 WebSocket 连接关闭事件
-    uni.onSocketClose(function (res) {
-      console.log("WebSocket 连接关闭:", res)
+    uni.onSocketClose(function (result) {
+      console.log("SocketClose:", result)
       socketConnected = false;
       // 断线重连
       if (reconnect) {
@@ -104,14 +121,14 @@ var stompApi = {
 
     //
     connectWebSocket();
-    stompApi.stompConnect(ws)
+    stompApi.stompConnect(webSocket)
   },
 
   /**
    * stomp长连接
    * TODO: 加载所属工作组，添加订阅
    */
-  stompConnect: function(ws) {
+  stompConnect: function(webSocket) {
     /**
      * 定期发送心跳或检测服务器心跳
      *  The heart-beating is using window.setInterval() to regularly send heart-beats and/or check server heart-beats.
@@ -126,17 +143,17 @@ var stompApi = {
       return clearInterval(id);
     };
 
-    stompClient = Stomp.over(ws);
-    // 更新连接状态: 连接中...
+    stompClient = Stomp.over(webSocket);
+    console.log('stomp connecting...')
     // let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTING
     // commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
     // bus.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
     // to disable logging, set it to an empty function:
-    if (constants.IS_PRODUCTION) {
-      // stompClient.debug = function (value) {}
-    }
+    // if (constants.IS_PRODUCTION) {
+    //   stompClient.debug = function (value) {}
+    // }
     stompClient.connect({}, function (frame) {
-      console.log('Connected: ' + frame)
+      console.log('Connected: ', frame);
       // TODO: 断开重连成功之后，需要重新从服务器请求thread，然后添加sub订阅
       // 登录成功之后，尝试登录次数清零
       stompReconnectTimes = 0
@@ -165,7 +182,7 @@ var stompApi = {
         // 增加尝试连接次数
         stompReconnectTimes++
         // 重新连接
-        stompConnect(ws)
+        stompConnect(webSocket)
       }, 5000)
     })
   },
@@ -187,98 +204,20 @@ var stompApi = {
   subscribeTopic: function(topic) {
     console.log('subscribeTopic:' + topic)
 	//
-    let contains = subscribedTopics.some(tp => {
-      return tp === topic
-    })
-    if (contains) {
-      return
-    }
-    subscribedTopics.push(topic)
+    // let contains = subscribedTopics.some(tp => {
+    //   return tp === topic
+    // })
+    // if (contains) {
+    //   return
+    // }
+    // subscribedTopics.push(topic)
     //
     stompClient.subscribe("/topic/" + topic, function (message) {
       console.log('message :', message, 'body:', message.body);
       //
       var messageObject = JSON.parse(message.body);
-	  // uni.$emit('message', messageObject);
-	   
-      if ((messageObject.type === 'text'
-        || messageObject.type === 'image'
-        || messageObject.type === 'file')
-        // && messageObject.user.uid !== app.uid
-        ) {
-        //
-        // // 新protobuf转换json
-        // messageObject.createdAt = messageObject.timestamp;
-        // if (messageObject.type === "text") {
-        //     messageObject.content = messageObject.text.content;
-        // } else if (messageObject.type === "image") {
-        //     messageObject.imageUrl = messageObject.image.imageUrl;
-        // }
-        // //
-        // let mid = messageObject.mid;
-        // // 发送消息回执：消息送达
-        // app.sendReceiptMessage(mid, 'received');
-        // app.sendReceiptMessage(mid, "read");
-      }
-      else if (messageObject.type === 'notification_browse_invite') {
-        //
-      } else if (messageObject.type === 'notification_queue') {
-          // 排队
-      } else if (messageObject.type === 'notification_queue_accept') {
-        // // 1. 保存thread
-        // app.thread = messageObject.thread;
-        // // 2. 订阅会话消息
-        // app.subscribeTopic(app.threadTopic);
-      } else if (messageObject.type === 'notification_invite_rate') {
-        // // 邀请评价
-        // app.isInviteRate = true;
-        // app.switchRate()
-      } else if (messageObject.type === 'notification_agent_close'
-          || messageObject.type === 'notification_auto_close') {
-        // // 新protobuf转换json
-        // messageObject.createdAt = messageObject.timestamp;
-        // messageObject.content = messageObject.text.content;
-        // // TODO: 会话关闭，添加按钮方便用户点击重新请求会话
-        // app.isThreadClosed = true
-      } else if (messageObject.type === 'notification_preview') {
-        //
-        // if (messageObject.user.uid !== app.uid) {
-        //     app.isInputingVisible = true;
-        //     setTimeout(function () {
-        //         app.isInputingVisible = false;
-        //     }, 5000)
-        // }
-      } else if (messageObject.type === 'notification_receipt') {
-        // 消息状态：送达 received、已读 read
-        // if (messageObject.user.uid !== app.uid) {
-        //   console.log('FIXME:消息状态：送达、已读, 显示不正确');
-        //   for (let i = app.messages.length - 1; i >= 0; i--) {
-        //     const msg = app.messages[i]
-        //     if (msg.mid === messageObject.receipt.mid) {
-        //       // TODO: 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
-        //       if (app.messages[i].status === 'read') {
-        //         return
-        //       }
-        //       console.log('do update:', msg.mid)
-        //       app.messages[i].status = messageObject.receipt.status
-        //     }
-        //   }
-        // }
-      } else if (messageObject.type === 'notification_recall') {
-        console.log('TODO:消息撤回');
-        // $("#other" + messageObject.mid).hide();
-      }
-      //
-      if (messageObject.type !== 'notification_preview'
-          && messageObject.type !== 'notification_receipt'
-          && messageObject.type !== 'notification_connect'
-          && messageObject.type !== 'notification_disconnect') {
-          // app.isRobot = false;
-          // app.pushToMessageArray(messageObject);
-          // app.scrollToBottom()
-      } else {
-          // TODO: 监听客服端输入状态
-      }
+	  uni.$emit('message', messageObject);
+	  
     });
   },
 

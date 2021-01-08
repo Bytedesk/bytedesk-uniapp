@@ -1,64 +1,97 @@
 <template>
 	<view>
 		<!-- 空盒子用来防止消息过少时 拉起键盘会遮盖消息 -->
-		<view :animation="anData" style="height:0;">
-		</view>
+		<view :animation="anData" style="height:0;"></view>
 		<!-- 消息体 -->
 		<scroll-view scroll-with-animation scroll-y="true" @touchmove="hideKey" style="width: 750rpx;" :style="{'height':srcollHeight}"
 		 :scroll-top="go">
 			<!-- 用来获取消息体高度 -->
 			<view id="content" scroll-with-animation>
 				<!-- 消息 -->
-				<view class="flex-column-start" v-for="(x,i) in msgList" :key="i">
-
-					<!-- 用户消息 头像可选加入-->
-					<view v-if="x.my" class="flex justify-end padding-right one-show  align-start  padding-top">
-						<!-- 	<image v-if="!x.my" class="chat-img" src="../../static/..." mode="aspectFill" ></image> -->
-						<view class="flex justify-end" style="width: 400rpx;">
-							<view class="margin-left padding-chat bg-cyan" style="border-radius: 35rpx;">
-								<text style="word-break: break-all;">{{x.msg}}</text>
-							</view>
-						</view>
-						<!-- <image class="chat-img margin-left" src="../../static/..." mode="aspectFill" ></image> -->
+				<view class="flex-column-start" v-for="(message, i) in messages" :key="i">
+					
+					<text style="text-align: center; margin-top: 10rpx; font-size: 25rpx; color: #AAAAAA;">{{ message.createdAt }}</text>
+					
+					<view style="text-align: center; margin-top: 10rpx;">
+						<text v-if="is_type_notification_agent_close(message)" style="word-break: break-all;">{{ message.content }}</text>
+						<text v-else-if="is_type_notification_visitor_close(message)" style="word-break: break-all;">{{ message.content }}</text>
+						<text v-else-if="is_type_notification_auto_close(message)" style="word-break: break-all;">{{ message.content }}</text>
+						<text v-else-if="is_type_notification_thread_reentry(message)" style="word-break: break-all;">{{ message.content }}</text>
+						<text v-else-if="is_type_notification_offline(message)" style="word-break: break-all;">{{ message.content }}</text>
+						<text v-else-if="is_type_notification_invite_rate(message)" style="word-break: break-all;">{{ message.content }}</text>
+						<text v-else-if="is_type_notification_rate_result(message)" style="word-break: break-all;">{{ message.content }}</text>
+						<text v-else-if="is_type_notification(message)" style="word-break: break-all;">{{ message.content }}</text>
 					</view>
 					
-					<!-- 机器人消息 -->
-					<view v-if="!x.my" class="flex-row-start margin-left margin-top one-show">
-						<view class="chat-img flex-row-center">
-							<image style="height: 75rpx;width: 75rpx;" src="./image/robot.png" mode="aspectFit"></image>
+					<view v-if="!is_type_notification(message)">
+						
+						<!-- 发送消息-->
+						<view v-if="is_self(message)" class="flex justify-end padding-right one-show  align-start  padding-top">
+							
+							<!-- <image class="chat-img margin-left" src="../../static/..." mode="aspectFill" ></image> -->
+							<view class="flex justify-end" style="width: 400rpx;">
+								<!-- 消息状态 -->
+								<view class="status">
+									<text v-if="is_sending(message)" class="fa fa-spinner fa-spin" style="font-size:12px"></text>
+									<text v-if="is_stored(message)" class="fa fa-times-circle" style="font-size:10px"></text>
+									<text v-if="is_received(message)" style="font-size:10px; margin-right: 5px;">送达</text>
+									<text v-if="is_read(message)" style="font-size:10px; margin-right: 5px;">已读</text>
+									<text v-if="is_error(message)" class="fa fa-times-circle" style="font-size:12px"></text>
+								</view>
+								<view class="margin-left padding-chat bg-cyan" style="border-radius: 35rpx;">
+									<text v-if="is_type_text(message)" style="word-break: break-all;">{{ message.content }}</text>
+									<image v-if="is_type_image(message)" class="message-img" :src="message.imageUrl" @click="previewImageMessage(message)" mode="aspectFill" ></image> 
+								</view>
+							</view>
+							<!-- 发送者头像 -->
+							<!-- <image v-if="is_self(message)" style="height: 75rpx;width: 75rpx; margin-left: 10rpx;" class="chat-img" :src="message.user.avatar" mode="aspectFill" ></image> -->
 						</view>
-						<view class="flex" style="width: 500rpx;">
-							<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">
-								<text style="word-break: break-all;">{{x.msg}}</text>
-								<!-- 消息模板 =>初次问候 -->
-								<view class="flex-column-start" v-if="x.type==1" style="color: #2fa39b;">
-									<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">你可以这样问我:</text>
-									<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item,index) in x.questionList" :key="index">{{item}}</text>
-									<view class="flex-row-start  padding-top-sm">
-										<text class="my-neirong-sm">没有你要的答案?</text>
-										<text class="padding-left" style="color: #007AFF;">换一批</text>
+						
+						<!-- 接收消息 -->
+						<view v-if="!is_self(message)" class="flex-row-start margin-left margin-top one-show">
+							<!-- 头像 -->
+							<view class="chat-img flex-row-center">
+								<image style="height: 75rpx;width: 75rpx;" :src="message.user.avatar" mode="aspectFit"></image>
+							</view>
+							<!-- 消息体 -->
+							<view class="flex" style="width: 500rpx;">
+								<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">
+									
+									<text v-if="is_type_text(message)" style="word-break: break-all;">{{ message.content }}</text>
+									<image v-if="is_type_image(message)" class="message-img" :src="message.imageUrl" @click="previewImageMessage(message)" mode="aspectFill" ></image> 
+									<!-- 消息模板 =>初次问候 -->
+									<view class="flex-column-start" v-if="message.type==1" style="color: #2fa39b;">
+										<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">你可以这样问我:</text>
+										<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item, index) in message.questionList" :key="index">{{item}}</text>
+										<!-- TODO: -->
+										<view class="flex-row-start  padding-top-sm">
+											<text class="my-neirong-sm">没有你要的答案?</text>
+											<text class="padding-left" style="color: #007AFF;">换一批</text>
+										</view>
 									</view>
-								</view>
-								<!-- 消息模板 =>多个答案 -->
-								<view class="flex-column-start" v-if="x.type==2" style="color: #2fa39b;">
-									<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">猜你想问:</text>
-									<!-- 连接服务器应该用item.id -->
-									<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item,index) in x.questionList" :key="index">{{item}}</text>
-								</view>
-								<!-- 消息模板 => 无法回答-->
-								<view class="flex-column-start" v-if="x.type==0">
-									<text class="padding-top-sm" style="color: #2fa39b;">提交意见与反馈</text>
-									<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">下面是一些常见问题,您可以点击对应的文字快速获取答案:</text>
-									<text @click="answer(index)" style="margin-top: 30rpx;color: #2fa39b;" v-for="(item,index) in x.questionList"
-									 :key="index">{{item}}</text>
-									<view class="flex-row-start  padding-top-sm">
-										<text class="my-neirong-sm">没有你要的答案?</text>
-										<text class="padding-left" style="color: #1396c5;">换一批</text>
+									<!-- 消息模板 =>多个答案 -->
+									<view class="flex-column-start" v-if="message.type==2" style="color: #2fa39b;">
+										<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">猜你想问:</text>
+										<!-- 连接服务器应该用item.id -->
+										<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item,index) in message.questionList" :key="index">{{item}}</text>
+									</view>
+									<!-- 消息模板 => 无法回答-->
+									<view class="flex-column-start" v-if="message.type==0">
+										<text class="padding-top-sm" style="color: #2fa39b;">提交意见与反馈</text>
+										<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">下面是一些常见问题,您可以点击对应的文字快速获取答案:</text>
+										<text @click="answer(index)" style="margin-top: 30rpx;color: #2fa39b;" v-for="(item,index) in message.questionList"
+										 :key="index">{{ item }}</text>
+										<view class="flex-row-start  padding-top-sm">
+											<text class="my-neirong-sm">没有你要的答案?</text>
+											<text class="padding-left" style="color: #1396c5;">换一批</text>
+										</view>
 									</view>
 								</view>
 							</view>
 						</view>
+						
 					</view>
+
 				</view>
 				
 				<!-- loading是显示 -->
@@ -69,7 +102,6 @@
 					<view class="flex" style="width: 500rpx;">
 						<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">
 							<view class="cuIcon-loading turn-load" style="font-size: 35rpx;color: #3e9982;">
-
 							</view>
 						</view>
 					</view>
@@ -95,11 +127,7 @@
 			<view class="box-normal flex-row-around flex-wrap">
 				<view class="tb-text" @click="takePicture()">
 					<view class="cuIcon-form"></view>
-					<text>拍照</text>
-				</view>
-				<view class="tb-text" @click="pickPhoto()">
-					<view class="cuIcon-form"></view>
-					<text>相册</text>
+					<text>图片</text>
 				</view>
 <!-- 				<view class="tb-text">
 					<view class="cuIcon-form"></view>
@@ -152,15 +180,23 @@ export default {
 		l = query.screenWidth / 750
 		wh = query.windowHeight
 		this.srcollHeight = query.windowHeight + "px"
-		
-		// 登录
-		uni.setNavigationBarTitle({
-		　　title:option.title
-		})
-		this.login(option)
+		//
+		this.option = option
 	},
 	onShow () {},
-	onReady () {},
+	onReady () {
+		//
+		let app = this;
+		uni.$on('message',function(messageObject) {
+			// console.log('uni on message');
+			app.onMessageReceived(messageObject)
+		})
+		// 登录
+		uni.setNavigationBarTitle({
+		　　title:this.option.title
+		})
+		this.login(this.option)
+	},
 	onHide () {},
 	data() {
 		return {
@@ -172,15 +208,17 @@ export default {
 			// my->谁发的消息 msg->消息文本 type->客服消息模板类型 questionList->快速获取问题答案的问题列表
 			msgList: [{
 				my: false,
-				msg: "你好我是客服机器人娜娜,请问有什么问题可以帮助您?(问候模板)",
+				content: "你好我是客服机器人娜娜,请问有什么问题可以帮助您?(问候模板)",
 				type: 1,
 				questionList: ["如何注销用户", "我想了解业务流程", "手机号如何更换"]
 			}],
-			msg: "",
+			//
+			content: "",
 			go: 0,
 			srcollHeight: 0,
 
 			// 萝卜丝
+			option: {},
 			isInputingVisible: false,
 			localPreviewContent: '',
 			//
@@ -247,11 +285,11 @@ export default {
 			type: 'workGroup',
 			// 指定客服
 			agentUid: '',
-			// 当前访客用户名
 			uid: '',
 			username: '',
-			password: '',
+			// password: '',
 			nickname: '',
+			avatar: '',
 			// 本地存储access_token的key
 			token: 'bd_kfe_token',
 			isConnected: false,
@@ -282,6 +320,10 @@ export default {
 		},
 	},
 	methods: {
+		//
+		is_self (message) {
+			return message.user.uid === this.uid;
+		},
 		// 发送状态
 		is_sending (message) {
 			return message.status === 'sending'
@@ -456,6 +498,16 @@ export default {
 			if (option.type === undefined || option.type === null) {
 				return
 			}
+			try {
+			    //
+			    this.uid = uni.getStorageSync(constants.uid)
+			    this.username = uni.getStorageSync(constants.username)
+			    this.nickname = uni.getStorageSync(constants.nickname)
+			    this.avatar = uni.getStorageSync(constants.avatar)
+			} catch (error) {
+			    console.error('read uid/username error', error)
+			}
+			//
 			let app = this
 			httpApi.requestThread(option.wid, option.type, option.aid, function(response) {
 				console.log('request thread success', option.wid, option.type, option.aid, response)
@@ -487,9 +539,9 @@ export default {
 			let message = response.data;
 			if (response.status_code === 200) {
 				//
-				if (this.isManulRequestThread || this.loadHistory === '0') {
+				// if (this.isManulRequestThread || this.loadHistory === '0') {
 					this.pushToMessageArray(message);
-				}
+				// }
 				// // 1. 保存thread
 				this.thread = message.thread;
 				// // 3. 加载聊天记录
@@ -502,9 +554,9 @@ export default {
 				// this.appendCommodityInfo()
 			} else if (response.status_code === 201) {
 				// message.content = '继续之前会话';
-				if (this.isManulRequestThread || this.loadHistory === '0') {
+				// if (this.isManulRequestThread || this.loadHistory === '0') {
 					this.pushToMessageArray(message);
-				}
+				// }
 				// // 1. 保存thread
 				this.thread = message.thread;
 				// // 3. 加载聊天记录
@@ -569,9 +621,6 @@ export default {
 			// // 建立长连接
 			this.byteDeskConnect();
 		},
-		/**
-		 * 发送同步消息
-		 */
 		sendTextMessageSync(content) {
 			// this.sendMessageSync('text', content)
 			if (content.length === 0) {
@@ -611,8 +660,8 @@ export default {
 			};
 			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 		},
-		sendImageMessageSync(content) {
-			// this.sendMessageSync('image', content)
+		sendImageMessageSync(imageUrl) {
+			console.log('sendImageMessageSync:', imageUrl);
 			//
 			let localId = this.guid();
 			var json = {
@@ -627,7 +676,7 @@ export default {
 					"avatar": this.thread.visitor.avatar
 				},
 				"image": {
-					"imageUrl": content
+					"imageUrl": imageUrl
 				},
 				"thread": {
 					"tid": this.thread.tid,
@@ -722,16 +771,13 @@ export default {
 			}
 			return JSON.stringify(commodidy)
 		},
-		/**
-		 * 输入框变化
-		 */
 		onInputChange (content) {
-			// console.log(content);
-			if (this.isRobot || this.isThreadClosed) {
-				return;
-			}
-			this.localPreviewContent = content
-			this.delaySendPreviewMessage()
+			console.log('onInputChange:', content);
+			// if (this.isRobot || this.isThreadClosed) {
+			// 	return;
+			// }
+			// this.localPreviewContent = content
+			// this.delaySendPreviewMessage()
 		},
 		sendPreviewMessage() {
 			//
@@ -764,15 +810,11 @@ export default {
 			};
 			stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
 		},
-		/**
-		 * 发送消息
-		 */
 		sendTextMessage () {
 			//
 			if (this.inputContent.trim().length === 0) {
 				return;
 			}
-			//
 			if (this.isRobot) {
 				// this.messageAnswer(this.inputContent);
 			} else {
@@ -786,10 +828,6 @@ export default {
 			// 	$("input")[1].focus()
 			// }, 100);
 		},
-		/**
-		 * 消息回执：收到消息之后回复给消息发送方
-		 * 消息content字段存放status: 1. received, 2. read
-		 */
 		sendReceiptMessage (mid, status) {
 			var localId = this.guid();
 			var json = {
@@ -821,9 +859,6 @@ export default {
 			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			// 收到消息后，向服务器发送回执
 		},
-		/**
-		 * 消息撤回
-		 */
 		sendRecallMessage (mid) {
 			var localId = this.guid();
 			var json = {
@@ -856,8 +891,87 @@ export default {
 		},
 		// 建立长连接
 		byteDeskConnect () {
-			//
 			stompApi.connect(this.thread)
+		},
+		onMessageReceived (messageObject) {
+			//
+			if ((messageObject.type === 'text'
+			  || messageObject.type === 'image'
+			  || messageObject.type === 'file')
+			  // && messageObject.user.uid !== this.uid
+			  ) {
+			  // 新protobuf转换json
+			  messageObject.createdAt = messageObject.timestamp;
+			  if (messageObject.type === "text") {
+			      messageObject.content = messageObject.text.content;
+			  } else if (messageObject.type === "image") {
+			      messageObject.imageUrl = messageObject.image.imageUrl;
+			  }
+			  //
+			  let mid = messageObject.mid;
+			  // 发送消息回执：消息送达
+			  this.sendReceiptMessage(mid, 'received');
+			  this.sendReceiptMessage(mid, "read");
+			}
+			else if (messageObject.type === 'notification_browebSockete_invite') {
+			  //
+			} else if (messageObject.type === 'notification_queue') {
+			    // 排队
+			} else if (messageObject.type === 'notification_queue_accept') {
+			  // // 1. 保存thread
+			  this.thread = messageObject.thread;
+			  // // 2. 订阅会话消息
+			  // this.subscribeTopic(this.threadTopic);
+			} else if (messageObject.type === 'notification_invite_rate') {
+			  // // 邀请评价
+			  this.isInviteRate = true;
+			  // this.switchRate()
+			} else if (messageObject.type === 'notification_agent_close'
+			    || messageObject.type === 'notification_auto_close') {
+			  // // 新protobuf转换json
+			  messageObject.createdAt = messageObject.timestamp;
+			  messageObject.content = messageObject.text.content;
+			  // // TODO: 会话关闭，添加按钮方便用户点击重新请求会话
+			  this.isThreadClosed = true
+			} else if (messageObject.type === 'notification_preview') {
+			  //
+			  if (messageObject.user.uid !== this.uid) {
+			      this.isInputingVisible = true;
+			      setTimeout(function () {
+			          this.isInputingVisible = false;
+			      }, 5000)
+			  }
+			} else if (messageObject.type === 'notification_receipt') {
+			  // 消息状态：送达 received、已读 read
+			  if (messageObject.user.uid !== this.uid) {
+			    for (let i = this.messages.length - 1; i >= 0 ; i--) {
+					const msg = this.messages[i]
+					if (msg.mid === messageObject.receipt.mid) {
+						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						if (this.messages[i].status === 'read') {
+							return
+						}
+						console.log('do update:', this.messages[i].mid, this.messages[i].content, messageObject.receipt.status)
+						// this.messages[i].status = messageObject.receipt.status
+						Vue.set(this.messages[i], 'status', messageObject.receipt.status)
+					}
+				}
+			  }
+			} else if (messageObject.type === 'notification_recall') {
+			  console.log('TODO:消息撤回');
+			  // $("#other" + messageObject.mid).hide();
+			}
+			//
+			if (messageObject.type !== 'notification_preview'
+			    && messageObject.type !== 'notification_receipt'
+			    && messageObject.type !== 'notification_connect'
+			    && messageObject.type !== 'notification_disconnect') {
+			    this.isRobot = false;
+			    this.pushToMessageArray(messageObject);
+			    // this.scrollToBottom()
+			} else {
+			    // TODO: 监听客服端输入状态
+			}
 		},
 		//
 		currentTimestamp () {
@@ -866,10 +980,36 @@ export default {
 		},
 		///
 		takePicture () {
+			// 拍照 + 相册
 			console.log('take picture');
+			let app = this;
+			uni.chooseImage({
+				count: 1, //默认9
+			    success: (chooseImageRes) => {
+			        const tempFilePaths = chooseImageRes.tempFilePaths;
+			        uni.uploadFile({
+			            url: constants.UPLOAD_IMAGE_URL,
+			            filePath: tempFilePaths[0],
+			            name: 'file',
+			            formData: {
+			                'file_name': app.guid(),
+							'username': app.username,
+							'client': constants.client
+			            },
+			            success: (response) => {
+			                console.log(response.data);
+							// 发送图片
+							var imageUrl = JSON.parse(response.data).data;
+							app.sendImageMessageSync(imageUrl)
+			            }
+			        });
+			    }
+			});
 		},
-		pickPhoto () {
-			console.log('pick photo');
+		previewImageMessage (message) {
+			uni.previewImage({
+				urls: [message.imageUrl]
+			});
 		},
 		guid() {
 			function s4 () {
@@ -921,7 +1061,6 @@ export default {
 							this.msgMove(moveY, 200)
 						}
 					}
-
 				}).exec();
 			}, 100)
 		},
@@ -929,24 +1068,23 @@ export default {
 		answer(id) {
 			// 这里应该传入问题的id,模拟就用index代替了
 			console.log(id)
-
 		},
 		sendMsg() {
 			// 消息为空不做任何操作
-			if (this.msg == "") {
+			if (this.content == "") {
 				return 0;
 			}
-			// 显示消息 msg消息文本,my鉴别是谁发的消息(不能用俩个消息数组循环,否则消息不会穿插)
+			// 显示消息 content消息文本,my鉴别是谁发的消息(不能用俩个消息数组循环,否则消息不会穿插)
 			this.msgList.push({
-				"msg": this.msg,
+				"content": this.content,
 				"my": true
 			})
 			// 保证消息可见
 			this.msgGo()
 			// 回答问题
-			this.msgKf(this.msg)
+			this.msgKf(this.content)
 			// 清除消息
-			this.msg = ""
+			this.content = ""
 		},
 		msgKf(x) {
 			// loading
@@ -958,18 +1096,18 @@ export default {
 				this.msgLoad = false
 				this.msgList.push({
 					my: false,
-					msg: "娜娜还在学习中,没能明白您的问题,您点击下方提交反馈与问题,我们会尽快人工处理(无法回答模板)",
+					content: "娜娜还在学习中,没能明白您的问题,您点击下方提交反馈与问题,我们会尽快人工处理(无法回答模板)",
 					type: 0,
 					questionList: ["如何注销用户", "我想了解业务流程", "手机号如何更换"]
 				})
 				this.msgList.push({
 					my: false,
-					msg: "单消息模板",
+					content: "单消息模板",
 					type: -1
 				})
 				this.msgList.push({
 					my: false,
-					msg: "根据您的问题,已为您匹配了下列问题(多个答案模板)",
+					content: "根据您的问题,已为您匹配了下列问题(多个答案模板)",
 					type: 2,
 					questionList: ["如何注销用户", "我想了解业务流程", "手机号如何更换"]
 				})
@@ -1052,6 +1190,13 @@ export default {
 		height: 100rpx;
 		background-color: #f7f7f7;
 	}
+	
+	.message-img {
+		border-radius: 5%;
+		width: 300rpx;
+		height: 300rpx;
+		background-color: #f7f7f7;
+	}
 
 	.padding-chat {
 		padding: 17rpx 20rpx;
@@ -1060,5 +1205,10 @@ export default {
 	.tb-nv {
 		width: 50rpx;
 		height: 50rpx;
+	}
+	
+	.status {
+	    float: right;
+	    margin-right: 8px;
 	}
 </style>

@@ -13,7 +13,7 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 	try {
 	    const username = uni.getStorageSync(constants.username);
 	    if (username != null && username.length > 0) {
-	        console.log(username);
+	        // console.log(username);
 			// 登录
 			let password = username
 			login(username, password, subDomain, successcb, failedcb);
