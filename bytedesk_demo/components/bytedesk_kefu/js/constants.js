@@ -26,6 +26,9 @@ module.exports = {
   CHAT_TYPE_WORKGROUP: 'workGroup',
   CHAT_TYPE_APPOINTED: 'appointed',
   //
+  vibrate: 'bytedesk_vibrate',
+  playAudio: 'bytedesk_playAudio',
+  //
   EVENT_BUS_MESSAGE: 'BYTEDESK_EVENT_BUS_MESSAGE',
   // 上传图片
   UPLOAD_IMAGE_URL: 'https://www.bytedesk.com/visitor/api/upload/image',

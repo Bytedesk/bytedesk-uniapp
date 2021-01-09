@@ -35,7 +35,9 @@ var stompApi = {
       } else {
         console.log('提示连接断开，无法发送消息')
 		// 重连
-		connectWebSocket();
+		setTimeout(function () {
+			connectWebSocket();
+		}, 5000)
       }
     }
 
@@ -69,6 +71,11 @@ var stompApi = {
 
     // 创建一个 WebSocket 连接
     function connectWebSocket() {
+	  //
+	  if (socketConnected) {
+		  return
+	  }
+	  //
       uni.connectSocket({
         url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessToken),
         header: {
@@ -104,7 +111,9 @@ var stompApi = {
       if (!socketConnected) {
         // 断线重连
         if (reconnect) {
-          connectWebSocket();
+          setTimeout(function () {
+			  connectWebSocket();
+		  }, 5000)
         }
       }
     })
@@ -115,10 +124,11 @@ var stompApi = {
       socketConnected = false;
       // 断线重连
       if (reconnect) {
-        connectWebSocket();
+        setTimeout(function () {
+        	connectWebSocket();
+        }, 5000)
       }
     })
-
     //
     connectWebSocket();
     stompApi.stompConnect(webSocket)

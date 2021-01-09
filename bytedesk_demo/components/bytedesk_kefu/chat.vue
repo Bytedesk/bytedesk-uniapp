@@ -147,6 +147,7 @@
 import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
 import * as stompApi from '@/components/bytedesk_kefu/js/api/stompapi.js'
+import Vue from 'vue'
 // rpx和px的比率
 var l
 // 可用窗口高度
@@ -195,7 +196,8 @@ export default {
 		uni.setNavigationBarTitle({
 		　　title:this.option.title
 		})
-		this.login(this.option)
+		// this.login(this.option)
+		this.requestThread(this.option)
 	},
 	onHide () {},
 	data() {
@@ -469,29 +471,29 @@ export default {
 			}
 		},
 		//
-		login(option) {
-			// 萝卜丝-匿名登录
-			try {
-			    // 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
-			    let subDomain = uni.getStorageSync(constants.subDomain)
-			    // 登录后台->渠道管理-》uniapp中创建应用获取
-			    let appKey = uni.getStorageSync(constants.appKey)
-			    if (subDomain && appKey) {
-			        // console.log(subDomain, appKey);
-					let app = this
-					httpApi.anonymousLogin(subDomain, appKey, function(result) {
-						// 请求会话
-						app.requestThread(option)
-					}, function(error) {
-						console.log('login error:', error)
-					})
-			    } else {
-					console.error('未设置subDomain或appKey')
-				}
-			} catch (error) {
-			    console.error('read subdomain/appkey error', error)
-			}
-		},
+		// login(option) {
+		// 	// 萝卜丝-匿名登录
+		// 	try {
+		// 	    // 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
+		// 	    let subDomain = uni.getStorageSync(constants.subDomain)
+		// 	    // 登录后台->渠道管理-》uniapp中创建应用获取
+		// 	    let appKey = uni.getStorageSync(constants.appKey)
+		// 	    if (subDomain && appKey) {
+		// 	        // console.log(subDomain, appKey);
+		// 			let app = this
+		// 			httpApi.anonymousLogin(subDomain, appKey, function(result) {
+		// 				// 请求会话
+		// 				app.requestThread(option)
+		// 			}, function(error) {
+		// 				console.log('login error:', error)
+		// 			})
+		// 	    } else {
+		// 			console.error('未设置subDomain或appKey')
+		// 		}
+		// 	} catch (error) {
+		// 	    console.error('read subdomain/appkey error', error)
+		// 	}
+		// },
 		// 请求会话
 		requestThread (option) {
 			//

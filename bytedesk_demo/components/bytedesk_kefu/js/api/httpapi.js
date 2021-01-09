@@ -13,7 +13,7 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 	try {
 	    const username = uni.getStorageSync(constants.username);
 	    if (username != null && username.length > 0) {
-	        // console.log(username);
+	        console.log(username);
 			// 登录
 			let password = username
 			login(username, password, subDomain, successcb, failedcb);
@@ -346,6 +346,125 @@ export function getVisitorThreads(page, size, successcb, failedcb) {
     },
     header: header,
     method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 查询技能组在线状态
+export function getWorkGroupStatus(workGroupWid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/status/workGroup',
+    data: {
+	  wid: workGroupWid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 查询指定客服在线状态
+export function getAgentStatus(agentUid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/status/agent',
+    data: {
+	  uid: agentUid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 加载用户个人资料
+export function getProfile (successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/user/profile',
+    data: {
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 自定义用户昵称
+export function updateNickname(nickname, successcb, failedcb) {
+  uni.request({
+    url: constants.API_BASE_URL + '/api/user/nickname',
+    data: {
+      'nickname': nickname,
+      'client': constants.client
+    },
+    method: 'POST',
+    header: {
+      'content-type': 'application/json' // 默认值
+    },
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 自定义用户头像
+export function updateAvatar(avatar, successcb, failedcb) {
+  uni.request({
+    url: constants.API_BASE_URL + '/api/user/avatar',
+    data: {
+      'avatar': avatar,
+      'client': constants.client
+    },
+    method: 'POST',
+    header: {
+      'content-type': 'application/json' // 默认值
+    },
     success (res) {
       successcb(res.data)
     },

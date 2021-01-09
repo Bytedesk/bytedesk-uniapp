@@ -1,7 +1,7 @@
 # 萝卜丝智能客服-uniapp sdk
 
 - [官网](https://www.bytedesk.com/)
-- 全部基于vuejs开发，不依赖原生SDK，全开源，支持自定义界面
+- 全部基于vuejs开发，不依赖原生SDK，100%全部开源，支持自定义界面
 - 支持web/h5/小程序/安卓/iOS等全平台
 
 ## Demo下载
@@ -64,10 +64,21 @@ startChat () {
 
 | 首页 | 聊天 | H5 |
 | :----------: | :----------: | :----------: |
-| <img src="./index.jpg?raw=true" width="250"> | <img src="./chat.jpg?raw=true" width="250"> | <img src="./h5.jpg?raw=true" width="250"> |
+| <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/index.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/h5.jpg?raw=true" width="250"> |
 
 ## 技术支持
 
 - QQ-3群: 825257535
 - 公众号：
 - <img src="https://github.com/Bytedesk/bytedesk-flutter/blob/master/luobosi_mp.png?raw=true" width="250">
+
+## 其他
+
+- [Flutter SDK](https://github.com/bytedesk/bytedesk-flutter)
+- [UniApp SDK](https://github.com/bytedesk/bytedesk-uniapp)
+- [iOS SDK](https://github.com/bytedesk/bytedesk-ios)
+- [Android SDK](https://github.com/bytedesk/bytedesk-android)
+- [Web 端接口](https://github.com/bytedesk/bytedesk-web)
+- [微信公众号/小程序接口](https://github.com/bytedesk/bytedesk-wechat)
+- [服务器端接口](https://github.com/bytedesk/bytedesk-server)
+- [机器人](https://github.com/bytedesk/bytedesk-chatbot)

@@ -1,0 +1,64 @@
+<template>
+	<view class="bytedesk">
+		<uni-section title="自定义用户信息" type="line"></uni-section>
+		<uni-list :border="true">
+			<uni-list-item title="设置昵称" clickable @click="setNickname()" :note="nickname" />
+			<uni-list-chat title="设置头像" clickable @click="setAvatar()" :avatar="avatar" :avatar-circle="true" />
+		</uni-list>
+	</view>
+</template>
+
+<script>
+	// 引入js文件
+	import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
+	
+	export default {
+		data() {
+			return {
+				nickname: '',
+				avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png' // 默认显示
+			}
+		},
+		onLoad() {
+			this.getProfile()
+		},
+		methods: {
+			getProfile () {
+				// 查询当前用户信息：昵称、头像
+				let app = this
+				httpApi.getProfile(function(response) {
+					console.log('getProfile success:', response)
+					app.nickname = response.data.nickname
+					app.avatar = response.data.avatar
+				}, function(error) {
+					console.log('getProfile error', error)
+				})
+			},
+			setNickname () {
+				// 可自定义用户昵称-客服端可见
+				let mynickname = '自定义APP昵称uniapp'
+				let app = this
+				httpApi.updateNickname(mynickname, function(response) {
+					console.log('updateNickname success:', response)
+					app.nickname = mynickname
+				}, function(error) {
+					console.log('updateNickname error', error)
+				})
+			},
+			setAvatar () {
+				// 可自定义用户头像url-客服端可见
+				let myavatarurl = 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/visitor_default_avatar.png'; // 头像网址url
+				let app = this
+				httpApi.updateAvatar(myavatarurl, function(response) {
+					console.log('updateAvatar success:', response)
+					app.avatar = myavatarurl
+				}, function(error) {
+					console.log('updateAvatar error', error)
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+</style>

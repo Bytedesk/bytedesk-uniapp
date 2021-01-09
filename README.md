@@ -1,7 +1,7 @@
 # 萝卜丝智能客服-uniapp sdk
 
 - [官网](https://www.bytedesk.com/)
-- 全部基于vuejs开发，不依赖原生SDK，全开源，支持自定义界面
+- 全部基于vuejs开发，不依赖原生SDK，100%全部开源，支持自定义界面
 - 支持web/h5/小程序/安卓/iOS等全平台
 
 ## Demo下载
@@ -65,6 +65,7 @@ startChat () {
 | 首页 | 聊天 | H5 |
 | :----------: | :----------: | :----------: |
 | <img src="./index.jpg?raw=true" width="250"> | <img src="./chat.jpg?raw=true" width="250"> | <img src="./h5.jpg?raw=true" width="250"> |
+| <img src="./chat_type.jpg?raw=true" width="250"> | <img src="./user_info.jpg?raw=true" width="250"> | <img src="./setting.jpg?raw=true" width="250"> |
 
 ## 技术支持
 
