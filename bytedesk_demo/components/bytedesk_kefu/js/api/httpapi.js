@@ -13,7 +13,7 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 	try {
 	    const username = uni.getStorageSync(constants.username);
 	    if (username != null && username.length > 0) {
-	        console.log(username);
+	        // console.log(username);
 			// 登录
 			let password = username
 			login(username, password, subDomain, successcb, failedcb);
@@ -25,7 +25,7 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 				let password = username
 				login(username, password, subDomain, successcb, failedcb);
 			}, function(error) {
-				// console.log('anonymousLogin:' + error)
+				console.log('anonymousLogin:', error)
 			})
 		}
 	} catch (e) {
@@ -38,6 +38,7 @@ export function login(username, password, subDomain, successcb, failedcb) {
 	// console.log('login:', username, password, subDomain);
 	//
 	oauth(username, password, function (result) {
+		// console.log('oauth:', result)
 		// TODO: 建立长连接
 		successcb(result.data)
 	}, function(error) {
@@ -214,7 +215,7 @@ export function registerAnonymous(subDomain, successcb, failedcb) {
       'content-type': 'application/json' // 默认值
     },
     success (res) {
-	  console.log('registerAnonymous:' + res)
+	  // console.log('registerAnonymous success:' + res)
 	  // {
 	  // 	"data": {
 	  // 		"data": {
@@ -241,6 +242,7 @@ export function registerAnonymous(subDomain, successcb, failedcb) {
       successcb(res.data)
     },
     fail (res) {
+	  console.log('registerAnonymous failed:', res)
       failedcb(res.data)
     }
   })
@@ -419,6 +421,62 @@ export function getProfile (successcb, failedcb) {
   uni.request({
     url: constants.API_BASE_URL + '/api/user/profile',
     data: {
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 通过aid，请求智能答案
+export function queryAnswer (tid, aid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/answer/query',
+    data: {
+	  tid: tid,
+	  aid: aid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 输入内容，请求智能答案
+export function messageAnswer (wid, type, aid, content, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/v2/answer/message',
+    data: {
+	  type: type,
+	  wid: wid,
+	  aid: aid,
+	  content: content,
       client: constants.client
     },
     header: header,

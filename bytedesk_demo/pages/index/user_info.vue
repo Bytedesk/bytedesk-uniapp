@@ -32,6 +32,7 @@
 					app.avatar = response.data.avatar
 				}, function(error) {
 					console.log('getProfile error', error)
+					uni.showToast({ title: error, duration: 2000 });
 				})
 			},
 			setNickname () {
@@ -43,6 +44,7 @@
 					app.nickname = mynickname
 				}, function(error) {
 					console.log('updateNickname error', error)
+					uni.showToast({ title: error, duration: 2000 });
 				})
 			},
 			setAvatar () {
@@ -54,6 +56,7 @@
 					app.avatar = myavatarurl
 				}, function(error) {
 					console.log('updateAvatar error', error)
+					uni.showToast({ title: error, duration: 2000 });
 				})
 			}
 		}

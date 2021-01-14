@@ -29,6 +29,7 @@
 					app.historyThreadList = response.data.content
 				}, function(error) {
 					console.log('getVisitorThreads error', error)
+					uni.showToast({ title: error, duration: 2000 });
 				})
 			}
 		}

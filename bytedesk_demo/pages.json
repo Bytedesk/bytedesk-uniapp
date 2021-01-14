@@ -49,7 +49,15 @@
 			}
 		},
 		{
-			"path": "components/bytedesk_kefu/chat",
+			"path": "components/bytedesk_kefu/chat-kf",
+			"style": {
+				"navigationBarTitleText": "萝卜丝智能客服",
+				"navigationBarBackgroundColor":"#007AFF",
+				"navigationBarTextStyle":"white"
+			}
+		},
+		{
+			"path": "components/bytedesk_kefu/chat-im",
 			"style": {
 				"navigationBarTitleText": "萝卜丝智能客服",
 				"navigationBarBackgroundColor":"#007AFF",

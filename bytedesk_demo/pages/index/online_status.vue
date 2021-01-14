@@ -39,6 +39,7 @@
 					app.workGroupOnlineStatus = response.data.status
 				}, function(error) {
 					console.log('getWorkGroupStatus error', error)
+					uni.showToast({ title: error, duration: 2000 });
 				})
 			},
 			getAgentStatus () {
@@ -49,6 +50,7 @@
 					app.agentOnlineStatus = response.data.status
 				}, function(error) {
 					console.log('getAgentStatus error', error)
+					uni.showToast({ title: error, duration: 2000 });
 				})
 			}
 		}

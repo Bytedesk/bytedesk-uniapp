@@ -3,114 +3,118 @@
 		<!-- 空盒子用来防止消息过少时 拉起键盘会遮盖消息 -->
 		<view :animation="anData" style="height:0;"></view>
 		<!-- 消息体 -->
-		<scroll-view scroll-with-animation scroll-y="true" @touchmove="hideKey" style="width: 750rpx;" :style="{'height':srcollHeight}"
-		 :scroll-top="go">
-			<!-- 用来获取消息体高度 -->
-			<view id="content" scroll-with-animation>
-				<!-- 消息 -->
-				<view class="flex-column-start" v-for="(message, i) in messages" :key="i">
-					
-					<text style="text-align: center; margin-top: 10rpx; font-size: 25rpx; color: #AAAAAA;">{{ message.createdAt }}</text>
-					
-					<view style="text-align: center; margin-top: 10rpx;">
-						<text v-if="is_type_notification_agent_close(message)" style="word-break: break-all;">{{ message.content }}</text>
-						<text v-else-if="is_type_notification_visitor_close(message)" style="word-break: break-all;">{{ message.content }}</text>
-						<text v-else-if="is_type_notification_auto_close(message)" style="word-break: break-all;">{{ message.content }}</text>
-						<text v-else-if="is_type_notification_thread_reentry(message)" style="word-break: break-all;">{{ message.content }}</text>
-						<text v-else-if="is_type_notification_offline(message)" style="word-break: break-all;">{{ message.content }}</text>
-						<text v-else-if="is_type_notification_invite_rate(message)" style="word-break: break-all;">{{ message.content }}</text>
-						<text v-else-if="is_type_notification_rate_result(message)" style="word-break: break-all;">{{ message.content }}</text>
-						<text v-else-if="is_type_notification(message)" style="word-break: break-all;">{{ message.content }}</text>
-					</view>
-					
-					<view v-if="!is_type_notification(message)">
-						
-						<!-- 发送消息-->
-						<view v-if="is_self(message)" class="flex justify-end padding-right one-show  align-start  padding-top">
-							
-							<!-- <image class="chat-img margin-left" src="../../static/..." mode="aspectFill" ></image> -->
-							<view class="flex justify-end" style="width: 400rpx;">
-								<!-- 消息状态 -->
-								<view class="status">
-									<text v-if="is_sending(message)" class="fa fa-spinner fa-spin" style="font-size:12px"></text>
-									<text v-if="is_stored(message)" class="fa fa-times-circle" style="font-size:10px"></text>
-									<text v-if="is_received(message)" style="font-size:10px; margin-right: 5px;">送达</text>
-									<text v-if="is_read(message)" style="font-size:10px; margin-right: 5px;">已读</text>
-									<text v-if="is_error(message)" class="fa fa-times-circle" style="font-size:12px"></text>
-								</view>
-								<view class="margin-left padding-chat bg-cyan" style="border-radius: 35rpx;">
-									<text v-if="is_type_text(message)" style="word-break: break-all;">{{ message.content }}</text>
-									<image v-if="is_type_image(message)" class="message-img" :src="message.imageUrl" @click="previewImageMessage(message)" mode="aspectFill" ></image> 
-								</view>
-							</view>
-							<!-- 发送者头像 -->
-							<!-- <image v-if="is_self(message)" style="height: 75rpx;width: 75rpx; margin-left: 10rpx;" class="chat-img" :src="message.user.avatar" mode="aspectFill" ></image> -->
-						</view>
-						
-						<!-- 接收消息 -->
-						<view v-if="!is_self(message)" class="flex-row-start margin-left margin-top one-show">
-							<!-- 头像 -->
-							<view class="chat-img flex-row-center">
-								<image style="height: 75rpx;width: 75rpx;" :src="message.user.avatar" mode="aspectFit"></image>
-							</view>
-							<!-- 消息体 -->
-							<view class="flex" style="width: 500rpx;">
-								<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">
-									
-									<text v-if="is_type_text(message)" style="word-break: break-all;">{{ message.content }}</text>
-									<image v-if="is_type_image(message)" class="message-img" :src="message.imageUrl" @click="previewImageMessage(message)" mode="aspectFill" ></image> 
-									<!-- 消息模板 =>初次问候 -->
-									<view class="flex-column-start" v-if="message.type==1" style="color: #2fa39b;">
-										<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">你可以这样问我:</text>
-										<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item, index) in message.questionList" :key="index">{{item}}</text>
-										<!-- TODO: -->
-										<view class="flex-row-start  padding-top-sm">
-											<text class="my-neirong-sm">没有你要的答案?</text>
-											<text class="padding-left" style="color: #007AFF;">换一批</text>
-										</view>
-									</view>
-									<!-- 消息模板 =>多个答案 -->
-									<view class="flex-column-start" v-if="message.type==2" style="color: #2fa39b;">
-										<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">猜你想问:</text>
-										<!-- 连接服务器应该用item.id -->
-										<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item,index) in message.questionList" :key="index">{{item}}</text>
-									</view>
-									<!-- 消息模板 => 无法回答-->
-									<view class="flex-column-start" v-if="message.type==0">
-										<text class="padding-top-sm" style="color: #2fa39b;">提交意见与反馈</text>
-										<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">下面是一些常见问题,您可以点击对应的文字快速获取答案:</text>
-										<text @click="answer(index)" style="margin-top: 30rpx;color: #2fa39b;" v-for="(item,index) in message.questionList"
-										 :key="index">{{ item }}</text>
-										<view class="flex-row-start  padding-top-sm">
-											<text class="my-neirong-sm">没有你要的答案?</text>
-											<text class="padding-left" style="color: #1396c5;">换一批</text>
-										</view>
-									</view>
-								</view>
-							</view>
-						</view>
-						
-					</view>
+		<view class="content" @touchstart="hideDrawer">
+			<scroll-view scroll-with-animation scroll-y="true" @touchmove="hideKey" style="width: 750rpx;" :style="{'height':srcollHeight}"
+			 :scroll-top="go">
+				<!-- 用来获取消息体高度 -->
+				<view id="content" scroll-with-animation ref="listm">
+					<!-- 消息 -->
+					<view class="flex-column-start" v-for="(message, i) in messages" :key="i">
 
-				</view>
-				
-				<!-- loading是显示 -->
-				<view v-show="msgLoad" class="flex-row-start margin-left margin-top">
-					<view class="chat-img flex-row-center">
-						<image style="height: 75rpx;width: 75rpx;" src="./image/robot.png" mode="aspectFit"></image>
+						<text style="text-align: center; margin-top: 10rpx; font-size: 25rpx; color: #AAAAAA;">{{ message.createdAt }}</text>
+						
+						<view style="text-align: center; margin-top: 10rpx; font-size: 30rpx; color: #AAAAAA;">
+							<text v-if="is_type_notification_agent_close(message)" style="word-break: break-all;">{{ message.content }}</text>
+							<text v-else-if="is_type_notification_visitor_close(message)" style="word-break: break-all;">{{ message.content }}</text>
+							<text v-else-if="is_type_notification_auto_close(message)" style="word-break: break-all;">{{ message.content }}</text>
+							<text v-else-if="is_type_notification_thread_reentry(message)" style="word-break: break-all;">{{ message.content }}</text>
+							<text v-else-if="is_type_notification_offline(message)" style="word-break: break-all;">{{ message.content }}</text>
+							<text v-else-if="is_type_notification_invite_rate(message)" style="word-break: break-all;">{{ message.content }}</text>
+							<text v-else-if="is_type_notification_rate_result(message)" style="word-break: break-all;">{{ message.content }}</text>
+							<text v-else-if="is_type_notification(message)" style="word-break: break-all;">{{ message.content }}</text>
+						</view>
+						
+						<view v-if="!is_type_notification(message)">
+							
+							<!-- 发送消息-->
+							<view v-if="is_self(message)" class="flex justify-end padding-right one-show  align-start  padding-top">
+								
+								<!-- <image class="chat-img margin-left" src="../../static/..." mode="aspectFill" ></image> -->
+								<view class="flex justify-end" style="width: 400rpx;">
+									<!-- 消息状态 -->
+									<view class="status">
+										<text v-if="is_sending(message)" class="fa fa-spinner fa-spin" style="font-size:12px"></text>
+										<text v-if="is_stored(message)" class="fa fa-times-circle" style="font-size:10px"></text>
+										<text v-if="is_received(message)" style="font-size:10px; margin-right: 5px;">送达</text>
+										<text v-if="is_read(message)" style="font-size:10px; margin-right: 5px;">已读</text>
+										<text v-if="is_error(message)" class="fa fa-times-circle" style="font-size:12px"></text>
+									</view>
+									<view class="margin-left padding-chat bg-cyan" style="border-radius: 35rpx;">
+										<text v-if="is_type_text(message)" style="word-break: break-all;">{{ message.content }}</text>
+										<image v-if="is_type_image(message)" class="message-img" :src="message.imageUrl" @click="previewImageMessage(message)" mode="aspectFill" ></image> 
+									</view>
+								</view>
+								<!-- 发送者头像 -->
+								<view>
+									<image style="margin-left: 10rpx; margin-right: 10rpx; height: 75rpx;width: 75rpx;" :src="message.user.avatar" mode="aspectFit"></image>
+								</view>
+								<!-- <image v-if="is_self(message)" style="height: 75rpx;width: 75rpx; margin-left: 10rpx;" class="chat-img" :src="message.user.avatar" mode="aspectFill" ></image> -->
+							</view>
+							
+							<!-- 接收消息 -->
+							<view v-if="!is_self(message)" class="flex-row-start margin-left margin-top one-show">
+								<!-- 头像 -->
+								<view>
+									<image style="height: 75rpx;width: 75rpx;" :src="message.user.avatar" mode="aspectFit"></image>
+								</view>
+								<!-- 消息体 -->
+								<view class="flex" style="width: 500rpx;">
+									<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">									
+										<text v-if="is_type_text(message)" style="word-break: break-all;">{{ message.content }}</text>
+										<image v-if="is_type_image(message)" class="message-img" :src="message.imageUrl" @click="previewImageMessage(message)" mode="aspectFill" ></image> 
+										<!-- 消息模板 =>初次问候 -->
+										<view class="flex-column-start" v-if="message.type==1" style="color: #2fa39b;">
+											<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">你可以这样问我:</text>
+											<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item, index) in message.questionList" :key="index">{{item}}</text>
+											<!-- TODO: -->
+											<view class="flex-row-start  padding-top-sm">
+												<text class="my-neirong-sm">没有你要的答案?</text>
+												<text class="padding-left" style="color: #007AFF;">换一批</text>
+											</view>
+										</view>
+										<!-- 消息模板 =>多个答案 -->
+										<view class="flex-column-start" v-if="message.type==2" style="color: #2fa39b;">
+											<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">猜你想问:</text>
+											<!-- 连接服务器应该用item.id -->
+											<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item,index) in message.questionList" :key="index">{{item}}</text>
+										</view>
+										<!-- 消息模板 => 无法回答-->
+										<view class="flex-column-start" v-if="message.type==0">
+											<text class="padding-top-sm" style="color: #2fa39b;">提交意见与反馈</text>
+											<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">下面是一些常见问题,您可以点击对应的文字快速获取答案:</text>
+											<text @click="answer(index)" style="margin-top: 30rpx;color: #2fa39b;" v-for="(item,index) in message.questionList"
+											 :key="index">{{ item }}</text>
+											<view class="flex-row-start  padding-top-sm">
+												<text class="my-neirong-sm">没有你要的答案?</text>
+												<text class="padding-left" style="color: #1396c5;">换一批</text>
+											</view>
+										</view>
+									</view>
+								</view>
+							</view>
+							
+						</view>
+			
 					</view>
-					<view class="flex" style="width: 500rpx;">
-						<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">
-							<view class="cuIcon-loading turn-load" style="font-size: 35rpx;color: #3e9982;">
+					
+					<!-- loading是显示 -->
+					<view v-show="msgLoad" class="flex-row-start margin-left margin-top">
+						<view class="chat-img flex-row-center">
+							<image style="height: 75rpx;width: 75rpx;" src="./image/robot.png" mode="aspectFit"></image>
+						</view>
+						<view class="flex" style="width: 500rpx;">
+							<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">
+								<view class="cuIcon-loading turn-load" style="font-size: 35rpx;color: #3e9982;">
+								</view>
 							</view>
 						</view>
 					</view>
+					
+					<!-- 防止消息底部被遮 -->
+					<view style="height: 120rpx;"></view>
 				</view>
-				
-				<!-- 防止消息底部被遮 -->
-				<view style="height: 120rpx;"></view>
-			</view>
-		</scroll-view>
+			</scroll-view>
+		</view>
 
 		<!-- 底部导航栏 -->
 		<view class="flex-column-center" style="position: fixed;bottom: -180px;" :animation="animationData">
@@ -125,10 +129,22 @@
 			</view>
 			<!-- 附加栏(自定义) -->
 			<view class="box-normal flex-row-around flex-wrap">
-				<view class="tb-text" @click="takePicture()">
+				<view class="tb-text" @click="chooseImage()">
 					<view class="cuIcon-form"></view>
-					<text>图片</text>
+					<text>相册</text>
 				</view>
+				<view class="tb-text" @click="camera()">
+					<view class="cuIcon-form"></view>
+					<text>拍照</text>
+				</view>
+<!-- 				<view class="tb-text" @click="chooseImage()">
+					<view class="cuIcon-form"></view>
+					<text>视频</text>
+				</view> -->
+<!-- 				<view class="tb-text" @click="chooseImage()">
+					<view class="cuIcon-form"></view>
+					<text>录制</text>
+				</view> -->
 <!-- 				<view class="tb-text">
 					<view class="cuIcon-form"></view>
 					<text>问题反馈</text>
@@ -263,12 +279,6 @@ export default {
 			preSessionId: '',
 			browseInviteBIid: '',
 			//
-			access_token: '',
-			passport: {
-				token: {
-					access_token: '',
-				}
-			},
 			adminUid: '',
 			workGroupWid: '',
 			subDomain: '',
@@ -420,6 +430,18 @@ export default {
 		},
 		my_nickname () {
 			return this.nickname.trim().length > 0 ? this.nickname : this.thread.visitor.nickname
+		},
+		scrollToBottom () {
+			console.log('scroll to bottom');
+			// 聊天记录滚动到最底部
+			let vm = this;
+			this.$nextTick(() => {
+				vm.scrollTop = 9999;
+				// const ulm = vm.$refs.listm;
+				// if (ulm != null) {
+				// 	ulm.scrollTop = ulm.scrollHeight
+				// }
+			})
 		},
 		pushToMessageArray(message) {
 			// 本地发送的消息
@@ -619,7 +641,7 @@ export default {
 			} else if (response.status_code === -3) {
 				// alert('您已经被禁言')
 			}
-			// this.scrollToBottom();
+			this.scrollToBottom();
 			// // 建立长连接
 			this.byteDeskConnect();
 		},
@@ -831,6 +853,7 @@ export default {
 			// }, 100);
 		},
 		sendReceiptMessage (mid, status) {
+			console.log(this.thread);
 			var localId = this.guid();
 			var json = {
 				"mid": localId,
@@ -911,8 +934,7 @@ export default {
 			  }
 			  //
 			  let mid = messageObject.mid;
-			  // 发送消息回执：消息送达
-			  this.sendReceiptMessage(mid, 'received');
+			  // 发送消息回执：消息已读
 			  this.sendReceiptMessage(mid, "read");
 			}
 			else if (messageObject.type === 'notification_browebSockete_invite') {
@@ -954,7 +976,6 @@ export default {
 							return
 						}
 						console.log('do update:', this.messages[i].mid, this.messages[i].content, messageObject.receipt.status)
-						// this.messages[i].status = messageObject.receipt.status
 						Vue.set(this.messages[i], 'status', messageObject.receipt.status)
 					}
 				}
@@ -970,7 +991,7 @@ export default {
 			    && messageObject.type !== 'notification_disconnect') {
 			    this.isRobot = false;
 			    this.pushToMessageArray(messageObject);
-			    // this.scrollToBottom()
+			    this.scrollToBottom()
 			} else {
 			    // TODO: 监听客服端输入状态
 			}
@@ -981,12 +1002,22 @@ export default {
 			return ''
 		},
 		///
-		takePicture () {
+		// 选择图片发送
+		chooseImage(){
+			this.getImage('album');
+		},
+		//拍照发送
+		camera(){
+			this.getImage('camera');
+		},
+		//选照片 or 拍照
+		getImage (type) {
 			// 拍照 + 相册
 			console.log('take picture');
 			let app = this;
 			uni.chooseImage({
 				count: 1, //默认9
+				sourceType:[type],
 			    success: (chooseImageRes) => {
 			        const tempFilePaths = chooseImageRes.tempFilePaths;
 			        uni.uploadFile({
@@ -1020,6 +1051,18 @@ export default {
 					.substring(1)
 			}
 			return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+		},
+		// 打开抽屉
+		openDrawer(){
+			// this.popupLayerClass = 'showLayer';
+		},
+		// 隐藏抽屉
+		hideDrawer(){
+			// this.popupLayerClass = '';
+			// setTimeout(()=>{
+			// 	this.hideMore = true;
+			// 	this.hideEmoji = true;
+			// },150);
 		},
 		// 切换输入法时移动输入框(按照官方的上推页面的原理应该会自动适应不同的键盘高度-->官方bug)
 		goPag(kh) {
@@ -1146,6 +1189,7 @@ export default {
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
 	@import "css/index-app.css";
+	@import "css/style.scss";
 
 	.bottom-dh-char {
 		background-color: #f9f9f9;
@@ -1211,6 +1255,5 @@ export default {
 	
 	.status {
 	    float: right;
-	    margin-right: 8px;
 	}
 </style>

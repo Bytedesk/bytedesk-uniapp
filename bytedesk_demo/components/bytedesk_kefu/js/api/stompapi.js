@@ -16,11 +16,13 @@ let currentThread = {
 
 var stompApi = {
 
-  connect: function(thread) {
+  connect: function(thread, callback) {
     console.log('connect stomp')
 	currentThread = thread;
 	// 已经连接则无需重复连接
 	if (socketConnected) {
+		// 长连接成功回调
+		callback();
 		return
 	}
 
@@ -131,14 +133,14 @@ var stompApi = {
     })
     //
     connectWebSocket();
-    stompApi.stompConnect(webSocket)
+    stompApi.stompConnect(webSocket, callback)
   },
 
   /**
    * stomp长连接
    * TODO: 加载所属工作组，添加订阅
    */
-  stompConnect: function(webSocket) {
+  stompConnect: function(webSocket, callback) {
     /**
      * 定期发送心跳或检测服务器心跳
      *  The heart-beating is using window.setInterval() to regularly send heart-beats and/or check server heart-beats.
@@ -174,6 +176,8 @@ var stompApi = {
       // let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTED
       // commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
       // bus.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+	  // 长连接成功回调
+	  callback()
     }, function (error) {
       console.log('连接断开【' + error + '】')
       // 清空订阅topic，以便于重连后添加订阅
@@ -223,11 +227,9 @@ var stompApi = {
     // subscribedTopics.push(topic)
     //
     stompClient.subscribe("/topic/" + topic, function (message) {
-      console.log('message :', message, 'body:', message.body);
-      //
+      // console.log('message :', message, 'body:', message.body);
       var messageObject = JSON.parse(message.body);
 	  uni.$emit('message', messageObject);
-	  
     });
   },
 

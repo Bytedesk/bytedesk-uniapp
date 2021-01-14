@@ -39,6 +39,7 @@
 				}
 			} catch (error) {
 			    console.error('read vibrate/playAudio error', error)
+				uni.showToast({ title: error, duration: 2000 });
 			}
 		},
 		methods: {

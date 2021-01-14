@@ -18,6 +18,7 @@ import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 export default {
 	data() {
 		return {
+			uid: '',
 			vibrate: true,
 			playAudio: true
 		}
@@ -30,8 +31,11 @@ export default {
 		let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
 		bytedesk.init(subDomain, appKey);
 		
-		// 读取振动、提示音设置(可选)
+		// (可选)
 		try {
+			// 读取用户uid
+			this.uid = uni.getStorageSync(constants.uid)
+			// 读取振动、提示音设置
 		    this.vibrate = uni.getStorageSync(constants.vibrate)
 			if (this.vibrate === null || this.vibrate === '') {
 				this.vibrate = true
@@ -48,7 +52,7 @@ export default {
 		// 监听消息通知
 		let app = this
 		uni.$on('message',function(messageObject) {
-			// console.log('uni on message');
+			// console.log('messageObject index:', messageObject);
 			if (messageObject.type === 'text') {
 				console.log('receive text:', messageObject.text.content);
 			} else if (messageObject.type === 'image') {
@@ -62,13 +66,27 @@ export default {
 			} else {
 				console.log('其他类型消息')
 			}
-			// 仅支持APP
-			// #ifdef APP-PLUS
-			// 振动
-			app.doVibrate();
-			// 播放提示音
-			app.doPlayAudio();
-			// #endif
+			//
+			// try {
+			// 	//
+			// 	if (this.uid === null || this.uid === undefined || this.uid === '') {
+			// 		this.uid = uni.getStorageSync(constants.uid)
+			// 	}
+			// 	// 判断是否是自己发送的消息，非自己发送的消息才会播放提示
+			// 	if (messageObject.user.uid !== this.uid) {
+			// 		console.log(messageObject.user.uid, this.uid);
+			// 		// 仅支持APP
+			// 		// #ifdef APP-PLUS
+			// 		// 振动
+			// 		app.doVibrate();
+			// 		// 播放提示音
+			// 		app.doPlayAudio();
+			// 		// #endif
+			// 	}
+			// } catch (error) {
+			//     console.error('read vibrate/playAudio error', error)
+			// }
+			
 		})
 	},
 	methods: {
@@ -80,11 +98,15 @@ export default {
 			// 仅支持APP
 			// #ifdef APP-PLUS
 			// 振动
-			uni.vibrate({
-			    success: function () {
-			        console.log('振动');
-			    }
-			});
+			// iOS上只有长震动，没有短震动
+			// iOS上需要手机设置“打开响铃时震动”或“静音时震动”，否则无法震动
+			// vibrate只适用于钉钉小程序、支付宝小程序
+			// 
+			// uni.vibrate({
+			//     success: function () {
+			//         console.log('振动');
+			//     }
+			// });
 			// #endif
 		},
 		// 播放提示音
