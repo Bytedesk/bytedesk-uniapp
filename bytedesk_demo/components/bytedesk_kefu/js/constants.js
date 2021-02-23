@@ -1,23 +1,25 @@
 // 常量
 module.exports = {
   // 测试
-  IS_PRODUCTION: false,
-  API_BASE_URL: 'http://192.168.0.104:8000',
-  WEBSOCKET_URL: 'ws://192.168.0.104:8000/stomp/mini?access_token=',
+  // IS_PRODUCTION: false,
+  // API_BASE_URL: 'http://192.168.0.105:8000',
+  // WEBSOCKET_URL: 'ws://192.168.0.105:8000/stomp/mini?access_token=',
   // API_BASE_URL: 'http://127.0.0.1:8000',
   // WEBSOCKET_URL: 'ws://127.0.0.1:8000/stomp/mini?access_token=',
   // 线上环境
-  // IS_PRODUCTION: true,
-  // API_BASE_URL: 'https://www.bytedesk.com',
-  // WEBSOCKET_URL: 'wss://www.bytedesk.com/stomp/mini?access_token=',
+  IS_PRODUCTION: true,
+  API_BASE_URL: 'https://www.bytedesk.com',
+  WEBSOCKET_URL: 'wss://www.bytedesk.com/stomp/mini?access_token=',
   //
   uid: 'bytedesk_uid',
   username: 'bytedesk_username',
+  password: 'bytedesk_password',
   nickname: 'bytedesk_nickname',
   avatar: 'bytedesk_avatar',
   description: 'bytedesk_description',
   subDomain: 'bytedesk_subDomain',
   isLogin: 'bytedesk_isLogin',
+  isLoginMobile: 'bytedesk_isLogin_Mobile',
   accessToken: 'bytedesk_accessToken',
   refreshToken: 'bytedesk_refreshToken',
   client: 'uniapp',

@@ -296,10 +296,17 @@ export default {
 			adminUid: '',
 			workGroupWid: '',
 			subDomain: '',
+			// TODO: 区分安卓、ios、小程序等
 			client: 'uniapp',
 			thread: {
 				id: 0,
-				tid: ''
+				tid: '',
+				topic: '',
+				visitor: {
+					uid: '',
+					nickname: 'visitor',
+					avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/visitor_default_avatar.png'
+				}
 			},
 			// 已经订阅的topic
 			subscribedTopics: [],
@@ -377,7 +384,7 @@ export default {
 	},
 	computed: {
 		threadTopic() {
-			return this.thread.topic.replace(/\//, ".");
+			return this.thread.topic.replace(/\//g, ".");
 		},
 	},
 	methods:{
@@ -488,7 +495,7 @@ export default {
 			// return content === null ? '{"categoryCode":"","content":"","id":"0","imageUrl":"","price":"","title":"","type":"commodity","url":""}' : JSON.parse(content);
 		},
 		scrollToBottom () {
-			console.log('scroll to bottom');
+			// console.log('scroll to bottom');
 			// 聊天记录滚动到最底部
 			let vm = this;
 			this.$nextTick(() => {
@@ -584,6 +591,7 @@ export default {
 			    this.username = uni.getStorageSync(constants.username)
 			    this.nickname = uni.getStorageSync(constants.nickname)
 			    this.avatar = uni.getStorageSync(constants.avatar)
+				// console.log('uid 1:', this.uid)
 			} catch (error) {
 			    console.error('read uid/username error', error)
 			}
@@ -615,7 +623,7 @@ export default {
 		},
 		// 
 		dealWithThread (response) {
-			//
+			// console.log('')
 			let message = response.data;
 			if (response.status_code === 200) {
 				//
@@ -680,7 +688,7 @@ export default {
 					this.pushToMessageArray(message);
 				}
 				// 1. 保存thread
-				this.thread = message.thread;
+				// this.thread = message.thread;
 				// 3. 加载聊天记录
 				// this.loadHistoryMessages();
 				// 返回机器人初始欢迎语 + 欢迎问题列表
@@ -738,7 +746,11 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				httpApi.sendMessageRest(JSON.stringify(json))
+			}
 		},
 		sendImageMessageSync(imageUrl) {
 			console.log('sendImageMessageSync:', imageUrl);
@@ -769,10 +781,15 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				httpApi.sendMessageRest(JSON.stringify(json))
+			}
 		},
 		sendVoiceMessageSync(voiceUrl, length, format) {
-			console.log('sendVoiceMessageSync:', voiceUrl);
+			// console.log('sendVoiceMessageSync:', voiceUrl);
 			//
 			let localId = this.guid();
 			var json = {
@@ -802,10 +819,15 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				httpApi.sendMessageRest(JSON.stringify(json))
+			}
 		},
 		sendVideoMessageSync(videoUrl) {
-			console.log('sendVideoMessageSync:', videoUrl);
+			// console.log('sendVideoMessageSync:', videoUrl);
 			//
 			let localId = this.guid();
 			var json = {
@@ -833,7 +855,12 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				httpApi.sendMessageRest(JSON.stringify(json))
+			}
 		},
 		sendCommodityMessageSync() {
 			let goods = this.option.goods
@@ -867,7 +894,12 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				httpApi.sendMessageRest(JSON.stringify(json))
+			}
 		},
 		appendCommodityInfo () {
 			let goods = this.option.goods
@@ -952,7 +984,12 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
+			// stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				httpApi.sendMessageRest(JSON.stringify(json))
+			}
 		},
 		sendTextMessage () {
 			//
@@ -973,7 +1010,7 @@ export default {
 			// }, 100);
 		},
 		sendReceiptMessage (mid, status) {
-			console.log(this.thread);
+			// console.log(this.thread);
 			var localId = this.guid();
 			var json = {
 				"mid": localId,
@@ -1001,8 +1038,12 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			// 收到消息后，向服务器发送回执
+			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				httpApi.sendMessageRest(JSON.stringify(json))
+			}
 		},
 		sendRecallMessage (mid) {
 			var localId = this.guid();
@@ -1031,8 +1072,12 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
-			// 收到消息后，向服务器发送回执
+			// stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				httpApi.sendMessageRest(JSON.stringify(json))
+			}
 		},
 		// 建立长连接
 		byteDeskConnect () {
@@ -1065,13 +1110,25 @@ export default {
 			    messageObject.content = messageObject.text.content;
 			  } else if (messageObject.type === "image") {
 			    messageObject.imageUrl = messageObject.image.imageUrl;
+			  } else if (messageObject.type === "file") {
+			    messageObject.fileUrl = messageObject.file.fileUrl;
+			  } else if (messageObject.type === "voice") {
+			    messageObject.voiceUrl = messageObject.voice.voiceUrl;
+			  } else if (messageObject.type === "video") {
+			    messageObject.videoOrShortUrl = messageObject.video.videoOrShortUrl;
 			  } else if (messageObject.type === "commodity") {
 				messageObject.content = messageObject.text.content;
 			  }
 			  //
 			  let mid = messageObject.mid;
-			  // 发送消息回执：消息已读
-			  this.sendReceiptMessage(mid, "read");
+			  // this.thread.topic = messageObject.thread.topic;
+			  // 非自己发送的消息，发送消息回执: 消息已读
+			  // console.log('uid 2:', messageObject.user.uid)
+			  // console.log('uid 3:', this.uid)
+			  if (messageObject.user.uid !== this.uid) {
+				  // console.log('do send receipt');
+				  this.sendReceiptMessage(mid, "read");
+			  }
 			}
 			else if (messageObject.type === 'notification_browebSockete_invite') {
 			  //

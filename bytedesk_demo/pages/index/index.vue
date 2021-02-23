@@ -1,11 +1,11 @@
 <template>
 	<view class="bytedesk">
 		<uni-list>
-			<uni-list-item title="联系客服" :to="`./chat_type`" note="人工/机器人/电商/附言" showArrow />
-			<uni-list-item title="用户信息" :to="`./user_info`" note="自定义用户信息" showArrow />
+			<uni-list-item title="联系客服" :to="`./chat_type`" note="人工/机器人/电商/附言/H5" showArrow />
+			<uni-list-item title="用户信息" :to="`./user_info`" note="自定义用户昵称/头像" showArrow />
 			<uni-list-item title="在线状态" :to="`./online_status`" note="客服是否在线" showArrow />
 			<uni-list-item title="历史会话" :to="`./history_thread`" note="历史会话记录" showArrow />
-			<uni-list-item title="消息提示" :to="`./setting`" note="声音/振动提示" showArrow />
+			<uni-list-item title="消息提示" :to="`./setting`" note="声音/振动提示开启/关闭" showArrow />
 		</uni-list>
 	</view>
 </template>
@@ -27,7 +27,7 @@ export default {
 		// 萝卜丝第二步：初始化
 		// 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
 		let subDomain = 'vip'
-		// 登录后台->渠道管理-》uniapp中创建应用获取
+		// 登录后台->渠道管理-》uniapp中创建应用获取appkey
 		let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
 		bytedesk.init(subDomain, appKey);
 		
@@ -49,7 +49,7 @@ export default {
 		}
 	},
 	onReady () {
-		// 监听消息通知
+		// 监听消息通知, 可选
 		let app = this
 		uni.$on('message',function(messageObject) {
 			// console.log('messageObject index:', messageObject);

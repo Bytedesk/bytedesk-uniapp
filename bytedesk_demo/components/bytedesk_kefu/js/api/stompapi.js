@@ -17,7 +17,7 @@ let currentThread = {
 var stompApi = {
 
   connect: function(thread, callback) {
-    console.log('connect stomp')
+    stompApi.printLog('connect stomp')
 	currentThread = thread;
 	// 已经连接则无需重复连接
 	if (socketConnected) {
@@ -28,14 +28,14 @@ var stompApi = {
 
     // 发送消息
     function sendSocketMessage(msg) {
-	  // console.log('sendSocketMessage:', msg)
+	  // printLog('sendSocketMessage:', msg)
       // 如果socket已连接则发送消息
       if (socketConnected) {
         uni.sendSocketMessage({
           data: msg
         })
       } else {
-        console.log('提示连接断开，无法发送消息')
+        stompApi.printLog('提示连接断开，无法发送消息')
 		// 重连
 		setTimeout(function () {
 			connectWebSocket();
@@ -45,7 +45,7 @@ var stompApi = {
 
     // 关闭连接
     function close() {
-	  console.log('close')
+	  stompApi.printLog('close')
       if (socketConnected) {
         uni.closeSocket()
         socketConnected = false;
@@ -54,13 +54,13 @@ var stompApi = {
 	
 	//
 	function onopen() {
-		console.log('onopen');
+		stompApi.printLog('onopen');
 		// stompApi.stompConnect(webSocket)
 	}
 	
 	//
 	function onmessage(message) {
-		console.log('onmessage:', message)
+		// printLog('onmessage:', message)
 	}
 
     // 符合WebSocket定义的对象
@@ -84,20 +84,20 @@ var stompApi = {
           // access_token: app.globalData.token.access_token
         },
         success() {
-          console.log("socket连接成功")
+          stompApi.printLog("socket连接成功")
         },
         fail() {
-          console.log("socket连接失败")
+          stompApi.printLog("socket连接失败")
         },
         complete() {
-          console.log("socket连接完成");
+          stompApi.printLog("socket连接完成");
         }
       })
     }
 
     // 监听 WebSocket 连接打开事件
     uni.onSocketOpen(function (result) {
-      console.log("SocketOpen:", result)
+      stompApi.printLog("SocketOpen:" + result)
       socketConnected = true;
       webSocket.onopen();
     })
@@ -109,7 +109,7 @@ var stompApi = {
 
     // 监听 WebSocket 错误事件
     uni.onSocketError(function (result) {
-      console.log("SocketError:", result)
+      stompApi.printLog("SocketError:" + result)
       if (!socketConnected) {
         // 断线重连
         if (reconnect) {
@@ -122,7 +122,7 @@ var stompApi = {
 
     // 监听 WebSocket 连接关闭事件
     uni.onSocketClose(function (result) {
-      console.log("SocketClose:", result)
+      stompApi.printLog("SocketClose:" + result)
       socketConnected = false;
       // 断线重连
       if (reconnect) {
@@ -156,21 +156,21 @@ var stompApi = {
     };
 
     stompClient = Stomp.over(webSocket);
-    console.log('stomp connecting...')
+    stompApi.printLog('stomp connecting...')
     // let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTING
     // commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
     // bus.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
     // to disable logging, set it to an empty function:
-    // if (constants.IS_PRODUCTION) {
-    //   stompClient.debug = function (value) {}
-    // }
+    if (constants.IS_PRODUCTION) {
+      stompClient.debug = function (value) {}
+    }
     stompClient.connect({}, function (frame) {
-      console.log('Connected: ', frame);
+      // printLog('Connected: ' + frame);
       // TODO: 断开重连成功之后，需要重新从服务器请求thread，然后添加sub订阅
       // 登录成功之后，尝试登录次数清零
       stompReconnectTimes = 0
 	  // 订阅topic
-	  let topic = currentThread.topic.replace(/\//, ".");
+	  let topic = currentThread.topic.replace(/\//g, "."); //replace(/\//, ".");
 	  stompApi.subscribeTopic(topic)
       // 更新连接状态：连接成功
       // let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTED
@@ -179,7 +179,7 @@ var stompApi = {
 	  // 长连接成功回调
 	  callback()
     }, function (error) {
-      console.log('连接断开【' + error + '】')
+      stompApi.printLog('连接断开【' + error + '】')
       // 清空订阅topic，以便于重连后添加订阅
       // commit(types.CLEAR_TOPIC, { root: true })
       // 统计连接次数，如果短时间内重试连接次数过多，则说明有可能token过期，需要刷新页面重新登录一下
@@ -192,7 +192,7 @@ var stompApi = {
       // bus.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
       // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
       setTimeout(function () {
-        console.log('reconnecting...')
+        stompApi.printLog('reconnecting...')
         // 增加尝试连接次数
         stompReconnectTimes++
         // 重新连接
@@ -203,7 +203,7 @@ var stompApi = {
   
   // 发送消息
   sendMessage: function(topic, jsonString) {
-    console.log('sendMessage:', topic, jsonString)
+    // console.log('sendMessage:', topic, jsonString)
     //
     stompClient.send("/app/" + topic, {},
       jsonString
@@ -216,7 +216,7 @@ var stompApi = {
    * @param topic
    */
   subscribeTopic: function(topic) {
-    console.log('subscribeTopic:' + topic)
+    stompApi.printLog('subscribeTopic:' + topic)
 	//
     // let contains = subscribedTopics.some(tp => {
     //   return tp === topic
@@ -248,8 +248,18 @@ var stompApi = {
    */
   stompDisconnect: function() {
     stompClient.disconnect(function () {
-      console.log('stomp disconnect')
+      stompApi.printLog('stomp disconnect')
     })
+  },
+  
+  isConnected: function () {
+	  return socketConnected;
+  },
+  
+  printLog: function(content) {
+	  if (!constants.IS_PRODUCTION) {
+		  console.log(content)
+	  }
   }
 
 }
@@ -258,10 +268,6 @@ module.exports = {
   // stompClient: stompClient,
   connect: stompApi.connect,
   subscribeTopic: stompApi.subscribeTopic,
-  sendMessage: stompApi.sendMessage
-  // sendImageMessage: stompApi.sendImageMessage,
-  // sendContactTextMessage: stompApi.sendContactTextMessage,
-  // sendContactImageMessage: stompApi.sendContactImageMessage,
-  // sendGroupTextMessage: stompApi.sendGroupTextMessage,
-  // sendGroupImageMessage: stompApi.sendGroupImageMessage
+  sendMessage: stompApi.sendMessage,
+  isConnected: stompApi.isConnected
 }

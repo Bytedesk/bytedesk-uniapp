@@ -328,7 +328,7 @@ export default {
 	},
 	computed: {
 		threadTopic() {
-			return this.thread.topic.replace(/\//, ".");
+			return this.thread.topic.replace(/\//g, ".");
 		},
 	},
 	methods: {
@@ -1189,7 +1189,8 @@ export default {
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
 	@import "css/index-app.css";
-	@import "css/style.scss";
+	/* 微信小程序编译报错 */
+	/* @import "css/style.scss"; */
 
 	.bottom-dh-char {
 		background-color: #f9f9f9;

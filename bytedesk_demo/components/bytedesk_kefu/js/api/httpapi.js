@@ -35,11 +35,10 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 }
 
 export function login(username, password, subDomain, successcb, failedcb) {
-	// console.log('login:', username, password, subDomain);
+	console.log('login:', username, password, subDomain);
 	//
-	oauth(username, password, function (result) {
-		// console.log('oauth:', result)
-		// TODO: 建立长连接
+	oauth(username, password, subDomain, function (result) {
+		console.log('oauth:', result)
 		successcb(result.data)
 	}, function(error) {
 		failedcb(error.data)
@@ -62,7 +61,7 @@ export function code2Session (code, successcb, failedcb) {
   })
 }
 
-export function oauth(username, password, successcb, failedcb) {
+export function oauth(username, password, subDomain, successcb, failedcb) {
   // console.log('oauth/token: ', username, password)
   //
   uni.request({
@@ -93,13 +92,20 @@ export function oauth(username, password, successcb, failedcb) {
 	  // 	"errMsg": "request:ok",
 	  // 	"statusCode": 200
 	  // }
-	  try {
-	      uni.setStorageSync(constants.isLogin, true);
-		  uni.setStorageSync(constants.accessToken, res.data.access_token)
-	  } catch (e) {
-	      // error
+	  if (res.data != null && res.data.access_token != null) {
+		try {
+		    uni.setStorageSync(constants.isLogin, true);
+			uni.setStorageSync(constants.username, username);
+			uni.setStorageSync(constants.password, password);
+			uni.setStorageSync(constants.subDomain, subDomain);
+			uni.setStorageSync(constants.accessToken, res.data.access_token)
+		} catch (e) {
+		    // error
+		}
+		successcb(res.data)
+	  } else {
+		  failedcb(res)
 	  }
-      successcb(res.data)
     },
     fail(res) {
       failedcb(res.data)
@@ -123,7 +129,18 @@ export function smsOauth(mobile, code, successcb, failedcb) {
     },
     method: 'POST',
     success(res) {
-      successcb(res.data)
+      if (res.data != null && res.data.access_token != null) {
+		try {
+			uni.setStorageSync(constants.isLogin, true);
+			uni.setStorageSync(constants.isLoginMobile, true);
+			uni.setStorageSync(constants.accessToken, res.data.access_token)
+		} catch (e) {
+			// error
+		}
+		successcb(res.data)
+      } else {
+        failedcb(res)
+      }
     },
     fail(res) {
       failedcb(res.data)
@@ -146,7 +163,18 @@ export function wechatOauth(unionid, successcb, failedcb) {
     },
     method: 'POST',
     success(res) {
-      successcb(res.data)
+      if (res.data != null && res.data.access_token != null) {
+      		try {
+      			uni.setStorageSync(constants.isLogin, true);
+      		uni.setStorageSync(constants.isLoginMobile, true);
+      			uni.setStorageSync(constants.accessToken, res.data.access_token)
+      		} catch (e) {
+      			// error
+      		}
+      		successcb(res.data)
+      } else {
+        failedcb(res)
+      }
     },
     fail(res) {
       failedcb(res.data)
@@ -154,14 +182,36 @@ export function wechatOauth(unionid, successcb, failedcb) {
   })
 }
 
-export function register(mobile, password, successcb, failedcb) {
+// export function register(mobile, password, successcb, failedcb) {
+//   // console.log('register:', mobile, password)
+//   uni.request({
+//     url: constants.API_BASE_URL + '/visitors/api/v1/register/mobile',
+//     data: {
+//       'mobile': mobile,
+//       'password': mobile,
+//       'admin': false, // 学校端时，修改为true
+//       'client': constants.client
+//     },
+//     method: 'POST',
+//     header: {
+//       'content-type': 'application/json' // 默认值
+//     },
+//     success (res) {
+//       successcb(res.data)
+//     },
+//     fail (res) {
+//       failedcb(res.data)
+//     }
+//   })
+// }
+
+export function mobileRegister(mobile, nickname, successcb, failedcb) {
   // console.log('register:', mobile, password)
   uni.request({
-    url: constants.API_BASE_URL + '/visitors/api/v1/register/mobile',
+    url: constants.API_BASE_URL + '/visitor/api/register/mobile',
     data: {
       'mobile': mobile,
-      'password': mobile,
-      'admin': false, // 学校端时，修改为true
+	  'nickname': nickname,
       'client': constants.client
     },
     method: 'POST',
@@ -265,7 +315,17 @@ export function registerUser(username, nickname, password, subDomain, successcb,
       'content-type': 'application/json' // 默认值
     },
     success (res) {
-      successcb(res.data)
+		try {
+		    uni.setStorageSync(constants.uid, res.data.data.uid);
+				  uni.setStorageSync(constants.username, res.data.data.username);
+				  uni.setStorageSync(constants.nickname, res.data.data.nickname);
+				  uni.setStorageSync(constants.avatar, res.data.data.avatar);
+				  uni.setStorageSync(constants.description, res.data.data.description);
+				  uni.setStorageSync(constants.subDomain, res.data.data.subDomain);
+		} catch (e) {
+		    // error
+		}
+		successcb(res.data)
     },
     fail (res) {
       failedcb(res.data)
@@ -492,12 +552,19 @@ export function messageAnswer (wid, type, aid, content, successcb, failedcb) {
 
 // 自定义用户昵称
 export function updateNickname(nickname, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not loggined')
+	  return
+	}
   uni.request({
     url: constants.API_BASE_URL + '/api/user/nickname',
     data: {
       'nickname': nickname,
       'client': constants.client
     },
+	header: header,
     method: 'POST',
     header: {
       'content-type': 'application/json' // 默认值
@@ -513,12 +580,20 @@ export function updateNickname(nickname, successcb, failedcb) {
 
 // 自定义用户头像
 export function updateAvatar(avatar, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not loggined')
+	  return
+	}
+	
   uni.request({
     url: constants.API_BASE_URL + '/api/user/avatar',
     data: {
       'avatar': avatar,
       'client': constants.client
     },
+	header: header,
     method: 'POST',
     header: {
       'content-type': 'application/json' // 默认值
@@ -530,6 +605,75 @@ export function updateAvatar(avatar, successcb, failedcb) {
       failedcb(res.data)
     }
   })
+}
+
+// 在长连接断开的情况下，发送消息
+export function sendMessageRest(json, successcb, failedcb) {
+  console.log('sendMessageRest:' + json)
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+	failedcb('not loggined')
+	return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/send',
+    data: {
+      'json': json,
+      'client': constants.client
+    },
+  	header: header,
+    method: 'POST',
+    header: {
+      'content-type': 'application/json' // 默认值
+    },
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+/**
+ * 登出
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function logout(successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not loggined')
+	  return
+	}
+	uni.request({
+		url: constants.API_BASE_URL + '/api/user/logout',
+		data: {
+		  'client': constants.HTTP_CLIENT
+		},
+		header: header,
+		method: 'POST',
+		success(res) {
+		  try {
+		  	uni.setStorageSync(constants.isLogin, false);
+		  	uni.setStorageSync(constants.isLoginMobile, false);
+		  	uni.setStorageSync(constants.accessToken, '')
+		  } catch (e) {
+		  	// error
+		  }
+		  successcb(res.data)
+		},
+		fail(res) {
+		  console.log('failed:' + res.data)
+		  failedcb(res.data)
+		},
+		complete(res) {
+		  console.log('completed:' + res.data)
+		}
+	})
 }
 
 export function visitorApiHeader() {
