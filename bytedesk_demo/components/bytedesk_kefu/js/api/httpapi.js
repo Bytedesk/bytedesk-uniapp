@@ -469,6 +469,34 @@ export function getAgentStatus(agentUid, successcb, failedcb) {
   })
 }
 
+// 加载更多聊天记录
+export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/user',
+    data: {
+	  uid: uid,
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 加载用户个人资料
 export function getProfile (successcb, failedcb) {
   //
