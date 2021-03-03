@@ -1,7 +1,7 @@
 <template>
 	<view class="bytedesk">
 		<uni-section title="历史会话" type="line"></uni-section>
-		<uni-list-chat v-for="thread in historyThreadList" :key="thread.tid" :title="thread.nickname" :note="thread.content" :time="thread.timestamp" showArrow/>
+		<uni-list-chat v-for="thread in historyThreadList" :key="thread.tid" :avatar="thread.avatar" :title="thread.nickname" :note="thread.content" :time="thread.timestamp" showArrow/>
 	</view>
 </template>
 

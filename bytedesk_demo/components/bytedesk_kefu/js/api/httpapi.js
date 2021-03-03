@@ -390,7 +390,89 @@ export function requestAgent(wid, type, aid, successcb, failedcb) {
   })
 }
 
-//
+// 客服端：当前进行中会话
+export function getCurrentThreads(page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/thread/visitor/history',
+    data: {
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 客服端：客服获取某访客历史会话
+export function getHistoryThreads(uid, page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/thread/history',
+    data: {
+	  uid: uid,
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 客服端分页加载-客服自己的历史会话：客服会话
+export function getThreadHistoryRecords(page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/thread/history/records',
+    data: {
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 访客端-历史会话
 export function getVisitorThreads(page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()

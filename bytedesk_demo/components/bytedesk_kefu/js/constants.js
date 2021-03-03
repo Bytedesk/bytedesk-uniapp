@@ -33,11 +33,11 @@ module.exports = {
   //
   EVENT_BUS_MESSAGE: 'BYTEDESK_EVENT_BUS_MESSAGE',
   // 上传图片
-  UPLOAD_IMAGE_URL: 'https://www.bytedesk.com/visitor/api/upload/image',
+  UPLOAD_IMAGE_URL: 'https://upload.bytedesk.com/visitor/api/upload/image',
   // 上传语音
-  UPLOAD_VOICE_URL: 'https://www.bytedesk.com/visitor/api/upload/voice',
+  UPLOAD_VOICE_URL: 'https://upload.bytedesk.com/visitor/api/upload/voice',
   // 上传视频
-  UPLOAD_VIDEO_URL: 'https://www.bytedesk.com/visitor/api/upload/video',
+  UPLOAD_VIDEO_URL: 'https://upload.bytedesk.com/visitor/api/upload/video',
   // 上传文件
-  UPLOAD_FILE_URL: 'https://www.bytedesk.com/visitor/api/upload/file',
+  UPLOAD_FILE_URL: 'https://upload.bytedesk.com/visitor/api/upload/file',
 }

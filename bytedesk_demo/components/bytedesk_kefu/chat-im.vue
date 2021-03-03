@@ -339,7 +339,7 @@ export default {
 		};
 	},
 	onLoad(option) {
-		this.getMsgList();
+		// this.getMsgList();
 		//语音自然播放结束
 		this.AUDIO.onEnded((res)=>{
 			this.playMsgid=null;
@@ -504,7 +504,7 @@ export default {
 			// });
 		},
 		scrollToMessage (message) {
-			console.log('scroll to ', message.mid);
+			// console.log('scroll to ', message.mid);
 			this.$nextTick(function() {
 				this.scrollToView = 'msg'+message.mid;//跳转上次的第一行信息位置
 				this.$nextTick(function() {
@@ -520,71 +520,6 @@ export default {
 			// 	app.$previewRefresh()
 			// }
 		},
-		/**
-		 * 1. 首先判断是否已经注册过
-		 * 2. 如果已经注册过，则直接调用登录接口
-		 * 3. 如果没有注册过，则从服务器请求用户名
-		 */
-		requestUsername () {
-			// this.username = localStorage.bd_kfe_username;
-			// this.password = this.username;
-			if (this.username) {
-				// this.login();
-			} else {
-				//
-				// $.ajax({
-				// 	url: this.HTTP_HOST + '/visitor/api/username',
-				// 	contentType: "application/json; charset=utf-8",
-				// 	type: "get",
-				// 	data: {
-				// 		nickname: this.nickname,
-				// 		subDomain: this.subDomain,
-				// 		client: this.client
-				// 	},
-				// 	success: function (response) {
-				// 		console.log('user:', response.data);
-				// 		// 登录
-				// 		app.uid = response.data.uid;
-				// 		app.username = response.data.username;
-				// 		app.password = app.username;
-				// 		app.nickname = response.data.nickname;
-				// 		// 本地存储
-				// 		localStorage.bd_kfe_uid = app.uid;
-				// 		localStorage.bd_kfe_username = app.username;
-				// 		// 登录
-				// 		app.login();
-				// 	},
-				// 	error: function (error) {
-				// 		//Do Something to handle error
-				// 		console.log(error);
-				// 	}
-				// });
-			}
-		},
-		//
-		// login(option) {
-		// 	// 萝卜丝-匿名登录
-		// 	try {
-		// 	    // 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
-		// 	    let subDomain = uni.getStorageSync(constants.subDomain)
-		// 	    // 登录后台->渠道管理-》uniapp中创建应用获取
-		// 	    let appKey = uni.getStorageSync(constants.appKey)
-		// 	    if (subDomain && appKey) {
-		// 	        // console.log(subDomain, appKey);
-		// 			let app = this
-		// 			httpApi.anonymousLogin(subDomain, appKey, function(result) {
-		// 				// 请求会话
-		// 				app.requestThread(option)
-		// 			}, function(error) {
-		// 				console.log('login error:', error)
-		// 			})
-		// 	    } else {
-		// 			console.error('未设置subDomain或appKey')
-		// 		}
-		// 	} catch (error) {
-		// 	    console.error('read subdomain/appkey error', error)
-		// 	}
-		// },
 		// 请求会话
 		requestThread (option) {
 			//
@@ -601,6 +536,8 @@ export default {
 			} catch (error) {
 			    console.error('read uid/username error', error)
 			}
+			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
+			this.loadHistoryMessages();
 			//
 			let app = this
 			httpApi.requestThread(option.wid, option.type, option.aid, function(response) {
@@ -629,7 +566,7 @@ export default {
 		},
 		// 加载更多聊天记录
 		loadHistoryMessages () {
-			console.log('loadHistoryMessages')
+			// console.log('loadHistoryMessages')
 			if (this.isManulRequestThread || this.loadHistory === '0') {
 				return;
 			}
@@ -640,7 +577,7 @@ export default {
 			this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
-			httpApi.loadHistoryMessages(this.uid, this.page, 20, function(response) {
+			httpApi.loadHistoryMessages(this.uid, this.page, 10, function(response) {
 				// console.log('loadHistoryMessages: ', response)
 				for (let i = 0; i < response.data.content.length; i++) {
 					const element = response.data.content[i]
@@ -666,7 +603,7 @@ export default {
 				// // 1. 保存thread
 				this.thread = message.thread;
 				// // 3. 加载聊天记录
-				this.loadHistoryMessages();
+				// this.loadHistoryMessages();
 				// // 设置当前为人工客服
 				this.isRobot = false;
 				// // 防止会话超时自动关闭，重新标记本地打开会话
@@ -681,7 +618,7 @@ export default {
 				// // 1. 保存thread
 				this.thread = message.thread;
 				// // 3. 加载聊天记录
-				this.loadHistoryMessages();
+				// this.loadHistoryMessages();
 				// // 设置当前为人工客服
 				this.isRobot = false;
 				// // 防止会话超时自动关闭，重新标记本地打开会话
@@ -723,7 +660,7 @@ export default {
 				// 1. 保存thread
 				// this.thread = message.thread;
 				// 3. 加载聊天记录
-				this.loadHistoryMessages();
+				// this.loadHistoryMessages();
 				// 返回机器人初始欢迎语 + 欢迎问题列表
 				this.pushToMessageArray(message);
 				// 1. 保存thread
@@ -1128,7 +1065,7 @@ export default {
 			})
 		},
 		onMessageReceived (messageObject) {
-			console.log('onMessageReceived:', messageObject)
+			// console.log('onMessageReceived:', messageObject)
 			//
 			if ((messageObject.type === 'text'
 			  || messageObject.type === 'image'
@@ -1184,7 +1121,7 @@ export default {
 			   messageObject.content = messageObject.extra.content;
 			   this.isInviteRate = true;
 			   // this.switchRate()
-			} else if (messageObject.type === 'notification_invite_rate') { 
+			} else if (messageObject.type === 'notification_rate_result') { 
 				// 访客评价结果
 				messageObject.createdAt = messageObject.timestamp;
 				messageObject.content = messageObject.extra.content;
@@ -1344,7 +1281,7 @@ export default {
 			})
 		},
 		// 接受消息(筛选处理)
-		screenMsg(msg){
+		// screenMsg(msg){
 			//从长连接处转发给这个方法，进行筛选处理
 			// if(msg.type=='system'){
 			// 	// 系统消息
@@ -1383,9 +1320,9 @@ export default {
 			// 	// 滚动到底
 			// 	this.scrollToView = 'msg'+msg.msg.id
 			// });
-		},
+		// },
 		// 加载初始页面消息
-		getMsgList() {
+		// getMsgList() {
 			// 消息列表
 			// let list = [
 			// 	{type:"system",msg:{id:0,type:"text",content:{text:"欢迎进入HM-chat聊天室"}}},
@@ -1416,19 +1353,19 @@ export default {
 			// 		this.scrollAnimation = true;
 			// 	});
 			// });
-		},
+		// },
 		//处理图片尺寸，如果不处理宽高，新进入页面加载图片时候会闪
-		setPicSize(content){
-			// 让图片最长边等于设置的最大长度，短边等比例缩小，图片控件真实改变，区别于aspectFit方式。
-			let maxW = uni.upx2px(350);//350是定义消息图片最大宽度
-			let maxH = uni.upx2px(350);//350是定义消息图片最大高度
-			if(content.w>maxW||content.h>maxH){
-				let scale = content.w/content.h;
-				content.w = scale>1?maxW:maxH*scale;
-				content.h = scale>1?maxW/scale:maxH;
-			}
-			return content;
-		},
+		// setPicSize(content){
+		// 	// 让图片最长边等于设置的最大长度，短边等比例缩小，图片控件真实改变，区别于aspectFit方式。
+		// 	let maxW = uni.upx2px(350);//350是定义消息图片最大宽度
+		// 	let maxH = uni.upx2px(350);//350是定义消息图片最大高度
+		// 	if(content.w>maxW||content.h>maxH){
+		// 		let scale = content.w/content.h;
+		// 		content.w = scale>1?maxW:maxH*scale;
+		// 		content.h = scale>1?maxW/scale:maxH;
+		// 	}
+		// 	return content;
+		// },
 		//更多功能(点击+弹出) 
 		showMore() {
 			this.isVoice = false;
@@ -1453,19 +1390,19 @@ export default {
 			},150);
 		},
 		// 选择表情
-		chooseEmoji(){
-			this.hideMore = true;
-			if(this.hideEmoji){
-				this.hideEmoji = false;
-				this.openDrawer();
-			}else{
-				this.hideDrawer();
-			}
-		},
+		// chooseEmoji(){
+		// 	this.hideMore = true;
+		// 	if(this.hideEmoji){
+		// 		this.hideEmoji = false;
+		// 		this.openDrawer();
+		// 	}else{
+		// 		this.hideDrawer();
+		// 	}
+		// },
 		//添加表情
-		addEmoji(em){
-			this.inputContent+=em.alt;
-		},
+		// addEmoji(em){
+		// 	this.inputContent+=em.alt;
+		// },
 		//获取焦点，如果不是选表情ing,则关闭抽屉
 		textareaFocus(){
 			if(this.popupLayerClass=='showLayer' && this.hideMore == false){
@@ -1578,7 +1515,72 @@ export default {
 		},
 		discard(){
 			return;
-		}
+		},
+		/**
+		 * 1. 首先判断是否已经注册过
+		 * 2. 如果已经注册过，则直接调用登录接口
+		 * 3. 如果没有注册过，则从服务器请求用户名
+		 */
+		requestUsername () {
+			// this.username = localStorage.bd_kfe_username;
+			// this.password = this.username;
+			if (this.username) {
+				// this.login();
+			} else {
+				//
+				// $.ajax({
+				// 	url: this.HTTP_HOST + '/visitor/api/username',
+				// 	contentType: "application/json; charset=utf-8",
+				// 	type: "get",
+				// 	data: {
+				// 		nickname: this.nickname,
+				// 		subDomain: this.subDomain,
+				// 		client: this.client
+				// 	},
+				// 	success: function (response) {
+				// 		console.log('user:', response.data);
+				// 		// 登录
+				// 		app.uid = response.data.uid;
+				// 		app.username = response.data.username;
+				// 		app.password = app.username;
+				// 		app.nickname = response.data.nickname;
+				// 		// 本地存储
+				// 		localStorage.bd_kfe_uid = app.uid;
+				// 		localStorage.bd_kfe_username = app.username;
+				// 		// 登录
+				// 		app.login();
+				// 	},
+				// 	error: function (error) {
+				// 		//Do Something to handle error
+				// 		console.log(error);
+				// 	}
+				// });
+			}
+		},
+		//
+		// login(option) {
+		// 	// 萝卜丝-匿名登录
+		// 	try {
+		// 	    // 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
+		// 	    let subDomain = uni.getStorageSync(constants.subDomain)
+		// 	    // 登录后台->渠道管理-》uniapp中创建应用获取
+		// 	    let appKey = uni.getStorageSync(constants.appKey)
+		// 	    if (subDomain && appKey) {
+		// 	        // console.log(subDomain, appKey);
+		// 			let app = this
+		// 			httpApi.anonymousLogin(subDomain, appKey, function(result) {
+		// 				// 请求会话
+		// 				app.requestThread(option)
+		// 			}, function(error) {
+		// 				console.log('login error:', error)
+		// 			})
+		// 	    } else {
+		// 			console.error('未设置subDomain或appKey')
+		// 		}
+		// 	} catch (error) {
+		// 	    console.error('read subdomain/appkey error', error)
+		// 	}
+		// },
 	}
 }
 </script>
