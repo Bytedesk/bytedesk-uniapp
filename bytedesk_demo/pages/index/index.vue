@@ -64,7 +64,7 @@ export default {
 			} else if (messageObject.type === 'file') {
 				console.log('receive file:', messageObject.file.fileUrl);
 			} else {
-				console.log('其他类型消息')
+				// console.log('其他类型消息')
 			}
 			//
 			// try {
@@ -86,7 +86,6 @@ export default {
 			// } catch (error) {
 			//     console.error('read vibrate/playAudio error', error)
 			// }
-			
 		})
 	},
 	methods: {

@@ -17,7 +17,7 @@
 					<view class="system">
 						<view class="text"> {{ message.createdAt }}</view>
 					</view>
-					
+					<!-- 商品消息 -->
 					<view v-if="is_type_commodity(message)" id="goods" class="goods-info">
 						<view class="goods-pic">
 							<img id="goods-pic" alt="" width="50px" height="50px":src="jsonObject(message.content).imageUrl">
@@ -30,7 +30,6 @@
 							</view>
 						</view>
 					</view>
-					
 					<!-- 系统消息 -->
 					<view class="system">
 						<view class="text" v-if="is_type_notification_agent_close(message)">{{ message.content }}</view>
@@ -71,7 +70,7 @@
 								<image :src="message.user.avatar"></image>
 							</view>
 						</view>
-						<!-- 别人发出的消息 -->
+						<!-- 收到别人的消息 -->
 						<view class="other" v-if="!is_self(message)">
 							<!-- 左-头像 -->
 							<view class="left">
@@ -95,7 +94,7 @@
 								<view v-if="is_type_image(message)" class="bubble img" @tap="previewImageMessage(message)">
 									<image :src="message.imageUrl"></image>
 								</view>
-								<view v-if="is_type_robot(message)" class="bubble img">
+								<view v-if="is_type_robot(message)" class="bubble">
 									<!-- <rich-text :nodes="message.content"></rich-text> -->
 									<view class="flex-column-start" style="color: #2fa39b;">
 										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx;cmargin-top: 20rpx;"></rich-text>
@@ -103,7 +102,7 @@
 											{{item.question}}
 										</text>
 										<!-- TODO: -->
-			<!-- 							<view class="flex-row-start  padding-top-sm">
+										<!-- <view class="flex-row-start  padding-top-sm">
 											<text class="my-neirong-sm">没有你要的答案?</text>
 											<text class="padding-left" style="color: #007AFF;">换一批</text>
 										</view> -->
@@ -118,7 +117,7 @@
 		<!-- 抽屉栏 -->
 		<view class="popup-layer" :class="popupLayerClass" @touchmove.stop.prevent="discard">
 			<!-- 表情 --> 
-<!-- 			<swiper class="emoji-swiper" :class="{hidden:hideEmoji}" indicator-dots="true" duration="150">
+			<!-- <swiper class="emoji-swiper" :class="{hidden:hideEmoji}" indicator-dots="true" duration="150">
 				<swiper-item v-for="(page,pid) in emojiList" :key="pid">
 					<view v-for="(em,eid) in page" :key="eid" @tap="addEmoji(em)">
 						<image mode="widthFix" :src="'/image/emoji/'+em.url"></image>
@@ -485,7 +484,6 @@ export default {
 		jsonObject (content) {
 			// console.log('parse json:', content);
 			return JSON.parse(content);
-			// return content === null ? '{"categoryCode":"","content":"","id":"0","imageUrl":"","price":"","title":"","type":"commodity","url":""}' : JSON.parse(content);
 		},
 		scrollToBottom () {
 			if (this.messages.length > 0) {
@@ -510,14 +508,6 @@ export default {
 					this.scrollAnimation = true;//恢复滚动动画
 				});
 			});
-		},
-		pushToMessageArray(message) {
-			// 本地发送的消息
-			this.messages.push(message);
-			// 查看大图刷新
-			// if (message.type === 'image') {
-			// 	app.$previewRefresh()
-			// }
 		},
 		// 请求会话
 		requestThread (option) {
@@ -653,9 +643,9 @@ export default {
 				this.thread = message.thread;
 			} else if (response.status_code === 206) {
 				// 返回机器人初始欢迎语 + 欢迎问题列表
-				if (this.isManulRequestThread || this.loadHistory === '0') {
-					this.pushToMessageArray(message);
-				}
+				// if (this.isManulRequestThread || this.loadHistory === '0') {
+				// 	this.pushToMessageArray(message);
+				// }
 				// 1. 保存thread
 				// this.thread = message.thread;
 				// 3. 加载聊天记录
@@ -677,198 +667,6 @@ export default {
 			this.scrollToBottom();
 			// // 建立长连接
 			this.byteDeskConnect();
-		},
-		sendTextMessageSync(content) {
-			// this.sendMessageSync('text', content)
-			if (content.length === 0) {
-				alert('消息不能为空');
-				return;
-			}
-			if (content.length >= 500) {
-				alert('消息长度太长，请分多次发送');
-				return;
-			}
-			//
-			let localId = this.guid();
-			var json = {
-				"mid": localId,
-				"timestamp": this.currentTimestamp(),
-				"client": this.client,
-				"version": "1",
-				"type": 'text',
-				"user": {
-					"uid": this.uid,
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
-				},
-				"text": {
-					"content": content
-				},
-				"thread": {
-					"tid": this.thread.tid,
-					"type": this.thread.type,
-					"content": content,
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar,
-					"topic": this.threadTopic,
-					"timestamp": this.currentTimestamp(),
-					"unreadCount": 0
-				}
-			};
-			if (stompApi.isConnected()) {
-				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			} else {
-				httpApi.sendMessageRest(JSON.stringify(json))
-			}
-		},
-		sendImageMessageSync(imageUrl) {
-			console.log('sendImageMessageSync:', imageUrl);
-			//
-			let localId = this.guid();
-			var json = {
-				"mid": localId,
-				"timestamp": this.currentTimestamp(),
-				"client": this.client,
-				"version": "1",
-				"type": 'image',
-				"user": {
-					"uid": this.uid,
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
-				},
-				"image": {
-					"imageUrl": imageUrl
-				},
-				"thread": {
-					"tid": this.thread.tid,
-					"type": this.thread.type,
-					"content": "[图片]",
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar,
-					"topic": this.threadTopic,
-					"timestamp": this.currentTimestamp(),
-					"unreadCount": 0
-				}
-			};
-			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			if (stompApi.isConnected()) {
-				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			} else {
-				httpApi.sendMessageRest(JSON.stringify(json))
-			}
-		},
-		sendVoiceMessageSync(voiceUrl, length, format) {
-			// console.log('sendVoiceMessageSync:', voiceUrl);
-			//
-			let localId = this.guid();
-			var json = {
-				"mid": localId,
-				"timestamp": this.currentTimestamp(),
-				"client": this.client,
-				"version": "1",
-				"type": 'voice',
-				"user": {
-					"uid": this.uid,
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
-				},
-				"voice": {
-					"voiceUrl": voiceUrl,
-					"length": length,
-					"format": format,
-				},
-				"thread": {
-					"tid": this.thread.tid,
-					"type": this.thread.type,
-					"content": "[语音]",
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar,
-					"topic": this.threadTopic,
-					"timestamp": this.currentTimestamp(),
-					"unreadCount": 0
-				}
-			};
-			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			if (stompApi.isConnected()) {
-				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			} else {
-				httpApi.sendMessageRest(JSON.stringify(json))
-			}
-		},
-		sendVideoMessageSync(videoUrl) {
-			// console.log('sendVideoMessageSync:', videoUrl);
-			//
-			let localId = this.guid();
-			var json = {
-				"mid": localId,
-				"timestamp": this.currentTimestamp(),
-				"client": this.client,
-				"version": "1",
-				"type": 'video',
-				"user": {
-					"uid": this.uid,
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
-				},
-				"video": {
-					"videoOrShortUrl": videoUrl
-				},
-				"thread": {
-					"tid": this.thread.tid,
-					"type": this.thread.type,
-					"content": "[视频]",
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar,
-					"topic": this.threadTopic,
-					"timestamp": this.currentTimestamp(),
-					"unreadCount": 0
-				}
-			};
-			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			if (stompApi.isConnected()) {
-				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			} else {
-				httpApi.sendMessageRest(JSON.stringify(json))
-			}
-		},
-		sendCommodityMessageSync() {
-			let goods = this.option.goods
-			if (goods !== "1") {
-				return
-			}
-			let jsonContent = this.commodityInfo();
-			// 发送商品信息
-			var json = {
-				"mid": this.guid(),
-				"timestamp": this.currentTimestamp(),
-				"client": this.client,
-				"version": "1",
-				"type": 'commodity',
-				"user": {
-					"uid": this.uid,
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
-				},
-				"text": {
-					"content": jsonContent
-				},
-				"thread": {
-					"tid": this.thread.tid,
-					"type": this.thread.type,
-					"content": "[商品]",
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar,
-					"topic": this.threadTopic,
-					"timestamp": this.currentTimestamp(),
-					"unreadCount": 0
-				}
-			};
-			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			if (stompApi.isConnected()) {
-				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			} else {
-				httpApi.sendMessageRest(JSON.stringify(json))
-			}
 		},
 		appendCommodityInfo () {
 			let goods = this.option.goods
@@ -924,6 +722,174 @@ export default {
 			// this.localPreviewContent = content
 			// this.delaySendPreviewMessage()
 		},
+		sendTextMessageSync(content) {
+			// this.sendMessageSync('text', content)
+			if (content.length === 0) {
+				alert('消息不能为空');
+				return;
+			}
+			if (content.length >= 500) {
+				alert('消息长度太长，请分多次发送');
+				return;
+			}
+			//
+			let localId = this.guid();
+			var json = {
+				"mid": localId,
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'text',
+				"user": {
+					"uid": this.uid,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar
+				},
+				"text": {
+					"content": content
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": content,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+		},
+		sendImageMessageSync(imageUrl) {
+			console.log('sendImageMessageSync:', imageUrl);
+			//
+			let localId = this.guid();
+			var json = {
+				"mid": localId,
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'image',
+				"user": {
+					"uid": this.uid,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar
+				},
+				"image": {
+					"imageUrl": imageUrl
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[图片]",
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+		},
+		sendVoiceMessageSync(voiceUrl, length, format) {
+			// console.log('sendVoiceMessageSync:', voiceUrl);
+			//
+			let localId = this.guid();
+			var json = {
+				"mid": localId,
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'voice',
+				"user": {
+					"uid": this.uid,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar
+				},
+				"voice": {
+					"voiceUrl": voiceUrl,
+					"length": length,
+					"format": format,
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[语音]",
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+		},
+		sendVideoMessageSync(videoUrl) {
+			// console.log('sendVideoMessageSync:', videoUrl);
+			//
+			let localId = this.guid();
+			var json = {
+				"mid": localId,
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'video',
+				"user": {
+					"uid": this.uid,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar
+				},
+				"video": {
+					"videoOrShortUrl": videoUrl
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[视频]",
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+		},
+		sendCommodityMessageSync() {
+			let goods = this.option.goods
+			if (goods !== "1") {
+				return
+			}
+			let jsonContent = this.commodityInfo();
+			// 发送商品信息
+			var json = {
+				"mid": this.guid(),
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'commodity',
+				"user": {
+					"uid": this.uid,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar
+				},
+				"text": {
+					"content": jsonContent
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[商品]",
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+		},
 		sendPreviewMessage() {
 			//
 			var localId = this.guid();
@@ -953,33 +919,9 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			// stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
-			if (stompApi.isConnected()) {
-				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			} else {
-				httpApi.sendMessageRest(JSON.stringify(json))
-			}
-		},
-		sendTextMessage () {
-			//
-			if (this.inputContent.trim().length === 0) {
-				return;
-			}
-			if (this.isRobot) {
-				this.messageAnswer(this.inputContent);
-			} else {
-				// 发送/广播会话消息
-				this.sendTextMessageSync(this.inputContent)
-			}
-			// 清空输入框
-			this.inputContent = "";
-			// 设置焦点
-			// setTimeout(function(){
-			// 	$("input")[1].focus()
-			// }, 100);
+			this.doSendMessage(json);
 		},
 		sendReceiptMessage (mid, status) {
-			// console.log(this.thread);
 			var localId = this.guid();
 			var json = {
 				"mid": localId,
@@ -1007,12 +949,7 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			// stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			if (stompApi.isConnected()) {
-				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			} else {
-				httpApi.sendMessageRest(JSON.stringify(json))
-			}
+			this.doSendMessage(json);
 		},
 		sendRecallMessage (mid) {
 			var localId = this.guid();
@@ -1041,11 +978,56 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			// stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
+			this.doSendMessage(json);
+		},
+		sendTextMessage () {
+			//
+			if (this.inputContent.trim().length === 0) {
+				return;
+			}
+			if (this.isRobot) {
+				this.messageAnswer(this.inputContent);
+			} else {
+				// 发送/广播会话消息
+				this.sendTextMessageSync(this.inputContent)
+			}
+			// 清空输入框
+			this.inputContent = "";
+			// 设置焦点
+			// setTimeout(function(){
+			// 	$("input")[1].focus()
+			// }, 100);
+		},
+		doSendMessage (json) {
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
-				httpApi.sendMessageRest(JSON.stringify(json))
+				let app = this
+				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
+					console.log('sendMessageRest success:', json)
+					// TODO: 待处理
+					// var messageObject = JSON.parse(json);
+					// app.pushToMessageArray(messageObject)
+				}, function(error) {
+					console.log('send message rest error:', error)
+					// TODO: 待处理
+					// var messageObject = JSON.parse(json);
+					// app.pushToMessageArray(messageObject)
+				})
+			}
+		},
+		pushToMessageArray(message) {
+			// 判断是否已经存在
+			let contains = false
+			for (var i = 0; i < this.messages.length; i++) {
+				let msg = this.messages[i]
+				if (msg.mid === message.mid) {
+					contains = true
+				}
+			}
+			// 如果不存在，则保存
+			if (!contains) {
+				this.messages.push(message);
 			}
 		},
 		// 建立长连接
@@ -1100,7 +1082,7 @@ export default {
 				  this.sendReceiptMessage(mid, "read");
 			  }
 			}
-			else if (messageObject.type === 'notification_browebSockete_invite') {
+			else if (messageObject.type === 'notification_browse_invite') {
 			  //
 			} else if (messageObject.type === 'notification_queue') {
 			    // 排队
@@ -1155,12 +1137,20 @@ export default {
 				}
 			  }
 			} else if (messageObject.type === 'notification_recall') {
-			  console.log('TODO:消息撤回');
-			  // $("#other" + messageObject.mid).hide();
+			  // console.log('消息撤回');
+			  for (let i = 0; i < this.messages.length; i++) {
+				  const element = this.messages[i];
+				  if (element.mid === messageObject.recall.mid) {
+					  this.messages.splice(i, 1)
+				  }
+			  }
 			}
 			//
 			if (messageObject.type !== 'notification_preview'
 			    && messageObject.type !== 'notification_receipt'
+				&& messageObject.type !== 'notification_recall'
+				&& messageObject.type !== 'notification_form_request'
+				&& messageObject.type !== 'notification_form_result'
 			    && messageObject.type !== 'notification_connect'
 			    && messageObject.type !== 'notification_disconnect') {
 			    this.isRobot = false;
@@ -1279,92 +1269,6 @@ export default {
 				console.log('messageAnswer error', error)
 			})
 		},
-		// 接受消息(筛选处理)
-		// screenMsg(msg){
-			//从长连接处转发给这个方法，进行筛选处理
-			// if(msg.type=='system'){
-			// 	// 系统消息
-			// 	switch (msg.msg.type){
-			// 		case 'text':
-			// 			this.addSystemTextMsg(msg);
-			// 			break;
-			// 		case 'redEnvelope':
-			// 			this.addSystemRedEnvelopeMsg(msg);
-			// 			break;
-			// 	}
-			// }else if(msg.type=='user'){
-			// 	// 用户消息
-			// 	switch (msg.msg.type){
-			// 		case 'text':
-			// 			this.addTextMsg(msg);
-			// 			break;
-			// 		case 'voice':
-			// 			this.addVoiceMsg(msg);
-			// 			break;
-			// 		case 'img':
-			// 			this.addImgMsg(msg);
-			// 			break;
-			// 		case 'redEnvelope':
-			// 			this.addRedEnvelopeMsg(msg);
-			// 			break;
-			// 	}
-			// 	console.log('用户消息');
-			// 	//非自己的消息震动
-			// 	if(msg.msg.userinfo.uid!=this.myuid){
-			// 		console.log('振动');
-			// 		uni.vibrateLong();
-			// 	}
-			// }
-			// this.$nextTick(function() {
-			// 	// 滚动到底
-			// 	this.scrollToView = 'msg'+msg.msg.id
-			// });
-		// },
-		// 加载初始页面消息
-		// getMsgList() {
-			// 消息列表
-			// let list = [
-			// 	{type:"system",msg:{id:0,type:"text",content:{text:"欢迎进入HM-chat聊天室"}}},
-			// 	{type:"user",msg:{id:1,type:"text",time:"12:56",userinfo:{uid:0,username:"大黑哥",face:"/image/face.jpg"},content:{text:"为什么温度会相差那么大？"}}},
-			// 	{type:"user",msg:{id:2,type:"text",time:"12:57",userinfo:{uid:1,username:"售后客服008",face:"/image/im/face/face_2.jpg"},content:{text:"这个是有偏差的，两个温度相差十几二十度是很正常的，如果相差五十度，那即是质量问题了。"}}},
-			// 	{type:"user",msg:{id:3,type:"voice",time:"12:59",userinfo:{uid:1,username:"售后客服008",face:"/image/im/face/face_2.jpg"},content:{url:"/static/voice/1.mp3",length:"00:06"}}},
-			// 	{type:"user",msg:{id:4,type:"voice",time:"13:05",userinfo:{uid:0,username:"大黑哥",face:"/image/face.jpg"},content:{url:"/static/voice/2.mp3",length:"00:06"}}},
-			// 	{type:"user",msg:{id:5,type:"img",time:"13:05",userinfo:{uid:0,username:"大黑哥",face:"/image/face.jpg"},content:{url:"/image/p10.jpg",w:200,h:200}}},
-			// 	{type:"user",msg:{id:6,type:"img",time:"12:59",userinfo:{uid:1,username:"售后客服008",face:"/image/im/face/face_2.jpg"},content:{url:"/image/q.jpg",w:1920,h:1080}}},
-			// 	{type:"system",msg:{id:7,type:"text",content:{text:"欢迎进入HM-chat聊天室"}}},
-			// 	{type:"system",msg:{id:9,type:"redEnvelope",content:{text:"售后客服008领取了你的红包"}}},
-			// 	{type:"user",msg:{id:10,type:"redEnvelope",time:"12:56",userinfo:{uid:0,username:"大黑哥",face:"/image/face.jpg"},content:{blessing:"恭喜发财，大吉大利，万事如意",rid:0,isReceived:false}}},
-			// 	{type:"user",msg:{id:11,type:"redEnvelope",time:"12:56",userinfo:{uid:1,username:"售后客服008",face:"/image/im/face/face_2.jpg"},content:{blessing:"恭喜发财",rid:1,isReceived:false}}},
-			// ]
-			// // 获取消息中的图片,并处理显示尺寸
-			// for(let i=0;i<list.length;i++){
-			// 	if(list[i].type=='user'&&list[i].msg.type=="img"){
-			// 		list[i].msg.content = this.setPicSize(list[i].msg.content);
-			// 		this.msgImgList.push(list[i].msg.content.url);
-			// 	}
-			// }
-			// this.msgList = list;
-			// // 滚动到底部
-			// this.$nextTick(function() {
-			// 	//进入页面滚动到底部
-			// 	this.scrollTop = 9999;
-			// 	this.$nextTick(function() {
-			// 		this.scrollAnimation = true;
-			// 	});
-			// });
-		// },
-		//处理图片尺寸，如果不处理宽高，新进入页面加载图片时候会闪
-		// setPicSize(content){
-		// 	// 让图片最长边等于设置的最大长度，短边等比例缩小，图片控件真实改变，区别于aspectFit方式。
-		// 	let maxW = uni.upx2px(350);//350是定义消息图片最大宽度
-		// 	let maxH = uni.upx2px(350);//350是定义消息图片最大高度
-		// 	if(content.w>maxW||content.h>maxH){
-		// 		let scale = content.w/content.h;
-		// 		content.w = scale>1?maxW:maxH*scale;
-		// 		content.h = scale>1?maxW/scale:maxH;
-		// 	}
-		// 	return content;
-		// },
 		//更多功能(点击+弹出) 
 		showMore() {
 			this.isVoice = false;
@@ -1408,17 +1312,6 @@ export default {
 				this.hideDrawer();
 			}
 		},
-		// 发送文字消息
-		// sendText() {
-		// 	this.hideDrawer();//隐藏抽屉
-		// 	if(!this.inputContent){
-		// 		return;
-		// 	}
-		// 	let content = this.replaceEmoji(this.inputContent);
-		// 	let msg = {text:content}
-		// 	this.sendMsg(msg,'text');
-		// 	this.inputContent = '';//清空输入框
-		// },
 		// 播放语音
 		playVoice(message) {
 			this.playMsgid = message.mid;
@@ -1556,30 +1449,6 @@ export default {
 				// });
 			}
 		},
-		//
-		// login(option) {
-		// 	// 萝卜丝-匿名登录
-		// 	try {
-		// 	    // 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
-		// 	    let subDomain = uni.getStorageSync(constants.subDomain)
-		// 	    // 登录后台->渠道管理-》uniapp中创建应用获取
-		// 	    let appKey = uni.getStorageSync(constants.appKey)
-		// 	    if (subDomain && appKey) {
-		// 	        // console.log(subDomain, appKey);
-		// 			let app = this
-		// 			httpApi.anonymousLogin(subDomain, appKey, function(result) {
-		// 				// 请求会话
-		// 				app.requestThread(option)
-		// 			}, function(error) {
-		// 				console.log('login error:', error)
-		// 			})
-		// 	    } else {
-		// 			console.error('未设置subDomain或appKey')
-		// 		}
-		// 	} catch (error) {
-		// 	    console.error('read subdomain/appkey error', error)
-		// 	}
-		// },
 	}
 }
 </script>

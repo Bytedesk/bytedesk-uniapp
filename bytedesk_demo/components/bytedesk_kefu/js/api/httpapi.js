@@ -739,10 +739,12 @@ export function sendMessageRest(json, successcb, failedcb) {
       'content-type': 'application/json' // 默认值
     },
     success (res) {
-      successcb(res.data)
+      // successcb(res.data)
+	  successcb(json)
     },
     fail (res) {
-      failedcb(res.data)
+      // failedcb(res.data)
+	  failedcb(json)
     }
   })
 }
