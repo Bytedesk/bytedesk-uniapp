@@ -1,15 +1,16 @@
 <template>
 	<view class="bytedesk">
-		<uni-section title="技能组客服" type="line"></uni-section>
+		<uni-section title="技能组客服(可按规则分配多个客服)" type="line"></uni-section>
 		<uni-list :border="true">
 			<!-- 技能组客服会话-支持多个客服 -->
 			<uni-list-item title="技能组客服" clickable @click="startWorkGroupChat()" note="默认人工" showArrow />
-			<!-- <uni-list-item title="TODO:技能组客服-机器人" clickable @click="startWorkGroupChatRobot()" note="默认机器人(服务器设置)" showArrow /> -->
+			<uni-list-item title="技能组客服-无历史消息记录" clickable @click="startWorkGroupChatNoHistory()" note="默认人工" showArrow />
+			<uni-list-item title="TODO:技能组客服-机器人" clickable @click="startWorkGroupChatRobot()" note="默认机器人(服务器设置)" showArrow />
 			<uni-list-item title="技能组客服-电商" clickable @click="startWorkGroupChatShop()" note="自动发送商品信息" showArrow />
 			<uni-list-item title="技能组客服-附言" clickable @click="startWorkGroupChatPostscript()" note="自动发送附言" showArrow />
 			<uni-list-item title="技能组客服-自定义昵称" clickable @click="startWorkGroupChatNickname()" note="客服所见昵称" showArrow />
 		</uni-list>
-		<uni-section title="指定客服" type="line"></uni-section>
+		<uni-section title="指定客服(分配固定一个客服)" type="line"></uni-section>
 		<uni-list :border="true">
 			<!-- 指定客服-支持一对一客服 -->
 			<uni-list-item title="指定客服" clickable @click="startAppointedChat()" note="默认人工" showArrow />
@@ -56,6 +57,13 @@ export default {
 		startWorkGroupChat () {
 			uni.navigateTo({
 				url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
+			});
+		},
+		// 技能组会话-无历史消息记录
+		startWorkGroupChatNoHistory () {
+			// 注意：最后添加参数history=0
+			uni.navigateTo({
+				url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&history=0'
 			});
 		},
 		startWorkGroupChatRobot () {

@@ -72,7 +72,7 @@ bytedesk.init(subDomain, appKey);
 startChat () {
   // console.log('start chat')
   uni.navigateTo({
-	url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
+  	url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
   });
 }
 ```
@@ -102,7 +102,3 @@ startChat () {
 - [微信公众号/小程序接口](https://github.com/bytedesk/bytedesk-wechat)
 - [服务器端接口](https://github.com/bytedesk/bytedesk-server)
 - [机器人](https://github.com/bytedesk/bytedesk-chatbot)
-
-## TODO
-
-- 支持国际化

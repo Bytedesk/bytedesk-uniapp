@@ -216,7 +216,6 @@ export default {
 			hideMore:true,
 			//表情定义
 			hideEmoji:true,
-
 			// 萝卜丝
 			option: {
 				sub: '',

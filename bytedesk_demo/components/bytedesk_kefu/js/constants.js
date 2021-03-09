@@ -2,8 +2,9 @@
 module.exports = {
   // 测试
   // IS_PRODUCTION: false,
-  // API_BASE_URL: 'http://192.168.0.105:8000',
-  // WEBSOCKET_URL: 'ws://192.168.0.105:8000/stomp/mini?access_token=',
+  // API_BASE_URL: 'http://172.16.0.223:8000',
+  // WEBSOCKET_URL: 'ws://172.16.0.223:8000/stomp/mini?access_token=',
+  // IS_PRODUCTION: false,
   // API_BASE_URL: 'http://127.0.0.1:8000',
   // WEBSOCKET_URL: 'ws://127.0.0.1:8000/stomp/mini?access_token=',
   // 线上环境
