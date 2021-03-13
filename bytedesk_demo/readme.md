@@ -72,7 +72,7 @@ bytedesk.init(subDomain, appKey);
 startChat () {
   // console.log('start chat')
   uni.navigateTo({
-  	url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
+  	url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
   });
 }
 ```
