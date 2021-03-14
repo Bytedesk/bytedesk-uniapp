@@ -390,8 +390,8 @@ export function requestAgent(wid, type, aid, successcb, failedcb) {
   })
 }
 
-// 客服端：当前进行中会话
-export function getCurrentThreads(page, size, successcb, failedcb) {
+// 请求客服会话-扫小程序码
+export function requestThreadScan(id, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
@@ -400,7 +400,34 @@ export function getCurrentThreads(page, size, successcb, failedcb) {
   }
   //
   uni.request({
-    url: constants.API_BASE_URL + '/api/thread/visitor/history',
+    url: constants.API_BASE_URL + '/api/thread/scan',
+    data: {
+      id: id,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  // console.log('request thread:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 客服端：当前进行中会话
+export function getThreads(page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/thread/get',
     data: {
 	  page: page,
 	  size: size,
@@ -571,6 +598,7 @@ export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
     header: header,
     method: 'GET',
     success (res) {
+	  console.log('loadHistoryMessages:', res)
       successcb(res.data)
     },
     fail (res) {
@@ -723,8 +751,8 @@ export function sendMessageRest(json, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-	failedcb('not loggined')
-	return
+    failedcb('not loggined')
+    return
   }
   //
   uni.request({
@@ -735,9 +763,6 @@ export function sendMessageRest(json, successcb, failedcb) {
     },
   	header: header,
     method: 'POST',
-    header: {
-      'content-type': 'application/json' // 默认值
-    },
     success (res) {
       // successcb(res.data)
 	  successcb(json)
@@ -772,6 +797,10 @@ export function logout(successcb, failedcb) {
 		  try {
 		  	uni.setStorageSync(constants.isLogin, false);
 		  	uni.setStorageSync(constants.isLoginMobile, false);
+			uni.setStorageSync(constants.uid, '');
+			uni.setStorageSync(constants.username, '');
+			uni.setStorageSync(constants.password, '');
+			uni.setStorageSync(constants.subDomain, '');
 		  	uni.setStorageSync(constants.accessToken, '')
 		  } catch (e) {
 		  	// error

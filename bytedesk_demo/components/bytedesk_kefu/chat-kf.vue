@@ -1,161 +1,176 @@
 <template>
 	<view>
-		<!-- 空盒子用来防止消息过少时 拉起键盘会遮盖消息 -->
-		<view :animation="anData" style="height:0;"></view>
-		<!-- 消息体 -->
 		<view class="content" @touchstart="hideDrawer">
-			<scroll-view scroll-with-animation scroll-y="true" @touchmove="hideKey" style="width: 750rpx;" :style="{'height':srcollHeight}"
-			 :scroll-top="go">
-				<!-- 用来获取消息体高度 -->
-				<view id="content" scroll-with-animation ref="listm">
-					<!-- 消息 -->
-					<view class="flex-column-start" v-for="(message, i) in messages" :key="i">
-
-						<text style="text-align: center; margin-top: 10rpx; font-size: 25rpx; color: #AAAAAA;">{{ message.createdAt }}</text>
-						
-						<view style="text-align: center; margin-top: 10rpx; font-size: 30rpx; color: #AAAAAA;">
-							<text v-if="is_type_notification_agent_close(message)" style="word-break: break-all;">{{ message.content }}</text>
-							<text v-else-if="is_type_notification_visitor_close(message)" style="word-break: break-all;">{{ message.content }}</text>
-							<text v-else-if="is_type_notification_auto_close(message)" style="word-break: break-all;">{{ message.content }}</text>
-							<text v-else-if="is_type_notification_thread_reentry(message)" style="word-break: break-all;">{{ message.content }}</text>
-							<text v-else-if="is_type_notification_offline(message)" style="word-break: break-all;">{{ message.content }}</text>
-							<text v-else-if="is_type_notification_invite_rate(message)" style="word-break: break-all;">{{ message.content }}</text>
-							<text v-else-if="is_type_notification_rate_result(message)" style="word-break: break-all;">{{ message.content }}</text>
-							<text v-else-if="is_type_notification(message)" style="word-break: break-all;">{{ message.content }}</text>
-						</view>
-						
-						<view v-if="!is_type_notification(message)">
-							
-							<!-- 发送消息-->
-							<view v-if="is_self(message)" class="flex justify-end padding-right one-show  align-start  padding-top">
-								
-								<!-- <image class="chat-img margin-left" src="../../static/..." mode="aspectFill" ></image> -->
-								<view class="flex justify-end" style="width: 400rpx;">
-									<!-- 消息状态 -->
-									<view class="status">
-										<text v-if="is_sending(message)" class="fa fa-spinner fa-spin" style="font-size:12px"></text>
-										<text v-if="is_stored(message)" class="fa fa-times-circle" style="font-size:10px"></text>
-										<text v-if="is_received(message)" style="font-size:10px; margin-right: 5px;">送达</text>
-										<text v-if="is_read(message)" style="font-size:10px; margin-right: 5px;">已读</text>
-										<text v-if="is_error(message)" class="fa fa-times-circle" style="font-size:12px"></text>
-									</view>
-									<view class="margin-left padding-chat bg-cyan" style="border-radius: 35rpx;">
-										<text v-if="is_type_text(message)" style="word-break: break-all;">{{ message.content }}</text>
-										<image v-if="is_type_image(message)" class="message-img" :src="message.imageUrl" @click="previewImageMessage(message)" mode="aspectFill" ></image> 
-									</view>
-								</view>
-								<!-- 发送者头像 -->
-								<view>
-									<image style="margin-left: 10rpx; margin-right: 10rpx; height: 75rpx;width: 75rpx;" :src="message.user.avatar" mode="aspectFit"></image>
-								</view>
-								<!-- <image v-if="is_self(message)" style="height: 75rpx;width: 75rpx; margin-left: 10rpx;" class="chat-img" :src="message.user.avatar" mode="aspectFill" ></image> -->
-							</view>
-							
-							<!-- 接收消息 -->
-							<view v-if="!is_self(message)" class="flex-row-start margin-left margin-top one-show">
-								<!-- 头像 -->
-								<view>
-									<image style="height: 75rpx;width: 75rpx;" :src="message.user.avatar" mode="aspectFit"></image>
-								</view>
-								<!-- 消息体 -->
-								<view class="flex" style="width: 500rpx;">
-									<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">									
-										<text v-if="is_type_text(message)" style="word-break: break-all;">{{ message.content }}</text>
-										<image v-if="is_type_image(message)" class="message-img" :src="message.imageUrl" @click="previewImageMessage(message)" mode="aspectFill" ></image> 
-										<!-- 消息模板 =>初次问候 -->
-										<view class="flex-column-start" v-if="message.type==1" style="color: #2fa39b;">
-											<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">你可以这样问我:</text>
-											<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item, index) in message.questionList" :key="index">{{item}}</text>
-											<!-- TODO: -->
-											<view class="flex-row-start  padding-top-sm">
-												<text class="my-neirong-sm">没有你要的答案?</text>
-												<text class="padding-left" style="color: #007AFF;">换一批</text>
-											</view>
-										</view>
-										<!-- 消息模板 =>多个答案 -->
-										<view class="flex-column-start" v-if="message.type==2" style="color: #2fa39b;">
-											<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">猜你想问:</text>
-											<!-- 连接服务器应该用item.id -->
-											<text @click="answer(index)" style="margin-top: 30rpx;" v-for="(item,index) in message.questionList" :key="index">{{item}}</text>
-										</view>
-										<!-- 消息模板 => 无法回答-->
-										<view class="flex-column-start" v-if="message.type==0">
-											<text class="padding-top-sm" style="color: #2fa39b;">提交意见与反馈</text>
-											<text style="color: #838383;font-size: 22rpx;margin-top: 15rpx;">下面是一些常见问题,您可以点击对应的文字快速获取答案:</text>
-											<text @click="answer(index)" style="margin-top: 30rpx;color: #2fa39b;" v-for="(item,index) in message.questionList"
-											 :key="index">{{ item }}</text>
-											<view class="flex-row-start  padding-top-sm">
-												<text class="my-neirong-sm">没有你要的答案?</text>
-												<text class="padding-left" style="color: #1396c5;">换一批</text>
-											</view>
-										</view>
-									</view>
-								</view>
-							</view>
-							
-						</view>
-			
+			<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView" @scrolltoupper="loadMoreMessages" upper-threshold="50">
+				<!-- 加载历史数据 waitingUI -->
+				<view class="loading" v-if="isHistoryLoading">
+					<view class="spinner">
+						<view class="rect1"></view>
+						<view class="rect2"></view>
+						<view class="rect3"></view>
+						<view class="rect4"></view>
+						<view class="rect5"></view>
 					</view>
-					
-					<!-- loading是显示 -->
-					<view v-show="msgLoad" class="flex-row-start margin-left margin-top">
-						<view class="chat-img flex-row-center">
-							<image style="height: 75rpx;width: 75rpx;" src="./image/robot.png" mode="aspectFit"></image>
+				</view>
+				<view class="row" v-for="(message, index) in messages" :key="index" :id="'msg'+message.mid">
+					<!-- 时间戳 -->
+					<view class="system">
+						<view class="text"> {{ message.createdAt }}</view>
+					</view>
+					<!-- 商品消息 -->
+					<view v-if="is_type_commodity(message)" id="goods" class="goods-info">
+						<view class="goods-pic">
+							<img id="goods-pic" alt="" width="50px" height="50px":src="jsonObject(message.content).imageUrl">
 						</view>
-						<view class="flex" style="width: 500rpx;">
-							<view class="margin-left padding-chat flex-column-start" style="border-radius: 35rpx;background-color: #f9f9f9;">
-								<view class="cuIcon-loading turn-load" style="font-size: 35rpx;color: #3e9982;">
-								</view>
+						<view class="goods-desc">
+							<view id="goods-name" class="goods-name">{{ jsonObject(message.content).title }}</view>
+							<view class="goods-more">
+								<view id="goods-price" class="goods-price">￥{{ jsonObject(message.content).price }}</view>
+								<view id="goods-sendlink" class="goods-sendlink" @click="sendCommodityMessageSync()">发送商品</view>
 							</view>
 						</view>
 					</view>
-					
-					<!-- 防止消息底部被遮 -->
-					<view style="height: 120rpx;"></view>
+					<!-- 系统消息 -->
+					<view class="system">
+						<view class="text" v-if="is_type_notification_agent_close(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_visitor_close(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_auto_close(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_thread_reentry(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_offline(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_invite_rate(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_rate_result(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification(message)">{{ message.content }}</view>
+					</view>
+					<!-- 用户消息 -->
+					<block v-if="!is_type_notification(message) && !is_type_commodity(message)">
+						<!-- 自己发出的消息 -->
+						<view class="my" v-if="is_self(message)">
+							<!-- 左-消息 -->
+							<view class="left">
+								<!-- 文字消息 -->
+								<view v-if="is_type_text(message)" class="bubble">
+									<rich-text :nodes="message.content"></rich-text>
+								</view>
+								<!-- 语言消息 -->
+								<view v-if="message.type=='voice'" class="bubble voice" @tap="playVoice(message)" :class="playMsgid == message.mid ? 'play' : ''">
+									<view class="length">{{message.voice.length}}</view>
+									<view class="icon my-voice"></view>
+								</view>
+								<!-- 图片消息 -->
+								<view v-if="is_type_image(message)" class="bubble img" @tap="previewImageMessage(message)">
+									<image :src="message.imageUrl"></image>
+								</view>
+								<!-- 机器人消息 -->
+								<view v-if="is_type_robot(message)" class="bubble">
+									<rich-text :nodes="message.content"></rich-text>
+								</view>
+							</view>
+							<!-- 右-头像 -->
+							<view class="right">
+								<image :src="message.user.avatar"></image>
+							</view>
+						</view>
+						<!-- 收到别人的消息 -->
+						<view class="other" v-if="!is_self(message)">
+							<!-- 左-头像 -->
+							<view class="left">
+								<image :src="message.user.avatar"></image>
+							</view>
+							<!-- 右-用户名称-时间-消息 -->
+							<view class="right">
+								<view class="username">
+									<view class="name">{{ message.user.nickname }}</view> 
+								</view>
+								<!-- 文字消息 -->
+								<view v-if="is_type_text(message)" class="bubble">
+									<rich-text :nodes="message.content"></rich-text>
+								</view>
+								<!-- 语音消息 -->
+								<view v-if="is_type_voice(message)" class="bubble voice" @tap="playVoice(message)" :class="playMsgid === message.mid ? 'play': ''">
+									<view class="icon other-voice"></view>
+									<view class="length">{{ message.voice.length }}</view>
+								</view>
+								<!-- 图片消息 -->
+								<view v-if="is_type_image(message)" class="bubble img" @tap="previewImageMessage(message)">
+									<image :src="message.imageUrl"></image>
+								</view>
+								<view v-if="is_type_robot(message)" class="bubble">
+									<!-- <rich-text :nodes="message.content"></rich-text> -->
+									<view class="flex-column-start" style="color: #2fa39b;">
+										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx;cmargin-top: 20rpx;"></rich-text>
+										<text @click="queryAnswer(item)" style="margin-top: 20rpx;" v-for="(item, index) in message.answers" :key="index">
+											{{item.question}}
+										</text>
+										<!-- TODO: 首先选择是否有帮助，如果用户选择没有帮助，则出现‘人工客服’按钮-->
+										<view class="flex-row-start  padding-top-sm">
+											<text class="my-neirong-sm">没有你要的答案?</text>
+											<text class="padding-left" style="color: #007AFF;" @click="requestAgent()">人工客服</text>
+										</view>
+									</view>
+								</view>
+							</view>
+						</view>
+					</block>
 				</view>
 			</scroll-view>
 		</view>
-
-		<!-- 底部导航栏 -->
-		<view class="flex-column-center" style="position: fixed;bottom: -180px;" :animation="animationData">
-			<view class="bottom-dh-char flex-row-around" style="font-size: 55rpx;">
-				<text @click="ckAdd" class="cuIcon-roundadd text-gray"></text>
-				<!-- vue无法使用软键盘"发送"，可以使用nvue -->
-				<input v-model="inputContent" class="dh-input" type="text" style="background-color: #f0f0f0;" @confirm="sendTextMessage"
-				 confirm-type="search" placeholder-class="my-neirong-sm" placeholder="输入内容..." />
-				<view @click="sendTextMessage" class="cu-tag round">
-					发送
+		<!-- 抽屉栏 -->
+		<view class="popup-layer" :class="popupLayerClass" @touchmove.stop.prevent="discard">
+			<!-- 表情 --> 
+			<!-- <swiper class="emoji-swiper" :class="{hidden:hideEmoji}" indicator-dots="true" duration="150">
+				<swiper-item v-for="(page,pid) in emojiList" :key="pid">
+					<view v-for="(em,eid) in page" :key="eid" @tap="addEmoji(em)">
+						<image mode="widthFix" :src="'/image/emoji/'+em.url"></image>
+					</view>
+				</swiper-item>
+			</swiper> -->
+			<!-- 更多功能 相册-拍照 -->
+			<view class="more-layer" :class="{hidden:hideMore}">
+				<view class="list">
+					<view class="box" @tap="chooseImage"><view class="icon tupian2"></view></view>
+					<view class="box" @tap="camera"><view class="icon paizhao"></view></view>
 				</view>
-			</view>
-			<!-- 附加栏(自定义) -->
-			<view class="box-normal flex-row-around flex-wrap">
-				<view class="tb-text" @click="chooseImage()">
-					<view class="cuIcon-form"></view>
-					<text>相册</text>
-				</view>
-				<view class="tb-text" @click="camera()">
-					<view class="cuIcon-form"></view>
-					<text>拍照</text>
-				</view>
-<!-- 				<view class="tb-text" @click="chooseImage()">
-					<view class="cuIcon-form"></view>
-					<text>视频</text>
-				</view> -->
-<!-- 				<view class="tb-text" @click="chooseImage()">
-					<view class="cuIcon-form"></view>
-					<text>录制</text>
-				</view> -->
-<!-- 				<view class="tb-text">
-					<view class="cuIcon-form"></view>
-					<text>问题反馈</text>
-				</view> -->
-<!-- 				<view class="tb-text">
-					<view class="cuIcon-form"></view>
-					<text>人工客服</text>
-				</view> -->
 			</view>
 		</view>
-		
+		<!-- 底部输入栏 -->
+		<view class="input-box" :class="popupLayerClass" @touchmove.stop.prevent="discard">
+			<!-- H5下不能录音，输入栏布局改动一下 -->
+			<!-- #ifndef H5 -->
+			<view class="voice">
+				<view class="icon" :class="isVoice?'jianpan':'yuyin'" @tap="switchVoice"></view>
+			</view>
+			<!-- #endif -->
+			<!-- #ifdef H5 -->
+			<view class="more" @tap="showMore">
+				<view class="icon add"></view>
+			</view>
+			<!-- #endif -->
+			<view class="textbox">
+				<view class="voice-mode" :class="[isVoice?'':'hidden',recording?'recording':'']" @touchstart="voiceBegin" @touchmove.stop.prevent="voiceIng" @touchend="voiceEnd" @touchcancel="voiceCancel">{{voiceTis}}</view>
+				<view class="text-mode"  :class="isVoice?'hidden':''">
+					<view class="box">
+						<textarea auto-height="true" v-model="inputContent" @focus="textareaFocus"/>
+					</view>
+<!-- 					<view class="em" @tap="chooseEmoji">
+						<view class="icon biaoqing"></view>
+					</view> -->
+				</view>
+			</view>
+			<!-- #ifndef H5 -->
+			<view class="more" @tap="showMore">
+				<view class="icon add"></view>
+			</view>
+			<!-- #endif -->
+			<view class="send" :class="isVoice?'hidden':''" @tap="sendTextMessage()">
+				<view class="btn">发送</view>
+			</view>
+		</view>
+		<!-- 录音UI效果 -->
+		<view class="record" :class="recording?'':'hidden'">
+			<view class="ing" :class="willStop?'hidden':''"><view class="icon luyin2" ></view></view>
+			<view class="cancel" :class="willStop?'':'hidden'"><view class="icon chehui" ></view></view>
+			<view class="tis" :class="willStop?'change':''">{{recordTis}}</view>
+		</view>
 	</view>
 </template>
 
@@ -163,80 +178,75 @@
 import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
 import * as stompApi from '@/components/bytedesk_kefu/js/api/stompapi.js'
+import moment from '@/components/bytedesk_kefu/js/api/moment.min.js'
 import Vue from 'vue'
-// rpx和px的比率
-var l
-// 可用窗口高度
-var wh
-// 顶部空盒子的高度
-var mgUpHeight
+// 
 export default {
-	onLoad(option) {
-		// 如果需要缓存消息缓存msgList即可
-		// 监听键盘拉起
-		// 因为无法控制键盘拉起的速度,所以这里尽量以慢速处理
-		uni.onKeyboardHeightChange(res => {
-			const query = uni.createSelectorQuery()
-			query.select('#content').boundingClientRect(data => {
-				// 若消息体没有超过2倍的键盘则向下移动差值,防止遮住消息体
-				var up = res.height * 2 - data.height - l * 110
-				// console.log(up)
-				if (up > 0) {
-					// 动态改变空盒子高度
-					this.msgMove(up, 300)
-					// 记录改变的值,若不收回键盘且发送了消息用来防止消息过多被遮盖
-					mgUpHeight = up
-				}
-				// 收回
-				if (res.height == 0) {
-					this.msgMove(0, 0)
-				}
-			}).exec();
-		})
-		var query = uni.getSystemInfoSync()
-		l = query.screenWidth / 750
-		wh = query.windowHeight
-		this.srcollHeight = query.windowHeight + "px"
-		//
-		this.option = option
-	},
-	onShow () {},
-	onReady () {
-		//
-		let app = this;
-		uni.$on('message',function(messageObject) {
-			// console.log('uni on message');
-			app.onMessageReceived(messageObject)
-		})
-		// 登录
-		uni.setNavigationBarTitle({
-		　　title:this.option.title
-		})
-		// this.login(this.option)
-		this.requestThread(this.option)
-	},
-	onHide () {},
 	data() {
 		return {
-			msgLoad: false,
-			anData: {},
-			animationData: {},
-			showTow: false,
-			// 消息体,定义机器人初次的消息(或者自定义出现时机)
-			// my->谁发的消息 msg->消息文本 type->客服消息模板类型 questionList->快速获取问题答案的问题列表
-			msgList: [{
-				my: false,
-				content: "你好我是客服机器人娜娜,请问有什么问题可以帮助您?(问候模板)",
-				type: 1,
-				questionList: ["如何注销用户", "我想了解业务流程", "手机号如何更换"]
-			}],
-			//
-			content: "",
-			go: 0,
-			srcollHeight: 0,
-
+			//消息列表
+			isHistoryLoading:false,
+			scrollAnimation:false,
+			scrollTop:0,
+			scrollToView:'',
+			
+			//录音相关参数
+			// #ifndef H5
+			//H5不能录音
+			RECORDER:uni.getRecorderManager(),
+			// #endif
+			isVoice:false,
+			voiceTis:'按住 说话',
+			recordTis:"手指上滑 取消发送",
+			recording:false,
+			willStop:false,
+			initPoint:{identifier:0,Y:0},
+			recordTimer:null,
+			recordLength:0,
+			
+			//播放语音相关参数
+			AUDIO:uni.createInnerAudioContext(),
+			playMsgid:null,
+			VoiceTimer:null,
+			// 抽屉参数
+			popupLayerClass:'',
+			// more参数
+			hideMore:true,
+			//表情定义
+			hideEmoji:true,
 			// 萝卜丝
-			option: {},
+			option: {
+				id: '',
+				sub: '',
+				uid: '',
+				wid: '',
+				type: '',
+				aid: '',
+				nickname: '',
+				//
+				tid: '',
+				avatar: '',
+				topic: '',
+				type: '',
+				title: '',
+				//
+				goods: '0',
+				goods_categoryCode: '',
+				goods_content: '',
+				goods_id: '',
+				goods_imageUrl: '',
+				goods_price: '',
+				goods_title: '',
+				goods_url: '',
+				//
+				history: '1',
+				//
+				postscript: '',
+				agentclient: '0',
+				lang: 'cn',
+				//
+				scan: ''
+			},
 			isInputingVisible: false,
 			localPreviewContent: '',
 			//
@@ -282,10 +292,17 @@ export default {
 			adminUid: '',
 			workGroupWid: '',
 			subDomain: '',
+			// TODO: 区分安卓、ios、小程序等
 			client: 'uniapp',
 			thread: {
 				id: 0,
-				tid: ''
+				tid: '',
+				topic: '',
+				visitor: {
+					uid: '',
+					nickname: 'visitor',
+					avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/visitor_default_avatar.png'
+				}
 			},
 			// 已经订阅的topic
 			subscribedTopics: [],
@@ -324,6 +341,76 @@ export default {
 			showLeaveMessage: false,
 			showRate: false,
 			showForm: false
+		};
+	},
+	onLoad(option) {
+		// this.getMsgList();
+		//语音自然播放结束
+		this.AUDIO.onEnded((res)=>{
+			this.playMsgid=null;
+		});
+		// #ifndef H5
+		//录音开始事件
+		this.RECORDER.onStart((e)=>{
+			this.recordBegin(e);
+		})
+		//录音结束事件
+		this.RECORDER.onStop((e)=>{
+			this.recordEnd(e);
+		})
+		// #endif
+		this.option = option
+		if (option.history === '0') {
+			this.loadHistory = '0'
+		}
+	},
+	onShow(){
+		this.scrollTop = 9999999;
+	},
+	onReady () {
+		//
+		let app = this;
+		uni.$on('message',function(messageObject) {
+			// console.log('uni on message');
+			app.onMessageReceived(messageObject)
+		})
+		// 登录
+		uni.setNavigationBarTitle({
+		　　title:this.option.title
+		})
+		if (this.option.agentclient === '1') {
+			console.log('客服端打开会话')
+			this.thread.tid = this.option.tid
+			this.thread.topic = this.option.topic
+			this.thread.type = this.option.type
+			this.thread.visitor.uid = this.option.uid
+			this.thread.visitor.nickname = this.option.nickname
+			this.thread.visitor.avatar = this.option.avatar
+			//
+			let visitorUid = this.option.topic.split('/')[1]
+			console.log('visitorUid:', visitorUid)
+			this.loadHistoryMessages(visitorUid);
+			//
+		} else if (this.option.scan != null &&
+			(this.option.scan.startsWith('a') || this.option.scan.startsWith('w'))) {
+			console.log('扫小程序码打开')
+			// TODO: 判断是否已经初始化，如果已经初始化则直接调用接口请求客服，否则首先初始化
+			
+			// 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
+			let subDomain = 'vip'
+			// 登录后台->渠道管理-》uniapp中创建应用获取appkey
+			let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
+			//
+			bytedesk.initWithCallback(subDomain, appKey, function(result){
+				console.log('initWithCallback success:', result)
+			}, function(error) {
+				console.log('initWithCallback error:', error)
+			});
+			// TODO: 初始化完毕之后，再调用
+			this.requestThreadScan()
+		} else {
+			// 正常打开
+			this.requestThread()
 		}
 	},
 	computed: {
@@ -331,7 +418,7 @@ export default {
 			return this.thread.topic.replace(/\//g, ".");
 		},
 	},
-	methods: {
+	methods:{
 		//
 		is_self (message) {
 			return message.user.uid === this.uid;
@@ -395,7 +482,6 @@ export default {
 			return message.type !== 'notification_preview'
 				&& message.type !== 'notification_thread'
 				&& message.type.startsWith('notification')
-				|| message.type === 'commodity'
 		},
 		is_type_close (message) {
 			return message.type === 'notification_auto_close'
@@ -429,97 +515,43 @@ export default {
 			return message.type === 'notification_rate_result'
 		},
 		my_nickname () {
+			if (this.option.nickname) {
+				return this.option.nickname
+			}
 			return this.nickname.trim().length > 0 ? this.nickname : this.thread.visitor.nickname
 		},
+		jsonObject (content) {
+			// console.log('parse json:', content);
+			return JSON.parse(content);
+		},
 		scrollToBottom () {
-			console.log('scroll to bottom');
-			// 聊天记录滚动到最底部
-			let vm = this;
-			this.$nextTick(() => {
-				vm.scrollTop = 9999;
-				// const ulm = vm.$refs.listm;
-				// if (ulm != null) {
-				// 	ulm.scrollTop = ulm.scrollHeight
-				// }
-			})
-		},
-		pushToMessageArray(message) {
-			// 本地发送的消息
-			this.messages.push(message);
-			// 查看大图刷新
-			// if (message.type === 'image') {
-			// 	app.$previewRefresh()
-			// }
-		},
-		/**
-		 * 1. 首先判断是否已经注册过
-		 * 2. 如果已经注册过，则直接调用登录接口
-		 * 3. 如果没有注册过，则从服务器请求用户名
-		 */
-		requestUsername () {
-			// this.username = localStorage.bd_kfe_username;
-			// this.password = this.username;
-			if (this.username) {
-				// this.login();
-			} else {
-				//
-				// $.ajax({
-				// 	url: this.HTTP_HOST + '/visitor/api/username',
-				// 	contentType: "application/json; charset=utf-8",
-				// 	type: "get",
-				// 	data: {
-				// 		nickname: this.nickname,
-				// 		subDomain: this.subDomain,
-				// 		client: this.client
-				// 	},
-				// 	success: function (response) {
-				// 		console.log('user:', response.data);
-				// 		// 登录
-				// 		app.uid = response.data.uid;
-				// 		app.username = response.data.username;
-				// 		app.password = app.username;
-				// 		app.nickname = response.data.nickname;
-				// 		// 本地存储
-				// 		localStorage.bd_kfe_uid = app.uid;
-				// 		localStorage.bd_kfe_username = app.username;
-				// 		// 登录
-				// 		app.login();
-				// 	},
-				// 	error: function (error) {
-				// 		//Do Something to handle error
-				// 		console.log(error);
-				// 	}
-				// });
+			if (this.messages.length > 0) {
+				// console.log('scroll to bottom', this.messages.length);
+				let lastMessage = this.messages[this.messages.length - 1]
+				this.scrollToMessage(lastMessage)
 			}
+			// 聊天记录滚动到最底部, FIXME: 不起作用？
+			// this.$nextTick(function() {
+			// 	//进入页面滚动到底部
+			// 	this.scrollTop = 9999;
+			// 	this.$nextTick(function() {
+			// 		this.scrollAnimation = true;
+			// 	});
+			// });
 		},
-		//
-		// login(option) {
-		// 	// 萝卜丝-匿名登录
-		// 	try {
-		// 	    // 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
-		// 	    let subDomain = uni.getStorageSync(constants.subDomain)
-		// 	    // 登录后台->渠道管理-》uniapp中创建应用获取
-		// 	    let appKey = uni.getStorageSync(constants.appKey)
-		// 	    if (subDomain && appKey) {
-		// 	        // console.log(subDomain, appKey);
-		// 			let app = this
-		// 			httpApi.anonymousLogin(subDomain, appKey, function(result) {
-		// 				// 请求会话
-		// 				app.requestThread(option)
-		// 			}, function(error) {
-		// 				console.log('login error:', error)
-		// 			})
-		// 	    } else {
-		// 			console.error('未设置subDomain或appKey')
-		// 		}
-		// 	} catch (error) {
-		// 	    console.error('read subdomain/appkey error', error)
-		// 	}
-		// },
+		scrollToMessage (message) {
+			// console.log('scroll to ', message.mid);
+			this.$nextTick(function() {
+				this.scrollToView = 'msg'+message.mid;//跳转上次的第一行信息位置
+				this.$nextTick(function() {
+					this.scrollAnimation = true;//恢复滚动动画
+				});
+			});
+		},
 		// 请求会话
-		requestThread (option) {
+		requestThread () {
 			//
-			if (option.type === undefined || option.type === null) {
+			if (this.option.type === undefined || this.option.type === null) {
 				return
 			}
 			try {
@@ -528,13 +560,16 @@ export default {
 			    this.username = uni.getStorageSync(constants.username)
 			    this.nickname = uni.getStorageSync(constants.nickname)
 			    this.avatar = uni.getStorageSync(constants.avatar)
+				// console.log('uid 1:', this.uid)
 			} catch (error) {
 			    console.error('read uid/username error', error)
 			}
+			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
+			this.loadHistoryMessages(this.uid);
 			//
 			let app = this
-			httpApi.requestThread(option.wid, option.type, option.aid, function(response) {
-				console.log('request thread success', option.wid, option.type, option.aid, response)
+			httpApi.requestThread(this.option.wid, this.option.type, this.option.aid, function(response) {
+				console.log('request thread success', app.option.wid, app.option.type, app.option.aid, response)
 				//
 				app.dealWithThread(response);
 			}, function(error) {
@@ -542,24 +577,78 @@ export default {
 			})
 		},
 		// 请求人工客服
-		requestAgent (option) {
+		requestAgent () {
 			//
-			if (option.type === undefined || option.type === null) {
+			if (this.option.type === undefined || this.option.type === null) {
 				return
 			}
 			//
 			let app = this
-			httpApi.requestAgent(option.wid, option.type, option.aid, function(response) {
-				console.log('request agent success', option.wid, option.type, option.aid, response)
+			httpApi.requestAgent(this.option.wid, this.option.type, this.option.aid, function(response) {
+				console.log('request agent success', app.option.wid, app.option.type, app.option.aid, response)
 				//
 				app.dealWithThread(response);
 			}, function(error) {
 				console.log('request agent error', error)
 			})
 		},
+		// 请求客服会话-扫小程序码
+		requestThreadScan () {
+			//
+			try {
+			    //
+			    this.uid = uni.getStorageSync(constants.uid)
+			    this.username = uni.getStorageSync(constants.username)
+			    this.nickname = uni.getStorageSync(constants.nickname)
+			    this.avatar = uni.getStorageSync(constants.avatar)
+				// console.log('uid 1:', this.uid)
+			} catch (error) {
+			    console.error('read uid/username error', error)
+			}
+			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
+			this.loadHistoryMessages(this.uid);
+			//
+			let app = this
+			httpApi.requestThreadScan(this.option.id, function(response) {
+				console.log('request thread scan success', app.option.id, response)
+				//
+				app.dealWithThread(response);
+			}, function(error) {
+				console.log('request thread scan error', error)
+			})
+		},
+		loadMoreMessages () {
+			this.loadHistoryMessages(this.uid)
+		},
+		// 加载更多聊天记录
+		loadHistoryMessages (uid) {
+			if (this.isManulRequestThread || this.loadHistory === '0') {
+				return;
+			}
+			if(this.isHistoryLoading){
+				return ;
+			}
+			// TODO: 加载历史聊天记录
+			this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
+			this.scrollAnimation = false;//关闭滑动动画
+			let app = this
+			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
+				// console.log('loadHistoryMessages: ', response)
+				for (let i = 0; i < response.data.content.length; i++) {
+					const element = response.data.content[i]
+					// console.log('element:', element);
+					app.messages.unshift(element)
+				}
+				app.scrollToBottom()
+				app.page += 1
+				app.isHistoryLoading = false;
+			}, function(error) {
+				console.log('load history messages error', error)
+			})
+		},
 		// 
 		dealWithThread (response) {
-			//
+			// console.log('')
 			let message = response.data;
 			if (response.status_code === 200) {
 				//
@@ -568,8 +657,6 @@ export default {
 				// }
 				// // 1. 保存thread
 				this.thread = message.thread;
-				// // 3. 加载聊天记录
-				// this.loadHistoryMessages();
 				// // 设置当前为人工客服
 				this.isRobot = false;
 				// // 防止会话超时自动关闭，重新标记本地打开会话
@@ -583,8 +670,6 @@ export default {
 				// }
 				// // 1. 保存thread
 				this.thread = message.thread;
-				// // 3. 加载聊天记录
-				// this.loadHistoryMessages();
 				// // 设置当前为人工客服
 				this.isRobot = false;
 				// // 防止会话超时自动关闭，重新标记本地打开会话
@@ -620,13 +705,11 @@ export default {
 				this.thread = message.thread;
 			} else if (response.status_code === 206) {
 				// 返回机器人初始欢迎语 + 欢迎问题列表
-				if (this.isManulRequestThread || this.loadHistory === '0') {
-					this.pushToMessageArray(message);
-				}
+				// if (this.isManulRequestThread || this.loadHistory === '0') {
+				// 	this.pushToMessageArray(message);
+				// }
 				// 1. 保存thread
-				this.thread = message.thread;
-				// 3. 加载聊天记录
-				// this.loadHistoryMessages();
+				// this.thread = message.thread;
 				// 返回机器人初始欢迎语 + 欢迎问题列表
 				this.pushToMessageArray(message);
 				// 1. 保存thread
@@ -644,6 +727,60 @@ export default {
 			this.scrollToBottom();
 			// // 建立长连接
 			this.byteDeskConnect();
+		},
+		appendCommodityInfo () {
+			let goods = this.option.goods
+			if (goods !== "1") {
+				return
+			}
+			let jsonContent = this.commodityInfo();
+			// 发送商品信息
+			var json = {
+				"mid": this.guid(),
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'commodity',
+				"user": {
+					"uid": this.uid,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar
+				},
+				"content": jsonContent,
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[商品]",
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.pushToMessageArray(json)
+		},
+		commodityInfo () {
+			//
+			let commodidy = {
+				"id": this.option.goods_id,
+				"title": this.option.goods_title,
+				"content":this.option.goods_content,
+				"price": this.option.goods_price,
+				"url": this.option.goods_url,
+				"imageUrl": this.option.goods_imageUrl,
+				"categoryCode": this.option.goods_categoryCode,
+				"type":"commodity"
+			}
+			return JSON.stringify(commodidy)
+		},
+		onInputChange (content) {
+			console.log('onInputChange:', content);
+			// if (this.isRobot || this.isThreadClosed) {
+			// 	return;
+			// }
+			// this.localPreviewContent = content
+			// this.delaySendPreviewMessage()
 		},
 		sendTextMessageSync(content) {
 			// this.sendMessageSync('text', content)
@@ -682,7 +819,7 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			this.doSendMessage(json);
 		},
 		sendImageMessageSync(imageUrl) {
 			console.log('sendImageMessageSync:', imageUrl);
@@ -713,10 +850,74 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			this.doSendMessage(json);
+		},
+		sendVoiceMessageSync(voiceUrl, length, format) {
+			// console.log('sendVoiceMessageSync:', voiceUrl);
+			//
+			let localId = this.guid();
+			var json = {
+				"mid": localId,
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'voice',
+				"user": {
+					"uid": this.uid,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar
+				},
+				"voice": {
+					"voiceUrl": voiceUrl,
+					"length": length,
+					"format": format,
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[语音]",
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+		},
+		sendVideoMessageSync(videoUrl) {
+			// console.log('sendVideoMessageSync:', videoUrl);
+			//
+			let localId = this.guid();
+			var json = {
+				"mid": localId,
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'video',
+				"user": {
+					"uid": this.uid,
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar
+				},
+				"video": {
+					"videoOrShortUrl": videoUrl
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[视频]",
+					"nickname": this.my_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
 		},
 		sendCommodityMessageSync() {
-			let goods = this.getUrlParam("goods")
+			let goods = this.option.goods
 			if (goods !== "1") {
 				return
 			}
@@ -747,61 +948,7 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-		},
-		appendCommodityInfo () {
-			let goods = this.getUrlParam("goods")
-			if (goods !== "1") {
-				return
-			}
-			let jsonContent = this.commodityInfo();
-			// 发送商品信息
-			var json = {
-				"mid": this.guid(),
-				"timestamp": this.currentTimestamp(),
-				"client": this.client,
-				"version": "1",
-				"type": 'commodity',
-				"user": {
-					"uid": this.uid,
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
-				},
-				"content": jsonContent,
-				"thread": {
-					"tid": this.thread.tid,
-					"type": this.thread.type,
-					"content": "[商品]",
-					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar,
-					"topic": this.threadTopic,
-					"timestamp": this.currentTimestamp(),
-					"unreadCount": 0
-				}
-			};
-			this.pushToMessageArray(json)
-		},
-		commodityInfo () {
-			//
-			let commodidy = {
-				"id": this.getUrlParam("goods_id"),
-				"title": this.getUrlParam("goods_title"),
-				"content":this.getUrlParam("goods_content"),
-				"price": this.getUrlParam("goods_price"),
-				"url": this.getUrlParam("goods_url"),
-				"imageUrl": this.getUrlParam("goods_imageUrl"),
-				"categoryCode": this.getUrlParam("goods_categoryCode"),
-				"type":"commodity"
-			}
-			return JSON.stringify(commodidy)
-		},
-		onInputChange (content) {
-			console.log('onInputChange:', content);
-			// if (this.isRobot || this.isThreadClosed) {
-			// 	return;
-			// }
-			// this.localPreviewContent = content
-			// this.delaySendPreviewMessage()
+			this.doSendMessage(json);
 		},
 		sendPreviewMessage() {
 			//
@@ -832,28 +979,9 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
-		},
-		sendTextMessage () {
-			//
-			if (this.inputContent.trim().length === 0) {
-				return;
-			}
-			if (this.isRobot) {
-				// this.messageAnswer(this.inputContent);
-			} else {
-				// 发送/广播会话消息
-				this.sendTextMessageSync(this.inputContent)
-			}
-			// 清空输入框
-			this.inputContent = "";
-			// 设置焦点
-			// setTimeout(function(){
-			// 	$("input")[1].focus()
-			// }, 100);
+			this.doSendMessage(json);
 		},
 		sendReceiptMessage (mid, status) {
-			console.log(this.thread);
 			var localId = this.guid();
 			var json = {
 				"mid": localId,
@@ -881,8 +1009,7 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			// 收到消息后，向服务器发送回执
+			this.doSendMessage(json);
 		},
 		sendRecallMessage (mid) {
 			var localId = this.guid();
@@ -911,46 +1038,141 @@ export default {
 					"unreadCount": 0
 				}
 			};
-			stompApi.sendMessage(this.threadTopic,JSON.stringify(json));
-			// 收到消息后，向服务器发送回执
+			this.doSendMessage(json);
+		},
+		sendTextMessage () {
+			//
+			if (this.inputContent.trim().length === 0) {
+				return;
+			}
+			if (this.isRobot) {
+				this.messageAnswer(this.inputContent);
+			} else {
+				// 发送/广播会话消息
+				this.sendTextMessageSync(this.inputContent)
+			}
+			// 清空输入框
+			this.inputContent = "";
+			// 设置焦点
+			// setTimeout(function(){
+			// 	$("input")[1].focus()
+			// }, 100);
+		},
+		doSendMessage (json) {
+			if (stompApi.isConnected()) {
+				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			} else {
+				let app = this
+				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
+					console.log('sendMessageRest success:', json)
+					// TODO: 待处理
+					// var messageObject = JSON.parse(json);
+					// app.pushToMessageArray(messageObject)
+				}, function(error) {
+					console.log('send message rest error:', error)
+					// TODO: 待处理
+					// var messageObject = JSON.parse(json);
+					// app.pushToMessageArray(messageObject)
+				})
+			}
+		},
+		pushToMessageArray(message) {
+			// 判断是否已经存在
+			let contains = false
+			for (var i = 0; i < this.messages.length; i++) {
+				let msg = this.messages[i]
+				if (msg.mid === message.mid) {
+					contains = true
+				}
+			}
+			// 如果不存在，则保存
+			if (!contains) {
+				this.messages.push(message);
+			}
 		},
 		// 建立长连接
 		byteDeskConnect () {
-			stompApi.connect(this.thread)
+			if (stompApi.isConnected()) {
+				// 订阅topic
+				let topic = this.thread.topic.replace(/\//g, ".");
+				stompApi.subscribeTopic(topic);
+			} else {
+				let app = this
+				stompApi.connect(this.thread, function() {
+					// 长连接成功回调
+					// 发送附言信息
+					if (app.option.postscript !== null 
+						&& app.option.postscript !== undefined 
+						&& app.option.postscript !== '') {
+						app.sendTextMessageSync(app.option.postscript)
+					}
+					// 发送商品信息
+					app.sendCommodityMessageSync()
+				})
+			}
 		},
 		onMessageReceived (messageObject) {
+			// console.log('onMessageReceived:', messageObject)
 			//
 			if ((messageObject.type === 'text'
 			  || messageObject.type === 'image'
-			  || messageObject.type === 'file')
+			  || messageObject.type === 'file'
+			  || messageObject.type === 'voice'
+			  || messageObject.type === 'video'
+			  || messageObject.type === 'commodity')
 			  // && messageObject.user.uid !== this.uid
 			  ) {
 			  // 新protobuf转换json
 			  messageObject.createdAt = messageObject.timestamp;
 			  if (messageObject.type === "text") {
-			      messageObject.content = messageObject.text.content;
+			    messageObject.content = messageObject.text.content;
 			  } else if (messageObject.type === "image") {
-			      messageObject.imageUrl = messageObject.image.imageUrl;
+			    messageObject.imageUrl = messageObject.image.imageUrl;
+			  } else if (messageObject.type === "file") {
+			    messageObject.fileUrl = messageObject.file.fileUrl;
+			  } else if (messageObject.type === "voice") {
+			    messageObject.voiceUrl = messageObject.voice.voiceUrl;
+			  } else if (messageObject.type === "video") {
+			    messageObject.videoOrShortUrl = messageObject.video.videoOrShortUrl;
+			  } else if (messageObject.type === "commodity") {
+				messageObject.content = messageObject.text.content;
 			  }
 			  //
 			  let mid = messageObject.mid;
-			  // 发送消息回执：消息已读
-			  this.sendReceiptMessage(mid, "read");
+			  // this.thread.topic = messageObject.thread.topic;
+			  // 非自己发送的消息，发送消息回执: 消息已读
+			  // console.log('uid 2:', messageObject.user.uid)
+			  // console.log('uid 3:', this.uid)
+			  if (messageObject.user.uid !== this.uid) {
+				  // console.log('do send receipt');
+				  this.sendReceiptMessage(mid, "read");
+			  }
 			}
-			else if (messageObject.type === 'notification_browebSockete_invite') {
+			else if (messageObject.type === 'notification_browse_invite') {
 			  //
 			} else if (messageObject.type === 'notification_queue') {
 			    // 排队
+				this.isThreadClosed = false;
 			} else if (messageObject.type === 'notification_queue_accept') {
-			  // // 1. 保存thread
-			  this.thread = messageObject.thread;
-			  // // 2. 订阅会话消息
-			  // this.subscribeTopic(this.threadTopic);
+				// 接入访客
+				messageObject.createdAt = messageObject.timestamp;
+				messageObject.content = messageObject.text.content;
+			   // 1. 保存thread
+			   // this.thread = messageObject.thread;
+			   // 2. 订阅会话消息
+			   // this.subscribeTopic(this.threadTopic);
+			   this.isThreadClosed = false;
 			} else if (messageObject.type === 'notification_invite_rate') {
-			  // // 邀请评价
-			  this.isInviteRate = true;
-			  // this.switchRate()
-			} else if (messageObject.type === 'notification_agent_close'
+			   // 邀请评价
+			   messageObject.createdAt = messageObject.timestamp;
+			   messageObject.content = messageObject.extra.content;
+			   this.isInviteRate = true;
+			   // this.switchRate()
+			} else if (messageObject.type === 'notification_rate_result') { 
+				// 访客评价结果
+				messageObject.createdAt = messageObject.timestamp;
+				messageObject.content = messageObject.extra.content;
+            } else if (messageObject.type === 'notification_agent_close'
 			    || messageObject.type === 'notification_auto_close') {
 			  // // 新protobuf转换json
 			  messageObject.createdAt = messageObject.timestamp;
@@ -981,25 +1203,34 @@ export default {
 				}
 			  }
 			} else if (messageObject.type === 'notification_recall') {
-			  console.log('TODO:消息撤回');
-			  // $("#other" + messageObject.mid).hide();
+			  // console.log('消息撤回');
+			  for (let i = 0; i < this.messages.length; i++) {
+				  const element = this.messages[i];
+				  if (element.mid === messageObject.recall.mid) {
+					  this.messages.splice(i, 1)
+				  }
+			  }
 			}
 			//
 			if (messageObject.type !== 'notification_preview'
 			    && messageObject.type !== 'notification_receipt'
+				&& messageObject.type !== 'notification_recall'
+				&& messageObject.type !== 'notification_form_request'
+				&& messageObject.type !== 'notification_form_result'
 			    && messageObject.type !== 'notification_connect'
 			    && messageObject.type !== 'notification_disconnect') {
 			    this.isRobot = false;
 			    this.pushToMessageArray(messageObject);
-			    this.scrollToBottom()
+			    // this.scrollToBottom()
+				this.scrollToMessage(messageObject)
 			} else {
 			    // TODO: 监听客服端输入状态
 			}
 		},
 		//
 		currentTimestamp () {
-			// return moment().format('YYYY-MM-DD HH:mm:ss')
-			return ''
+			return moment().format('YYYY-MM-DD HH:mm:ss')
+			// return ''
 		},
 		///
 		// 选择图片发送
@@ -1052,209 +1283,300 @@ export default {
 			}
 			return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 		},
+		queryAnswer (answer) {
+			console.log('answer:', answer);
+			let app = this
+			httpApi.queryAnswer(this.thread.tid, answer.aid, function(response) {
+				console.log('queryAnswer success', response)
+				//
+				if (response.status_code === 200)  {
+					//
+					let queryMessage = response.data.query;
+					let replyMessage = response.data.reply;
+					//
+					app.pushToMessageArray(queryMessage);
+					app.pushToMessageArray(replyMessage);
+					//
+					// app.scrollToBottom()
+					app.scrollToMessage(replyMessage)
+				} else {
+					// app.$message.warning(response.message)
+					uni.showToast({ title: response.message, duration: 2000 });
+				}
+			}, function(error) {
+				console.log('queryAnswer error', error)
+			})
+		},
+		messageAnswer (content) {
+			let app = this;
+			// 包含’人工‘二字
+			if (content.indexOf('人工') !== -1) {
+				// 请求人工客服
+				app.requestAgent()
+				return;
+			} 
+			httpApi.messageAnswer(this.option.wid, this.option.type, this.option.aid, content, function(response) {
+				console.log('messageAnswer success', response)
+				if (response.status_code === 200 ||
+					response.status_code === 201)  {
+					//
+					let queryMessage = response.data.query;
+					let replyMessage = response.data.reply;
+					//
+					app.pushToMessageArray(queryMessage);
+					app.pushToMessageArray(replyMessage);
+					// app.scrollToBottom()
+					app.scrollToMessage(replyMessage)
+				} else {
+					// app.$message.warning(response.data.message)
+					uni.showToast({ title: response.message, duration: 2000 });
+				}
+			}, function(error) {
+				console.log('messageAnswer error', error)
+			})
+		},
+		//更多功能(点击+弹出) 
+		showMore() {
+			this.isVoice = false;
+			this.hideEmoji = true;
+			if(this.hideMore){
+				this.hideMore = false;
+				this.openDrawer();
+			}else{
+				this.hideDrawer();
+			}
+		},
 		// 打开抽屉
 		openDrawer(){
-			// this.popupLayerClass = 'showLayer';
+			this.popupLayerClass = 'showLayer';
 		},
 		// 隐藏抽屉
 		hideDrawer(){
-			// this.popupLayerClass = '';
-			// setTimeout(()=>{
-			// 	this.hideMore = true;
-			// 	this.hideEmoji = true;
-			// },150);
+			this.popupLayerClass = '';
+			setTimeout(()=>{
+				this.hideMore = true;
+				this.hideEmoji = true;
+			},150);
 		},
-		// 切换输入法时移动输入框(按照官方的上推页面的原理应该会自动适应不同的键盘高度-->官方bug)
-		goPag(kh) {
-			this.upTowmn(0, 250)
-			if (this.keyHeight != 0) {
-				if (kh - this.keyHeight > 0) {
-					this.upTowmn(this.keyHeight - kh, 250)
-				}
+		// 选择表情
+		// chooseEmoji(){
+		// 	this.hideMore = true;
+		// 	if(this.hideEmoji){
+		// 		this.hideEmoji = false;
+		// 		this.openDrawer();
+		// 	}else{
+		// 		this.hideDrawer();
+		// 	}
+		// },
+		//添加表情
+		// addEmoji(em){
+		// 	this.inputContent+=em.alt;
+		// },
+		//获取焦点，如果不是选表情ing,则关闭抽屉
+		textareaFocus(){
+			if(this.popupLayerClass=='showLayer' && this.hideMore == false){
+				this.hideDrawer();
 			}
 		},
-		// 移动顶部的空盒子
-		msgMove(x, t) {
-			var animation = uni.createAnimation({
-				duration: t,
-				timingFunction: 'linear',
-			})
-			this.animation = animation
-			animation.height(x).step()
-			this.anData = animation.export()
+		// 播放语音
+		playVoice(message) {
+			this.playMsgid = message.mid;
+			this.AUDIO.src = message.voice.voiceUrl;
+			this.$nextTick(function() {
+				this.AUDIO.play();
+			});
 		},
-		// 保持消息体可见
-		msgGo() {
-			const query = uni.createSelectorQuery()
-			// 延时100ms保证是最新的高度
-			setTimeout(() => {
-				// 获取消息体高度
-				query.select('#content').boundingClientRect(data => {
-					// 如果超过scorll高度就滚动scorll
-					if (data.height - wh > 0) {
-						this.go = data.height - wh
-					}
-					// 保证键盘第一次拉起时消息体能保持可见
-					var moveY = wh - data.height
-					// 超出页面则缩回空盒子
-					if (moveY - mgUpHeight < 0) {
-						// 小于0则视为0
-						if (moveY < 0) {
-							this.msgMove(0, 200)
-						} else {
-							// 否则缩回盒子对应的高度
-							this.msgMove(moveY, 200)
-						}
-					}
-				}).exec();
-			}, 100)
-		},
-		// 回答问题的业务逻辑
-		answer(id) {
-			// 这里应该传入问题的id,模拟就用index代替了
-			console.log(id)
-		},
-		sendMsg() {
-			// 消息为空不做任何操作
-			if (this.content == "") {
-				return 0;
+		// 录音开始
+		voiceBegin(e){
+			if(e.touches.length>1){
+				return ;
 			}
-			// 显示消息 content消息文本,my鉴别是谁发的消息(不能用俩个消息数组循环,否则消息不会穿插)
-			this.msgList.push({
-				"content": this.content,
-				"my": true
-			})
-			// 保证消息可见
-			this.msgGo()
-			// 回答问题
-			this.msgKf(this.content)
-			// 清除消息
-			this.content = ""
+			this.initPoint.Y = e.touches[0].clientY;
+			this.initPoint.identifier = e.touches[0].identifier;
+			this.RECORDER.start({format:"mp3"});//录音开始,
 		},
-		msgKf(x) {
-			// loading
-			this.msgLoad = true
-			// 这里连接服务器获取答案
-			// 下面模拟请求
-			setTimeout(() => {
-				// 取消loading
-				this.msgLoad = false
-				this.msgList.push({
-					my: false,
-					content: "娜娜还在学习中,没能明白您的问题,您点击下方提交反馈与问题,我们会尽快人工处理(无法回答模板)",
-					type: 0,
-					questionList: ["如何注销用户", "我想了解业务流程", "手机号如何更换"]
-				})
-				this.msgList.push({
-					my: false,
-					content: "单消息模板",
-					type: -1
-				})
-				this.msgList.push({
-					my: false,
-					content: "根据您的问题,已为您匹配了下列问题(多个答案模板)",
-					type: 2,
-					questionList: ["如何注销用户", "我想了解业务流程", "手机号如何更换"]
-				})
-				this.msgGo()
-			}, 2000)
+		//录音开始UI效果
+		recordBegin(e){
+			this.recording = true;
+			this.voiceTis='松开 结束';
+			this.recordLength = 0;
+			this.recordTimer = setInterval(()=>{
+				this.recordLength++;
+			},1000)
 		},
-		// 不建议输入框聚焦时操作此动画
-		ckAdd() {
-			if (!this.showTow) {
-				this.upTowmn(-180, 350)
+		// 录音被打断
+		voiceCancel(){
+			this.recording = false;
+			this.voiceTis='按住 说话';
+			this.recordTis = '手指上滑 取消发送'
+			this.willStop = true;//不发送录音
+			this.RECORDER.stop();//录音结束
+		},
+		// 录音中(判断是否触发上滑取消发送)
+		voiceIng(e){
+			if(!this.recording){
+				return;
+			}
+			let touche = e.touches[0];
+			//上滑一个导航栏的高度触发上滑取消发送
+			if(this.initPoint.Y - touche.clientY>=uni.upx2px(100)){
+				this.willStop = true;
+				this.recordTis = '松开手指 取消发送'
+			}else{
+				this.willStop = false;
+				this.recordTis = '手指上滑 取消发送'
+			}
+		},
+		// 结束录音
+		voiceEnd(e){
+			if(!this.recording){
+				return;
+			}
+			this.recording = false;
+			this.voiceTis='按住 说话';
+			this.recordTis = '手指上滑 取消发送'
+			this.RECORDER.stop();//录音结束
+		},
+		//录音结束(回调文件)
+		recordEnd(e){
+			clearInterval(this.recordTimer);
+			if(!this.willStop){
+				// e: {"tempFilePath":"_doc/uniapp_temp_1610607301718/recorder/1610607667800.mp3"}
+				// console.log("e: " + JSON.stringify(e), ' length:', this.recordLength);
+				let app = this;
+				uni.uploadFile({
+				    url: constants.UPLOAD_VOICE_URL,
+				    filePath: e.tempFilePath,
+				    name: 'file',
+				    formData: {
+				        'file_name': app.guid(),
+						'username': app.username,
+						'client': constants.client
+				    },
+				    success: (response) => {
+				        console.log(response.data);
+						// 发送图片
+						var voiceUrl = JSON.parse(response.data).data;
+						app.sendVoiceMessageSync(voiceUrl, this.recordLength, "mp3");
+				    }
+				});
+				
+			}else{
+				console.log('取消发送录音');
+			}
+			this.willStop = false;
+		},
+		// 切换语音/文字输入
+		switchVoice(){
+			this.hideDrawer();
+			this.isVoice = this.isVoice?false:true;
+		},
+		discard(){
+			return;
+		},
+		/**
+		 * 1. 首先判断是否已经注册过
+		 * 2. 如果已经注册过，则直接调用登录接口
+		 * 3. 如果没有注册过，则从服务器请求用户名
+		 */
+		requestUsername () {
+			// this.username = localStorage.bd_kfe_username;
+			// this.password = this.username;
+			if (this.username) {
+				// this.login();
 			} else {
-				this.upTowmn(0, 200)
+				//
+				// $.ajax({
+				// 	url: this.HTTP_HOST + '/visitor/api/username',
+				// 	contentType: "application/json; charset=utf-8",
+				// 	type: "get",
+				// 	data: {
+				// 		nickname: this.nickname,
+				// 		subDomain: this.subDomain,
+				// 		client: this.client
+				// 	},
+				// 	success: function (response) {
+				// 		console.log('user:', response.data);
+				// 		// 登录
+				// 		app.uid = response.data.uid;
+				// 		app.username = response.data.username;
+				// 		app.password = app.username;
+				// 		app.nickname = response.data.nickname;
+				// 		// 本地存储
+				// 		localStorage.bd_kfe_uid = app.uid;
+				// 		localStorage.bd_kfe_username = app.username;
+				// 		// 登录
+				// 		app.login();
+				// 	},
+				// 	error: function (error) {
+				// 		//Do Something to handle error
+				// 		console.log(error);
+				// 	}
+				// });
 			}
-			this.showTow = !this.showTow
 		},
-		hideKey() {
-			uni.hideKeyboard()
-		},
-		// 拉起/收回附加栏
-		upTowmn(x, t) {
-			var animation = uni.createAnimation({
-				duration: t,
-				timingFunction: 'ease',
-			})
-			this.animation = animation
-			animation.translateY(x).step()
-			this.animationData = animation.export()
-		}
 	}
 }
 </script>
-
-<style>
+<style lang="scss">
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
 	@import "css/index-app.css";
-	/* 微信小程序编译报错 */
-	/* @import "css/style.scss"; */
-
-	.bottom-dh-char {
-		background-color: #f9f9f9;
-		width: 750rpx;
-		height: 110rpx;
-	}
-
-	.center-box {
-		width: 720rpx;
-		padding-left: 25rpx;
-	}
-
-	.hui-box {
-		width: 750rpx;
-		height: 100%;
-	}
-
-	.dh-input {
-		width: 500rpx;
-		height: 65rpx;
-		border-radius: 30rpx;
-		padding-left: 15rpx;
-		background-color: #FFFFFF;
-	}
-
-	.box-normal {
-		width: 750rpx;
-		height: 180px;
-		background-color: #FFFFFF;
-	}
-
-	.tb-text view {
-		font-size: 65rpx;
-	}
-
-	.tb-text text {
-		font-size: 25rpx;
-		color: #737373;
-	}
-
-	.chat-img {
-		border-radius: 50%;
-		width: 100rpx;
-		height: 100rpx;
-		background-color: #f7f7f7;
-	}
+	@import "css/style.scss";
 	
-	.message-img {
-		border-radius: 5%;
-		width: 300rpx;
-		height: 300rpx;
-		background-color: #f7f7f7;
-	}
-
-	.padding-chat {
-		padding: 17rpx 20rpx;
-	}
-
-	.tb-nv {
-		width: 50rpx;
-		height: 50rpx;
-	}
-	
-	.status {
-	    float: right;
-	}
+	 .goods-info {
+	    background: #e6f9ff; 
+	    margin: 0 auto; 
+	    margin-top: 10px; 
+	    margin-bottom: 10px;
+	    width: 80%; 
+	    height: 75px; 
+	    border-radius: 5px; 
+	    font-size: 15px; 
+	    border:1px solid #c2dfe7;
+	  }
+	  
+	  .goods-pic {
+	    float:left;
+	    margin-left: 10px;
+	    margin-top: 10px;
+	  }
+	  
+	  .goods-desc {
+	    float:left;
+	    margin-left: 10px;
+	    margin-top: 10px;
+	    width: 70%;
+	  }
+	  
+	  .goods-name {
+	    float:left;
+	    margin-top: 5px;
+	    margin-left: 10px;
+	    width: 90%;
+	    overflow: hidden;
+	    white-space: nowrap;
+	    display: block;
+	    text-overflow: ellipsis;
+	  }
+	  
+	  .goods-more {
+	    clear:both;
+	    margin-top: 2px;
+	    margin-left: 2px;
+	  }
+	  
+	  .goods-price {
+	    float:left;
+	    margin-top: 2px;
+	    margin-left: 2px;
+	    color: red;
+	  }
+	  
+	  .goods-sendlink {
+	    float:left;
+	    margin-top: 2px;
+	    margin-left: 50px;
+	    cursor:pointer;
+	  }
 </style>

@@ -1,8 +1,8 @@
 <template>
 	<view>
 		<view class="content" @touchstart="hideDrawer">
-			<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView" @scrolltoupper="loadHistoryMessages" upper-threshold="50">
-				<!-- 加载历史数据waitingUI -->
+			<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView" @scrolltoupper="loadMoreMessages" upper-threshold="50">
+				<!-- 加载历史数据 waitingUI -->
 				<view class="loading" v-if="isHistoryLoading">
 					<view class="spinner">
 						<view class="rect1"></view>
@@ -101,11 +101,11 @@
 										<text @click="queryAnswer(item)" style="margin-top: 20rpx;" v-for="(item, index) in message.answers" :key="index">
 											{{item.question}}
 										</text>
-										<!-- TODO: -->
-										<!-- <view class="flex-row-start  padding-top-sm">
+										<!-- TODO: 首先选择是否有帮助，如果用户选择没有帮助，则出现‘人工客服’按钮-->
+										<view class="flex-row-start  padding-top-sm">
 											<text class="my-neirong-sm">没有你要的答案?</text>
-											<text class="padding-left" style="color: #007AFF;">换一批</text>
-										</view> -->
+											<text class="padding-left" style="color: #007AFF;" @click="requestAgent()">人工客服</text>
+										</view>
 									</view>
 								</view>
 							</view>
@@ -173,10 +173,12 @@
 		</view>
 	</view>
 </template>
+
 <script>
 import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
 import * as stompApi from '@/components/bytedesk_kefu/js/api/stompapi.js'
+import moment from '@/components/bytedesk_kefu/js/api/moment.min.js'
 import Vue from 'vue'
 // 
 export default {
@@ -187,9 +189,6 @@ export default {
 			scrollAnimation:false,
 			scrollTop:0,
 			scrollToView:'',
-			msgList:[],
-			msgImgList:[],
-			myuid:0,
 			
 			//录音相关参数
 			// #ifndef H5
@@ -217,15 +216,20 @@ export default {
 			hideEmoji:true,
 			// 萝卜丝
 			option: {
+				id: '',
 				sub: '',
 				uid: '',
 				wid: '',
 				type: '',
 				aid: '',
 				nickname: '',
-				// hidenav: '',
-				// backurl: '',
-				// 
+				//
+				tid: '',
+				avatar: '',
+				topic: '',
+				type: '',
+				title: '',
+				//
 				goods: '0',
 				goods_categoryCode: '',
 				goods_content: '',
@@ -234,11 +238,14 @@ export default {
 				goods_price: '',
 				goods_title: '',
 				goods_url: '',
-				// 
-				history: 1,
-				// 
+				//
+				history: '1',
+				//
 				postscript: '',
-				lang: 'cn'
+				agentclient: '0',
+				lang: 'cn',
+				//
+				scan: ''
 			},
 			isInputingVisible: false,
 			localPreviewContent: '',
@@ -252,6 +259,7 @@ export default {
 			messages: [],
 			loadMoreVisible: true,
 			//
+			isLogin: false,
 			// 留言 + 表单
 			realname: '',
 			mobile: '',
@@ -333,7 +341,9 @@ export default {
 			showInputBar: true,
 			showLeaveMessage: false,
 			showRate: false,
-			showForm: false
+			showForm: false,
+			//
+			timer: ''
 		};
 	},
 	onLoad(option) {
@@ -371,8 +381,58 @@ export default {
 		uni.setNavigationBarTitle({
 		　　title:this.option.title
 		})
-		// this.login(this.option)
-		this.requestThread(this.option)
+		if (this.option.agentclient === '1') {
+			console.log('客服端打开会话')
+			try {
+			    //
+			    this.uid = uni.getStorageSync(constants.uid)
+			    this.username = uni.getStorageSync(constants.username)
+			    this.nickname = uni.getStorageSync(constants.nickname)
+			    this.avatar = uni.getStorageSync(constants.avatar)
+			} catch (error) {
+			    console.error('read uid/username error', error)
+			}
+			this.thread.tid = this.option.tid
+			this.thread.topic = this.option.topic
+			this.thread.type = this.option.type
+			this.thread.visitor.uid = this.option.uid
+			this.thread.visitor.nickname = this.option.nickname
+			this.thread.visitor.avatar = this.option.avatar
+			//
+			let visitorUid = this.option.topic.split('/')[1]
+			console.log('visitorUid:', visitorUid)
+			this.loadHistoryMessages(visitorUid);
+			//
+		} else if (this.option.scan != null &&
+			(this.option.scan.startsWith('a') || this.option.scan.startsWith('w'))) {
+			console.log('扫小程序码打开')
+			// TODO: 判断是否已经初始化，如果已经初始化则直接调用接口请求客服，否则首先初始化
+			try {
+				//
+				this.isLogin = uni.getStorageSync(constants.isLogin);
+				if (this.isLogin) {
+					this.requestThreadScan()
+				} else {
+					// 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
+					let subDomain = 'vip'
+					// 登录后台->渠道管理-》uniapp中创建应用获取appkey
+					let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
+					//
+					bytedesk.initWithCallback(subDomain, appKey, function(result){
+						console.log('initWithCallback success:', result)
+						// TODO: 初始化完毕之后，再调用
+						this.requestThreadScan()
+					}, function(error) {
+						console.log('initWithCallback error:', error)
+					});
+				}
+			} catch (e){
+				//TODO handle the exception
+			}
+		} else {
+			// 正常打开
+			this.requestThread()
+		}
 	},
 	computed: {
 		threadTopic() {
@@ -475,11 +535,30 @@ export default {
 		is_type_notification_rate_result(message) {
 			return message.type === 'notification_rate_result'
 		},
+		my_uid () {
+			return this.uid
+		},
 		my_nickname () {
+			// 客服端
+			if (this.option.agentclient === '1') {
+				return this.nickname;
+			}
+			// 访客端
 			if (this.option.nickname) {
 				return this.option.nickname
 			}
 			return this.nickname.trim().length > 0 ? this.nickname : this.thread.visitor.nickname
+		},
+		my_avatar () {
+			// 客服端
+			if (this.option.agentclient === '1') {
+				return this.avatar;
+			}
+			// 访客端
+			if (this.option.avatar) {
+				return this.option.avatar
+			}
+			return this.avatar.trim().length > 0 ? this.avatar : this.thread.visitor.avatar
 		},
 		jsonObject (content) {
 			// console.log('parse json:', content);
@@ -510,9 +589,9 @@ export default {
 			});
 		},
 		// 请求会话
-		requestThread (option) {
+		requestThread () {
 			//
-			if (option.type === undefined || option.type === null) {
+			if (this.option.type === undefined || this.option.type === null) {
 				return
 			}
 			try {
@@ -526,11 +605,11 @@ export default {
 			    console.error('read uid/username error', error)
 			}
 			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
-			this.loadHistoryMessages();
+			this.loadHistoryMessages(this.uid);
 			//
 			let app = this
-			httpApi.requestThread(option.wid, option.type, option.aid, function(response) {
-				console.log('request thread success', option.wid, option.type, option.aid, response)
+			httpApi.requestThread(this.option.wid, this.option.type, this.option.aid, function(response) {
+				console.log('request thread success', app.option.wid, app.option.type, app.option.aid, response)
 				//
 				app.dealWithThread(response);
 			}, function(error) {
@@ -538,24 +617,50 @@ export default {
 			})
 		},
 		// 请求人工客服
-		requestAgent (option) {
+		requestAgent () {
 			//
-			if (option.type === undefined || option.type === null) {
+			if (this.option.type === undefined || this.option.type === null) {
 				return
 			}
 			//
 			let app = this
-			httpApi.requestAgent(option.wid, option.type, option.aid, function(response) {
-				console.log('request agent success', option.wid, option.type, option.aid, response)
+			httpApi.requestAgent(this.option.wid, this.option.type, this.option.aid, function(response) {
+				console.log('request agent success', app.option.wid, app.option.type, app.option.aid, response)
 				//
 				app.dealWithThread(response);
 			}, function(error) {
 				console.log('request agent error', error)
 			})
 		},
+		// 请求客服会话-扫小程序码
+		requestThreadScan () {
+			//
+			try {
+			    //
+			    this.uid = uni.getStorageSync(constants.uid)
+			    this.username = uni.getStorageSync(constants.username)
+			    this.nickname = uni.getStorageSync(constants.nickname)
+			    this.avatar = uni.getStorageSync(constants.avatar)
+			} catch (error) {
+			    console.error('read uid/username error', error)
+			}
+			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
+			this.loadHistoryMessages(this.uid);
+			//
+			let app = this
+			httpApi.requestThreadScan(this.option.id, function(response) {
+				console.log('request thread scan success', app.option.id, response)
+				//
+				app.dealWithThread(response);
+			}, function(error) {
+				console.log('request thread scan error', error)
+			})
+		},
+		loadMoreMessages () {
+			this.loadHistoryMessages(this.uid)
+		},
 		// 加载更多聊天记录
-		loadHistoryMessages () {
-			// console.log('loadHistoryMessages')
+		loadHistoryMessages (uid) {
 			if (this.isManulRequestThread || this.loadHistory === '0') {
 				return;
 			}
@@ -566,7 +671,7 @@ export default {
 			this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
-			httpApi.loadHistoryMessages(this.uid, this.page, 10, function(response) {
+			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
 				// console.log('loadHistoryMessages: ', response)
 				for (let i = 0; i < response.data.content.length; i++) {
 					const element = response.data.content[i]
@@ -591,8 +696,6 @@ export default {
 				// }
 				// // 1. 保存thread
 				this.thread = message.thread;
-				// // 3. 加载聊天记录
-				// this.loadHistoryMessages();
 				// // 设置当前为人工客服
 				this.isRobot = false;
 				// // 防止会话超时自动关闭，重新标记本地打开会话
@@ -606,8 +709,6 @@ export default {
 				// }
 				// // 1. 保存thread
 				this.thread = message.thread;
-				// // 3. 加载聊天记录
-				// this.loadHistoryMessages();
 				// // 设置当前为人工客服
 				this.isRobot = false;
 				// // 防止会话超时自动关闭，重新标记本地打开会话
@@ -648,8 +749,6 @@ export default {
 				// }
 				// 1. 保存thread
 				// this.thread = message.thread;
-				// 3. 加载聊天记录
-				// this.loadHistoryMessages();
 				// 返回机器人初始欢迎语 + 欢迎问题列表
 				this.pushToMessageArray(message);
 				// 1. 保存thread
@@ -682,9 +781,9 @@ export default {
 				"version": "1",
 				"type": 'commodity',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"content": jsonContent,
 				"thread": {
@@ -741,9 +840,9 @@ export default {
 				"version": "1",
 				"type": 'text',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"text": {
 					"content": content
@@ -772,9 +871,9 @@ export default {
 				"version": "1",
 				"type": 'image',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"image": {
 					"imageUrl": imageUrl
@@ -803,9 +902,9 @@ export default {
 				"version": "1",
 				"type": 'voice',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"voice": {
 					"voiceUrl": voiceUrl,
@@ -836,9 +935,9 @@ export default {
 				"version": "1",
 				"type": 'video',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"video": {
 					"videoOrShortUrl": videoUrl
@@ -870,9 +969,9 @@ export default {
 				"version": "1",
 				"type": 'commodity',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"text": {
 					"content": jsonContent
@@ -900,9 +999,9 @@ export default {
 				"version": "1",
 				"type": "notification_preview",
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"preview": {
 					"content": this.localPreviewContent === undefined ? " " : this.localPreviewContent
@@ -930,9 +1029,9 @@ export default {
 				"version": "1",
 				"type": "notification_receipt",
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"receipt": {
 					"mid": mid,
@@ -960,9 +1059,9 @@ export default {
 				"version": "1",
 				"type": "notification_recall",
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"recall": {
 					"mid": mid
@@ -1032,18 +1131,24 @@ export default {
 		},
 		// 建立长连接
 		byteDeskConnect () {
-			let app = this
-			stompApi.connect(this.thread, function() {
-				// 长连接成功回调
-				// 发送附言信息
-				if (app.option.postscript !== null 
-					&& app.option.postscript !== undefined 
-					&& app.option.postscript !== '') {
-					app.sendTextMessageSync(app.option.postscript)
-				}
-				// 发送商品信息
-				app.sendCommodityMessageSync()
-			})
+			if (stompApi.isConnected()) {
+				// 订阅topic
+				let topic = this.thread.topic.replace(/\//g, ".");
+				stompApi.subscribeTopic(topic);
+			} else {
+				let app = this
+				stompApi.connect(this.thread, function() {
+					// 长连接成功回调
+					// 发送附言信息
+					if (app.option.postscript !== null 
+						&& app.option.postscript !== undefined 
+						&& app.option.postscript !== '') {
+						app.sendTextMessageSync(app.option.postscript)
+					}
+					// 发送商品信息
+					app.sendCommodityMessageSync()
+				})
+			}
 		},
 		onMessageReceived (messageObject) {
 			// console.log('onMessageReceived:', messageObject)
@@ -1163,8 +1268,8 @@ export default {
 		},
 		//
 		currentTimestamp () {
-			// return moment().format('YYYY-MM-DD HH:mm:ss')
-			return ''
+			return moment().format('YYYY-MM-DD HH:mm:ss')
+			// return ''
 		},
 		///
 		// 选择图片发送
@@ -1243,6 +1348,12 @@ export default {
 		},
 		messageAnswer (content) {
 			let app = this;
+			// 包含’人工‘二字
+			if (content.indexOf('人工') !== -1) {
+				// 请求人工客服
+				app.requestAgent()
+				return;
+			} 
 			httpApi.messageAnswer(this.option.wid, this.option.type, this.option.aid, content, function(response) {
 				console.log('messageAnswer success', response)
 				if (response.status_code === 200 ||
@@ -1252,13 +1363,7 @@ export default {
 					let replyMessage = response.data.reply;
 					//
 					app.pushToMessageArray(queryMessage);
-					// 包含’人工‘二字
-					if (content.indexOf('人工') !== -1) {
-						// 请求人工客服
-						app.requestAgent()
-					} else {
-						app.pushToMessageArray(replyMessage);
-					}
+					app.pushToMessageArray(replyMessage);
 					// app.scrollToBottom()
 					app.scrollToMessage(replyMessage)
 				} else {
@@ -1449,6 +1554,13 @@ export default {
 				// });
 			}
 		},
+	},
+	mounted() {
+	  // 如果长连接断开，则定时刷新聊天记录
+	  // this.timer = setInterval(this.getThreads, 1000);
+	},
+	beforeDestroy() {
+	  // clearInterval(this.timer);
 	}
 }
 </script>

@@ -56,63 +56,63 @@ export default {
 		// 技能组会话
 		startWorkGroupChat () {
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
 			});
 		},
 		// 技能组会话-无历史消息记录
 		startWorkGroupChatNoHistory () {
 			// 注意：最后添加参数history=0
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&history=0'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&history=0'
 			});
 		},
 		startWorkGroupChatRobot () {
 			// 服务器端设置此技能组为默认机器人
 			// 管理后台-》客服管理-》技能组-》点击某个技能组最右边‘编辑’按钮-》开启默认机器人或离线机器人
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWidRobot + '&type=workGroup&aid=&title=萝卜丝&history=0'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWidRobot + '&type=workGroup&aid=&title=萝卜丝&history=0'
 			});
 		},
 		startWorkGroupChatShop () {
 			// 增加商品信息参数
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&&goods=1&goods_categoryCode=101&goods_content=商品详情&goods_id=123&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp&goods_price=1000&goods_title=商品标题&goods_url=https://item.m.jd.com/product/12172344.html&history=0&lang=cn'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&&goods=1&goods_categoryCode=101&goods_content=商品详情&goods_id=123&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp&goods_price=1000&goods_title=商品标题&goods_url=https://item.m.jd.com/product/12172344.html&history=0&lang=cn'
 			});
 		},
 		startWorkGroupChatPostscript () {
 			// 增加附言参数：postscript=这是附言自动发送给客服
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&postscript=这是附言自动发送给客服'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&postscript=这是附言自动发送给客服'
 			});
 		},
 		startWorkGroupChatNickname () {
 			// 增加参数：nickname=自定义昵称
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&nickname=自定义昵称'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&nickname=自定义昵称'
 			});
 		},
 		// 一对一会话
 		startAppointedChat () {
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝'
 			});
 		},
 		startAppointedChatShop () {
 			// 增加商品信息参数
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&goods=1&goods_categoryCode=101&goods_content=商品详情&goods_id=123&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp&goods_price=1000&goods_title=商品标题哈哈哈哈哈哈哈哈哈哈或或或或或或或或或&goods_url=https://item.m.jd.com/product/12172344.html&history=0&lang=cn'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&goods=1&goods_categoryCode=101&goods_content=商品详情&goods_id=123&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp&goods_price=1000&goods_title=商品标题哈哈哈哈哈哈哈哈哈哈或或或或或或或或或&goods_url=https://item.m.jd.com/product/12172344.html&history=0&lang=cn'
 			});
 		},
 		startAppointedChatPostscript () {
 			// 增加附言参数：postscript=这是附言自动发送给客服
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&postscript=这是附言自动发送给客服'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&postscript=这是附言自动发送给客服'
 			});
 		},
 		startAppointedChatNickname () {
 			// 增加参数：nickname=自定义昵称
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-im?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&nickname=自定义昵称'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&nickname=自定义昵称'
 			});
 		},
 		// 集成H5链接

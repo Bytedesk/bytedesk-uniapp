@@ -25,6 +25,30 @@
 			}
 		},
 		{
+			"path": "pages/index/history_thread_visitor",
+			"style": {
+				"navigationBarTitleText": "访客端历史会话",
+				"navigationBarBackgroundColor":"#007AFF",
+				"navigationBarTextStyle":"white"
+			}
+		},
+		{
+			"path": "pages/index/history_thread_agent",
+			"style": {
+				"navigationBarTitleText": "客服端历史会话",
+				"navigationBarBackgroundColor":"#007AFF",
+				"navigationBarTextStyle":"white"
+			}
+		},
+		{
+			"path": "pages/index/current_thread_agent",
+			"style": {
+				"navigationBarTitleText": "当前会话",
+				"navigationBarBackgroundColor":"#007AFF",
+				"navigationBarTextStyle":"white"
+			}
+		},
+		{
 			"path": "pages/index/online_status",
 			"style": {
 				"navigationBarTitleText": "在线状态",

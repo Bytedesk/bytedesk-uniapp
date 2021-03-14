@@ -13,7 +13,7 @@ let currentThread = {
 	tid: '',
 	topic: ''
 }
-
+//
 var stompApi = {
 
   connect: function(thread, callback) {
@@ -49,6 +49,8 @@ var stompApi = {
       if (socketConnected) {
         uni.closeSocket()
         socketConnected = false;
+		// 为断开重连做准备
+		subscribedTopics = [];
       }
     }
 	
@@ -111,6 +113,8 @@ var stompApi = {
     uni.onSocketError(function (result) {
       stompApi.printLog("SocketError:" + result)
       if (!socketConnected) {
+		// 为断开重连做准备
+		subscribedTopics = [];
         // 断线重连
         if (reconnect) {
           setTimeout(function () {
@@ -124,6 +128,8 @@ var stompApi = {
     uni.onSocketClose(function (result) {
       stompApi.printLog("SocketClose:" + result)
       socketConnected = false;
+	  // 为断开重连做准备
+	  subscribedTopics = [];
       // 断线重连
       if (reconnect) {
         setTimeout(function () {
@@ -170,8 +176,15 @@ var stompApi = {
       // 登录成功之后，尝试登录次数清零
       stompReconnectTimes = 0
 	  // 订阅topic
-	  let topic = currentThread.topic.replace(/\//g, "."); //replace(/\//, ".");
-	  stompApi.subscribeTopic(topic)
+	  if (currentThread != null && currentThread != undefined) {
+		let topic = currentThread.topic.replace(/\//g, ".");
+		stompApi.subscribeTopic(topic)
+	  }
+	  //
+	  for (var i = 0; i < subscribedTopics.length; i++) {
+	  	let tp = subscribedTopics[i]
+		stompApi.subscribeTopic(tp)
+	  }
       // 更新连接状态：连接成功
       // let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTED
       // commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
@@ -216,15 +229,16 @@ var stompApi = {
    * @param topic
    */
   subscribeTopic: function(topic) {
-    stompApi.printLog('subscribeTopic:' + topic)
-	//
-    // let contains = subscribedTopics.some(tp => {
-    //   return tp === topic
-    // })
-    // if (contains) {
-    //   return
-    // }
-    // subscribedTopics.push(topic)
+    // stompApi.printLog('subscribeTopic:' + topic)
+    // 防止重复订阅
+	if (subscribedTopics.includes(topic)) {
+		return;
+	}
+	subscribedTopics.push(topic);
+	// 判断是否为空
+	if (stompClient === null || stompClient === undefined) {
+		return
+	}
     //
     stompClient.subscribe("/topic/" + topic, function (message) {
       // console.log('message :', message, 'body:', message.body);

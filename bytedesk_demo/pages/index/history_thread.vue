@@ -1,36 +1,40 @@
 <template>
 	<view class="bytedesk">
 		<uni-section title="历史会话" type="line"></uni-section>
-		<uni-list-chat v-for="thread in historyThreadList" :key="thread.tid" :avatar="thread.avatar" :title="thread.nickname" :note="thread.content" :time="thread.timestamp" showArrow/>
+		<uni-list :border="true">
+			<uni-list-item title="访客端-历史会话" clickable @click="gotoVisitorHistoryThreads()" note="需要访客登录" showArrow />
+			<uni-list-item title="客服端-历史会话" clickable @click="gotoAgentHistoryThreads()" note="需要登录客服账号" showArrow />
+		</uni-list>
+		<uni-section title="当前会话" type="line"></uni-section>
+		<uni-list :border="true">
+			<uni-list-item title="客服端-进行中会话" clickable @click="gotoAgentCurrentThreads()" note="需要登录客服账号" showArrow />
+		</uni-list>
 	</view>
 </template>
 
 <script>
-	// 引入js文件
-	import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
-	
 	export default {
 		data() {
 			return {
-				historyThreadList: []
 			}
 		},
 		onLoad() {
-			this.getVisitorThreads()
 		},
 		methods: {
-			getVisitorThreads () {
-				let page = 0;
-				let size = 20;
-				//
-				let app = this
-				httpApi.getVisitorThreads(page, size, function(response) {
-					console.log('getVisitorThreads success:', response)
-					app.historyThreadList = response.data.content
-				}, function(error) {
-					console.log('getVisitorThreads error', error)
-					uni.showToast({ title: error, duration: 2000 });
-				})
+			gotoVisitorHistoryThreads () {
+				uni.navigateTo({
+					url: './history_thread_visitor'
+				});
+			},
+			gotoAgentHistoryThreads () {
+				uni.navigateTo({
+					url: './history_thread_agent'
+				});
+			},
+			gotoAgentCurrentThreads () {
+				uni.navigateTo({
+					url: './current_thread_agent'
+				});
 			}
 		}
 	}
