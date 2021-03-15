@@ -47,7 +47,7 @@ export function login(username, password, subDomain, successcb, failedcb) {
 
 export function code2Session (code, successcb, failedcb) {
   uni.request({
-    url: constants.API_BASE_URL + '/visitors/api/v1/code2Session',
+    url: constants.API_BASE_URL + '/visitors/api/v1/code2Session2',
     data: {
       'code': code,
     },
@@ -607,6 +607,34 @@ export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
   })
 }
 
+// 加载从某条消息记录之后的消息
+export function loadMessagesFrom(uid, id, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/user/from',
+    data: {
+	  uid: uid,
+	  id: id,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  console.log('loadMessagesFrom:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 加载用户个人资料
 export function getProfile (successcb, failedcb) {
   //
@@ -759,6 +787,35 @@ export function sendMessageRest(json, successcb, failedcb) {
     url: constants.API_BASE_URL + '/api/messages/send',
     data: {
       'json': json,
+      'client': constants.client
+    },
+  	header: header,
+    method: 'POST',
+    success (res) {
+      // successcb(res.data)
+	  successcb(json)
+    },
+    fail (res) {
+      // failedcb(res.data)
+	  failedcb(json)
+    }
+  })
+}
+
+// 将获取到的小程序openid绑定到当前用户
+export function bindMiniOpenid(openid, successcb, failedcb) {
+  console.log('bindMiniOpenid:' + openid)
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/user/bind/mini/openid',
+    data: {
+      'miniOpenId': openid,
       'client': constants.client
     },
   	header: header,

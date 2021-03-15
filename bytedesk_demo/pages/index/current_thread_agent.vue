@@ -32,14 +32,6 @@
 				let app = this
 				httpApi.getThreads(page, size, function(response) {
 					console.log('getThreads success:', response)
-					// for (var i = 0; i < response.data.agentThreads.length; i++) {
-					// 	let thread = response.data.agentThreads[i]
-					// 	if (thread.type === 'workgroup') {
-					// 		app.workGroupThreadList.push(thread)
-					// 	} else {
-					// 		app.agentThreadList.push(thread)
-					// 	}
-					// }
 					for (var i = 0; i < response.data.agentThreads.length; i++) {
 						let thread = response.data.agentThreads[i]
 						if (thread.type === 'workgroup') {

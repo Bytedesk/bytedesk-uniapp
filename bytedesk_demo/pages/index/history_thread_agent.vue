@@ -28,7 +28,15 @@
 			startChat (thread) {
 				console.log('chat');
 				uni.navigateTo({
-					url: '../../components/bytedesk_kefu/chat-im?topic=' + thread.topic + '&type=agent&title=萝卜丝'
+					url: '../../components/bytedesk_kefu/chat-im?'
+						+ 'tid=' + thread.tid
+						+ '&uid=' + thread.uid 
+						+ '&nickname=' + thread.nickname 
+						+ '&avatar=' + thread.avatar 
+						+ '&topic=' + thread.topic 
+						+ '&type=' + thread.type 
+						+ '&title=' + thread.nickname
+						+ '&agentclient=1'
 				});
 			},
 			getThreadHistoryRecords () {
@@ -38,14 +46,6 @@
 				let app = this
 				httpApi.getThreadHistoryRecords(page, size, function(response) {
 					console.log('getThreadHistoryRecords success:', response)
-					// for (var i = 0; i < response.data.content.length; i++) {
-					// 	let thread = response.data.content[i]
-					// 	if (thread.type === 'workgroup') {
-					// 		app.workGroupThreadList.push(thread)
-					// 	} else {
-					// 		app.agentThreadList.push(thread)
-					// 	}
-					// }
 					for (var i = 0; i < response.data.content.length; i++) {
 						let thread = response.data.content[i]
 						if (thread.type === 'workgroup') {

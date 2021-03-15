@@ -175,6 +175,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
 import * as stompApi from '@/components/bytedesk_kefu/js/api/stompapi.js'
@@ -259,6 +260,7 @@ export default {
 			messages: [],
 			loadMoreVisible: true,
 			//
+			isLogin: false,
 			// 留言 + 表单
 			realname: '',
 			mobile: '',
@@ -340,7 +342,10 @@ export default {
 			showInputBar: true,
 			showLeaveMessage: false,
 			showRate: false,
-			showForm: false
+			showForm: false,
+			//
+			visitorUid: '',
+			timer: ''
 		};
 	},
 	onLoad(option) {
@@ -387,33 +392,51 @@ export default {
 			this.thread.visitor.nickname = this.option.nickname
 			this.thread.visitor.avatar = this.option.avatar
 			//
-			let visitorUid = this.option.topic.split('/')[1]
-			console.log('visitorUid:', visitorUid)
-			this.loadHistoryMessages(visitorUid);
+			this.visitorUid = this.option.topic.split('/')[1]
+			console.log('visitorUid:', this.visitorUid)
+			this.loadHistoryMessages(this.visitorUid);
+			// 添加订阅topic
+			let topic = this.thread.topic.replace(/\//g, ".");
+			stompApi.subscribeTopic(topic)
 			//
 		} else if (this.option.scan != null &&
 			(this.option.scan.startsWith('a') || this.option.scan.startsWith('w'))) {
 			console.log('扫小程序码打开')
+			// TODO: 调用微信授权登录
+			// #ifdef MP-WEIXIN
+			// #endif
+			// #ifdef MP-QQ
+			// #endif
 			// TODO: 判断是否已经初始化，如果已经初始化则直接调用接口请求客服，否则首先初始化
-			
-			// 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
-			let subDomain = 'vip'
-			// 登录后台->渠道管理-》uniapp中创建应用获取appkey
-			let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
-			//
-			bytedesk.initWithCallback(subDomain, appKey, function(result){
-				console.log('initWithCallback success:', result)
-			}, function(error) {
-				console.log('initWithCallback error:', error)
-			});
-			// TODO: 初始化完毕之后，再调用
-			this.requestThreadScan()
+			try {
+				//
+				this.isLogin = uni.getStorageSync(constants.isLogin);
+				if (this.isLogin) {
+					this.requestThreadScan()
+				} else {
+					// 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
+					let subDomain = 'vip'
+					// 登录后台->渠道管理-》uniapp中创建应用获取appkey
+					let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
+					//
+					bytedesk.initWithCallback(subDomain, appKey, function(result){
+						console.log('initWithCallback success:', result)
+						// TODO: 初始化完毕之后，再调用
+						this.requestThreadScan()
+					}, function(error) {
+						console.log('initWithCallback error:', error)
+					});
+				}
+			} catch (e){
+				//TODO handle the exception
+			}
 		} else {
 			// 正常打开
 			this.requestThread()
 		}
 	},
 	computed: {
+		...mapGetters([ 'userInfo' ]),
 		threadTopic() {
 			return this.thread.topic.replace(/\//g, ".");
 		},
@@ -421,7 +444,8 @@ export default {
 	methods:{
 		//
 		is_self (message) {
-			return message.user.uid === this.uid;
+			// return message.user.uid === this.uid;
+			return message.user.uid === this.my_uid();
 		},
 		// 发送状态
 		is_sending (message) {
@@ -514,11 +538,41 @@ export default {
 		is_type_notification_rate_result(message) {
 			return message.type === 'notification_rate_result'
 		},
+		my_uid () {
+			// 客服端
+			if (this.option.agentclient === '1') {
+				return this.userInfo.uid;
+			}
+			return this.uid
+		},
 		my_nickname () {
+			// 客服端
+			if (this.option.agentclient === '1') {
+				return this.userInfo.nickname;
+			}
+			// 访客端
 			if (this.option.nickname) {
 				return this.option.nickname
 			}
 			return this.nickname.trim().length > 0 ? this.nickname : this.thread.visitor.nickname
+		},
+		thread_nickname () {
+			// 访客端
+			if (this.option.nickname) {
+				return this.option.nickname
+			}
+			return this.nickname.trim().length > 0 ? this.nickname : this.thread.visitor.nickname
+		},
+		my_avatar () {
+			// 客服端
+			if (this.option.agentclient === '1') {
+				return this.userInfo.avatar;
+			}
+			// 访客端
+			if (this.option.avatar) {
+				return this.option.avatar
+			}
+			return this.avatar.trim().length > 0 ? this.avatar : this.thread.visitor.avatar
 		},
 		jsonObject (content) {
 			// console.log('parse json:', content);
@@ -601,7 +655,6 @@ export default {
 			    this.username = uni.getStorageSync(constants.username)
 			    this.nickname = uni.getStorageSync(constants.nickname)
 			    this.avatar = uni.getStorageSync(constants.avatar)
-				// console.log('uid 1:', this.uid)
 			} catch (error) {
 			    console.error('read uid/username error', error)
 			}
@@ -618,7 +671,11 @@ export default {
 			})
 		},
 		loadMoreMessages () {
-			this.loadHistoryMessages(this.uid)
+			if (this.option.agentclient === '1') {
+				this.loadHistoryMessages(this.visitorUid)
+			} else {
+				this.loadHistoryMessages(this.uid)
+			}
 		},
 		// 加载更多聊天记录
 		loadHistoryMessages (uid) {
@@ -633,7 +690,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				// console.log('loadHistoryMessages: ', response)
+				console.log('loadHistoryMessages: ', response)
 				for (let i = 0; i < response.data.content.length; i++) {
 					const element = response.data.content[i]
 					// console.log('element:', element);
@@ -644,6 +701,22 @@ export default {
 				app.isHistoryLoading = false;
 			}, function(error) {
 				console.log('load history messages error', error)
+			})
+		},
+		// 加载从某条消息记录之后的消息
+		loadMessagesFrom (uid, id) {
+			let app = this
+			httpApi.loadMessagesFrom(uid, id, function(response) {
+				console.log('loadMessagesFrom: ', response)
+				for (let i = 0; i < response.data.content.length; i++) {
+					const element = response.data.content[i]
+					// console.log('element:', element);
+					// app.messages.unshift(element)
+					app.pushToMessageArray(element)
+				}
+				app.scrollToBottom()
+			}, function(error) {
+				console.log('load messages from error', error)
 			})
 		},
 		// 
@@ -742,16 +815,16 @@ export default {
 				"version": "1",
 				"type": 'commodity',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"content": jsonContent,
 				"thread": {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[商品]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -801,9 +874,9 @@ export default {
 				"version": "1",
 				"type": 'text',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"text": {
 					"content": content
@@ -812,7 +885,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": content,
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -832,9 +905,9 @@ export default {
 				"version": "1",
 				"type": 'image',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"image": {
 					"imageUrl": imageUrl
@@ -843,7 +916,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[图片]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -863,9 +936,9 @@ export default {
 				"version": "1",
 				"type": 'voice',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"voice": {
 					"voiceUrl": voiceUrl,
@@ -876,7 +949,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[语音]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -896,9 +969,9 @@ export default {
 				"version": "1",
 				"type": 'video',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"video": {
 					"videoOrShortUrl": videoUrl
@@ -907,7 +980,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[视频]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -930,9 +1003,9 @@ export default {
 				"version": "1",
 				"type": 'commodity',
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"text": {
 					"content": jsonContent
@@ -941,7 +1014,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[商品]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -960,9 +1033,9 @@ export default {
 				"version": "1",
 				"type": "notification_preview",
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"preview": {
 					"content": this.localPreviewContent === undefined ? " " : this.localPreviewContent
@@ -972,7 +1045,7 @@ export default {
 					"type": this.thread.type,
 					// TODO: 根据内容类型设置不同, 如: [图片]
 					"content": this.localPreviewContent,
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -990,9 +1063,9 @@ export default {
 				"version": "1",
 				"type": "notification_receipt",
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"receipt": {
 					"mid": mid,
@@ -1002,7 +1075,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					// "content": content,
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -1020,9 +1093,9 @@ export default {
 				"version": "1",
 				"type": "notification_recall",
 				"user": {
-					"uid": this.uid,
+					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.thread.visitor.avatar
+					"avatar": this.my_avatar()
 				},
 				"recall": {
 					"mid": mid
@@ -1031,7 +1104,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					// "content": content,
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -1062,19 +1135,14 @@ export default {
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
-				let app = this
 				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
 					console.log('sendMessageRest success:', json)
-					// TODO: 待处理
-					// var messageObject = JSON.parse(json);
-					// app.pushToMessageArray(messageObject)
 				}, function(error) {
 					console.log('send message rest error:', error)
-					// TODO: 待处理
-					// var messageObject = JSON.parse(json);
-					// app.pushToMessageArray(messageObject)
 				})
 			}
+			// 先插入本地
+			this.onMessageReceived(json)
 		},
 		pushToMessageArray(message) {
 			// 判断是否已经存在
@@ -1181,7 +1249,7 @@ export default {
 			  this.isThreadClosed = true
 			} else if (messageObject.type === 'notification_preview') {
 			  //
-			  if (messageObject.user.uid !== this.uid) {
+			  if (!this.is_self(messageObject)) {
 			      this.isInputingVisible = true;
 			      setTimeout(function () {
 			          this.isInputingVisible = false;
@@ -1189,7 +1257,7 @@ export default {
 			  }
 			} else if (messageObject.type === 'notification_receipt') {
 			  // 消息状态：送达 received、已读 read
-			  if (messageObject.user.uid !== this.uid) {
+			  if (!this.is_self(messageObject)) {
 			    for (let i = this.messages.length - 1; i >= 0 ; i--) {
 					const msg = this.messages[i]
 					if (msg.mid === messageObject.receipt.mid) {
@@ -1515,6 +1583,13 @@ export default {
 				// });
 			}
 		},
+	},
+	mounted() {
+	  // 如果长连接断开，则定时刷新聊天记录
+	  // this.timer = setInterval(this.getThreads, 1000);
+	},
+	beforeDestroy() {
+	  // clearInterval(this.timer);
 	}
 }
 </script>
