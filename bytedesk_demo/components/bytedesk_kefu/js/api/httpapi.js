@@ -598,7 +598,7 @@ export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
     header: header,
     method: 'GET',
     success (res) {
-	  console.log('loadHistoryMessages:', res)
+	  // console.log('loadHistoryMessages:', res)
       successcb(res.data)
     },
     fail (res) {
@@ -626,7 +626,7 @@ export function loadMessagesFrom(uid, id, successcb, failedcb) {
     header: header,
     method: 'GET',
     success (res) {
-	  console.log('loadMessagesFrom:', res)
+	  // console.log('loadMessagesFrom:', res)
       successcb(res.data)
     },
     fail (res) {
@@ -775,7 +775,7 @@ export function updateAvatar(avatar, successcb, failedcb) {
 
 // 在长连接断开的情况下，发送消息
 export function sendMessageRest(json, successcb, failedcb) {
-  console.log('sendMessageRest:' + json)
+  // console.log('sendMessageRest:' + json)
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
@@ -821,12 +821,10 @@ export function bindMiniOpenid(openid, successcb, failedcb) {
   	header: header,
     method: 'POST',
     success (res) {
-      // successcb(res.data)
-	  successcb(json)
+      successcb(res.data)
     },
     fail (res) {
-      // failedcb(res.data)
-	  failedcb(json)
+      failedcb(res.data)
     }
   })
 }

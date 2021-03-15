@@ -690,11 +690,13 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				console.log('loadHistoryMessages: ', response)
-				for (let i = 0; i < response.data.content.length; i++) {
-					const element = response.data.content[i]
-					// console.log('element:', element);
-					app.messages.unshift(element)
+				// console.log('loadHistoryMessages: ', response)
+				if (response.status_code === 200) {
+					for (let i = 0; i < response.data.content.length; i++) {
+						const element = response.data.content[i]
+						// console.log('element:', element);
+						app.messages.unshift(element)
+					}
 				}
 				app.scrollToBottom()
 				app.page += 1
@@ -703,16 +705,41 @@ export default {
 				console.log('load history messages error', error)
 			})
 		},
+		// 加载最新10条消息，用于定时拉取最新消息
+		loadLatestMessage () {
+			let uid = ''
+			if (this.option.agentclient === '1') {
+				uid = this.visitorUid
+			} else {
+				uid = this.uid
+			}
+			let app = this
+			httpApi.loadHistoryMessages(uid, 0, 10, function(response) {
+				// console.log('load recent Messages: ', response)
+				if (response.status_code === 200) {
+					for (let i = 0; i < response.data.content.length; i++) {
+						const element = response.data.content[i]
+						// console.log('element:', element);
+						app.pushToMessageArray(element)
+						// app.scrollToBottom()
+					}
+				}
+			}, function(error) {
+				console.log('load recent messages error', error)
+			})
+		},
 		// 加载从某条消息记录之后的消息
 		loadMessagesFrom (uid, id) {
 			let app = this
 			httpApi.loadMessagesFrom(uid, id, function(response) {
-				console.log('loadMessagesFrom: ', response)
-				for (let i = 0; i < response.data.content.length; i++) {
-					const element = response.data.content[i]
-					// console.log('element:', element);
-					// app.messages.unshift(element)
-					app.pushToMessageArray(element)
+				// console.log('loadMessagesFrom: ', response)
+				if (response.status_code === 200) {
+					for (let i = 0; i < response.data.content.length; i++) {
+						const element = response.data.content[i]
+						// console.log('element:', element);
+						// app.messages.unshift(element)
+						app.pushToMessageArray(element)
+					}
 				}
 				app.scrollToBottom()
 			}, function(error) {
@@ -1136,7 +1163,7 @@ export default {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
 				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
-					console.log('sendMessageRest success:', json)
+					// console.log('sendMessageRest success:', json)
 				}, function(error) {
 					console.log('send message rest error:', error)
 				})
@@ -1586,10 +1613,10 @@ export default {
 	},
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
-	  // this.timer = setInterval(this.getThreads, 1000);
+	  this.timer = setInterval(this.loadLatestMessage, 1000 * 5);
 	},
 	beforeDestroy() {
-	  // clearInterval(this.timer);
+	  clearInterval(this.timer);
 	}
 }
 </script>

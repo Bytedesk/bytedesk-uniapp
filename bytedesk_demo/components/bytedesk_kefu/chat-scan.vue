@@ -1,6 +1,5 @@
 <template>
 	<view>
-		<!-- TODO: 微信授权登录 -->
 		<view class="content" @touchstart="hideDrawer">
 			<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView" @scrolltoupper="loadMoreMessages" upper-threshold="50">
 				<!-- 加载历史数据 waitingUI -->
@@ -176,6 +175,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
 import * as stompApi from '@/components/bytedesk_kefu/js/api/stompapi.js'
@@ -344,6 +344,7 @@ export default {
 			showRate: false,
 			showForm: false,
 			//
+			visitorUid: '',
 			timer: ''
 		};
 	},
@@ -384,15 +385,6 @@ export default {
 		})
 		if (this.option.agentclient === '1') {
 			console.log('客服端打开会话')
-			try {
-			    //
-			    this.uid = uni.getStorageSync(constants.uid)
-			    this.username = uni.getStorageSync(constants.username)
-			    this.nickname = uni.getStorageSync(constants.nickname)
-			    this.avatar = uni.getStorageSync(constants.avatar)
-			} catch (error) {
-			    console.error('read uid/username error', error)
-			}
 			this.thread.tid = this.option.tid
 			this.thread.topic = this.option.topic
 			this.thread.type = this.option.type
@@ -400,13 +392,21 @@ export default {
 			this.thread.visitor.nickname = this.option.nickname
 			this.thread.visitor.avatar = this.option.avatar
 			//
-			let visitorUid = this.option.topic.split('/')[1]
-			console.log('visitorUid:', visitorUid)
-			this.loadHistoryMessages(visitorUid);
+			this.visitorUid = this.option.topic.split('/')[1]
+			console.log('visitorUid:', this.visitorUid)
+			this.loadHistoryMessages(this.visitorUid);
+			// 添加订阅topic
+			let topic = this.thread.topic.replace(/\//g, ".");
+			stompApi.subscribeTopic(topic)
 			//
 		} else if (this.option.scan != null &&
 			(this.option.scan.startsWith('a') || this.option.scan.startsWith('w'))) {
 			console.log('扫小程序码打开')
+			// TODO: 调用微信授权登录
+			// #ifdef MP-WEIXIN
+			// #endif
+			// #ifdef MP-QQ
+			// #endif
 			// TODO: 判断是否已经初始化，如果已经初始化则直接调用接口请求客服，否则首先初始化
 			try {
 				//
@@ -436,6 +436,7 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters([ 'userInfo' ]),
 		threadTopic() {
 			return this.thread.topic.replace(/\//g, ".");
 		},
@@ -443,7 +444,8 @@ export default {
 	methods:{
 		//
 		is_self (message) {
-			return message.user.uid === this.uid;
+			// return message.user.uid === this.uid;
+			return message.user.uid === this.my_uid();
 		},
 		// 发送状态
 		is_sending (message) {
@@ -537,13 +539,24 @@ export default {
 			return message.type === 'notification_rate_result'
 		},
 		my_uid () {
+			// 客服端
+			if (this.option.agentclient === '1') {
+				return this.userInfo.uid;
+			}
 			return this.uid
 		},
 		my_nickname () {
 			// 客服端
 			if (this.option.agentclient === '1') {
-				return this.nickname;
+				return this.userInfo.nickname;
 			}
+			// 访客端
+			if (this.option.nickname) {
+				return this.option.nickname
+			}
+			return this.nickname.trim().length > 0 ? this.nickname : this.thread.visitor.nickname
+		},
+		thread_nickname () {
 			// 访客端
 			if (this.option.nickname) {
 				return this.option.nickname
@@ -553,7 +566,7 @@ export default {
 		my_avatar () {
 			// 客服端
 			if (this.option.agentclient === '1') {
-				return this.avatar;
+				return this.userInfo.avatar;
 			}
 			// 访客端
 			if (this.option.avatar) {
@@ -658,7 +671,11 @@ export default {
 			})
 		},
 		loadMoreMessages () {
-			this.loadHistoryMessages(this.uid)
+			if (this.option.agentclient === '1') {
+				this.loadHistoryMessages(this.visitorUid)
+			} else {
+				this.loadHistoryMessages(this.uid)
+			}
 		},
 		// 加载更多聊天记录
 		loadHistoryMessages (uid) {
@@ -674,16 +691,59 @@ export default {
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
 				// console.log('loadHistoryMessages: ', response)
-				for (let i = 0; i < response.data.content.length; i++) {
-					const element = response.data.content[i]
-					// console.log('element:', element);
-					app.messages.unshift(element)
+				if (response.status_code === 200) {
+					for (let i = 0; i < response.data.content.length; i++) {
+						const element = response.data.content[i]
+						// console.log('element:', element);
+						app.messages.unshift(element)
+					}
 				}
 				app.scrollToBottom()
 				app.page += 1
 				app.isHistoryLoading = false;
 			}, function(error) {
 				console.log('load history messages error', error)
+			})
+		},
+		// 加载最新10条消息，用于定时拉取最新消息
+		loadLatestMessage () {
+			let uid = ''
+			if (this.option.agentclient === '1') {
+				uid = this.visitorUid
+			} else {
+				uid = this.uid
+			}
+			let app = this
+			httpApi.loadHistoryMessages(uid, 0, 10, function(response) {
+				// console.log('load recent Messages: ', response)
+				if (response.status_code === 200) {
+					for (let i = 0; i < response.data.content.length; i++) {
+						const element = response.data.content[i]
+						// console.log('element:', element);
+						app.pushToMessageArray(element)
+						// app.scrollToBottom()
+					}
+				}
+			}, function(error) {
+				console.log('load recent messages error', error)
+			})
+		},
+		// 加载从某条消息记录之后的消息
+		loadMessagesFrom (uid, id) {
+			let app = this
+			httpApi.loadMessagesFrom(uid, id, function(response) {
+				// console.log('loadMessagesFrom: ', response)
+				if (response.status_code === 200) {
+					for (let i = 0; i < response.data.content.length; i++) {
+						const element = response.data.content[i]
+						// console.log('element:', element);
+						// app.messages.unshift(element)
+						app.pushToMessageArray(element)
+					}
+				}
+				app.scrollToBottom()
+			}, function(error) {
+				console.log('load messages from error', error)
 			})
 		},
 		// 
@@ -791,7 +851,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[商品]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -852,7 +912,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": content,
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -883,7 +943,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[图片]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -916,7 +976,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[语音]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -947,7 +1007,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[视频]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -981,7 +1041,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					"content": "[商品]",
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -1012,7 +1072,7 @@ export default {
 					"type": this.thread.type,
 					// TODO: 根据内容类型设置不同, 如: [图片]
 					"content": this.localPreviewContent,
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -1042,7 +1102,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					// "content": content,
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -1071,7 +1131,7 @@ export default {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
 					// "content": content,
-					"nickname": this.my_nickname(),
+					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
 					"timestamp": this.currentTimestamp(),
@@ -1102,19 +1162,14 @@ export default {
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
-				let app = this
 				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
-					console.log('sendMessageRest success:', json)
-					// TODO: 待处理
-					// var messageObject = JSON.parse(json);
-					// app.pushToMessageArray(messageObject)
+					// console.log('sendMessageRest success:', json)
 				}, function(error) {
 					console.log('send message rest error:', error)
-					// TODO: 待处理
-					// var messageObject = JSON.parse(json);
-					// app.pushToMessageArray(messageObject)
 				})
 			}
+			// 先插入本地
+			this.onMessageReceived(json)
 		},
 		pushToMessageArray(message) {
 			// 判断是否已经存在
@@ -1221,7 +1276,7 @@ export default {
 			  this.isThreadClosed = true
 			} else if (messageObject.type === 'notification_preview') {
 			  //
-			  if (messageObject.user.uid !== this.uid) {
+			  if (!this.is_self(messageObject)) {
 			      this.isInputingVisible = true;
 			      setTimeout(function () {
 			          this.isInputingVisible = false;
@@ -1229,7 +1284,7 @@ export default {
 			  }
 			} else if (messageObject.type === 'notification_receipt') {
 			  // 消息状态：送达 received、已读 read
-			  if (messageObject.user.uid !== this.uid) {
+			  if (!this.is_self(messageObject)) {
 			    for (let i = this.messages.length - 1; i >= 0 ; i--) {
 					const msg = this.messages[i]
 					if (msg.mid === messageObject.receipt.mid) {
@@ -1558,10 +1613,10 @@ export default {
 	},
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
-	  // this.timer = setInterval(this.getThreads, 1000);
+	  this.timer = setInterval(this.loadLatestMessage, 1000 * 5);
 	},
 	beforeDestroy() {
-	  // clearInterval(this.timer);
+	  clearInterval(this.timer);
 	}
 }
 </script>

@@ -4,7 +4,7 @@
 		<uni-section title="客服端-历史会话" type="line"></uni-section>
 		<uni-list-chat clickable @click="startChat(thread)" v-for="thread in workGroupThreadList" :key="thread.tid" :avatar="thread.avatar" :title="thread.nickname" :note="thread.content" :time="thread.timestamp" showArrow/>
 		<uni-list-chat clickable @click="startChat(thread)" v-for="thread in agentThreadList" :key="thread.tid" :avatar="thread.avatar" :title="thread.nickname" :note="thread.content" :time="thread.timestamp" showArrow/>
-		<view class="nodata" v-if="workGroupThreadList.length === 0 || agentThreadList.length === 0">
+		<view class="nodata" v-if="workGroupThreadList.length === 0 && agentThreadList.length === 0">
 			当前无进行中会话
 		</view>
 	</view>
