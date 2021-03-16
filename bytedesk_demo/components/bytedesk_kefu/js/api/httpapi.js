@@ -732,9 +732,6 @@ export function updateNickname(nickname, successcb, failedcb) {
     },
 	header: header,
     method: 'POST',
-    header: {
-      'content-type': 'application/json' // 默认值
-    },
     success (res) {
       successcb(res.data)
     },
@@ -761,9 +758,6 @@ export function updateAvatar(avatar, successcb, failedcb) {
     },
 	header: header,
     method: 'POST',
-    header: {
-      'content-type': 'application/json' // 默认值
-    },
     success (res) {
       successcb(res.data)
     },
