@@ -53,7 +53,7 @@
 								</view>
 								<!-- 语言消息 -->
 								<view v-if="message.type=='voice'" class="bubble voice" @tap="playVoice(message)" :class="playMsgid == message.mid ? 'play' : ''">
-									<view class="length">{{message.voice.length}}</view>
+									<view class="length">{{message.length}}</view>
 									<view class="icon my-voice"></view>
 								</view>
 								<!-- 图片消息 -->
@@ -88,7 +88,7 @@
 								<!-- 语音消息 -->
 								<view v-if="is_type_voice(message)" class="bubble voice" @tap="playVoice(message)" :class="playMsgid === message.mid ? 'play': ''">
 									<view class="icon other-voice"></view>
-									<view class="length">{{ message.voice.length }}</view>
+									<view class="length">{{ message.length }}</view>
 								</view>
 								<!-- 图片消息 -->
 								<view v-if="is_type_image(message)" class="bubble img" @tap="previewImageMessage(message)">
@@ -690,7 +690,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				// console.log('loadHistoryMessages: ', response)
+				console.log('loadHistoryMessages: ', response)
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
 						const element = response.data.content[i]
@@ -1227,6 +1227,7 @@ export default {
 			    messageObject.fileUrl = messageObject.file.fileUrl;
 			  } else if (messageObject.type === "voice") {
 			    messageObject.voiceUrl = messageObject.voice.voiceUrl;
+				messageObject.length = messageObject.voice.length;
 			  } else if (messageObject.type === "video") {
 			    messageObject.videoOrShortUrl = messageObject.video.videoOrShortUrl;
 			  } else if (messageObject.type === "commodity") {
@@ -1476,7 +1477,8 @@ export default {
 		// 播放语音
 		playVoice(message) {
 			this.playMsgid = message.mid;
-			this.AUDIO.src = message.voice.voiceUrl;
+			// this.AUDIO.src = message.voice.voiceUrl;
+			this.AUDIO.src = message.voiceUrl;
 			this.$nextTick(function() {
 				this.AUDIO.play();
 			});
@@ -1544,7 +1546,7 @@ export default {
 				    filePath: e.tempFilePath,
 				    name: 'file',
 				    formData: {
-				        'file_name': app.guid(),
+				        'file_name': app.guid() + ".mp3",
 						'username': app.username,
 						'client': constants.client
 				    },
