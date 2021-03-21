@@ -299,7 +299,6 @@ export function registerAnonymous(subDomain, successcb, failedcb) {
 }
 
 export function registerUser(username, nickname, password, subDomain, successcb, failedcb) {
-  // console.log('registerUser:' + username + nickname + password + subDomain)
   //
   uni.request({
     url: constants.API_BASE_URL + '/visitor/api/username',
@@ -316,12 +315,12 @@ export function registerUser(username, nickname, password, subDomain, successcb,
     },
     success (res) {
 		try {
-		    uni.setStorageSync(constants.uid, res.data.data.uid);
-				  uni.setStorageSync(constants.username, res.data.data.username);
-				  uni.setStorageSync(constants.nickname, res.data.data.nickname);
-				  uni.setStorageSync(constants.avatar, res.data.data.avatar);
-				  uni.setStorageSync(constants.description, res.data.data.description);
-				  uni.setStorageSync(constants.subDomain, res.data.data.subDomain);
+		  uni.setStorageSync(constants.uid, res.data.data.uid);
+		  uni.setStorageSync(constants.username, res.data.data.username);
+		  uni.setStorageSync(constants.nickname, res.data.data.nickname);
+		  uni.setStorageSync(constants.avatar, res.data.data.avatar);
+		  uni.setStorageSync(constants.description, res.data.data.description);
+		  uni.setStorageSync(constants.subDomain, res.data.data.subDomain);
 		} catch (e) {
 		    // error
 		}

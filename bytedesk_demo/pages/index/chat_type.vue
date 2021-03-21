@@ -23,6 +23,12 @@
 			<!-- 如果不想集成SDK，也可以直接集成H5页面即可，其余操作均可忽略，只需一步集成H5链接即可 -->
 			<uni-list-item title="H5客服" clickable @click="startH5Chat()" note="H5客服一步搞定" showArrow />
 		</uni-list>
+		<uni-section title="TODO:小程序码" type="line"></uni-section>
+		<uni-list :border="true">
+			<!-- 服务器端生成小程序码 -->
+			<uni-list-item title="技能组客服" clickable @click="startWorkGroupQrcodeChat()" note="服务器生成小程序码" showArrow />
+			<uni-list-item title="指定客服" clickable @click="startAgentQrcodeChat()" note="服务器生成小程序码" showArrow />
+		</uni-list>
 	</view>
 </template>
 
@@ -123,6 +129,24 @@ export default {
 			uni.navigateTo({
 				url:"../../components/bytedesk_kefu/webview?url=" + encodeURIComponent(url)
 			})
+		},
+		// TODO内测中: 小程序码客服-技能组客服
+		startWorkGroupQrcodeChat () {
+			// 服务器端生成小程序码
+			// scene: scene=wid // 其中wid非同上面wid, 此处wid = w + workgroup.id, 注意：是workGroup表的id字段非wid字段，因微信小程序码参数长度限制<32
+			// page: components/bytedesk_kefu/chat-scan
+			uni.navigateTo({
+				url: '../../components/bytedesk_kefu/chat-scan?scan=w17'
+			});
+		},
+		// TODO内测中: 小程序码客服-指定客服
+		startAgentQrcodeChat () {
+			// 服务器端生成小程序码
+			// scene: scene=aid // 其中aid非同上面aid, 此处aid = a + agent.id, 注意：是user表的id字段非uuid字段，因微信小程序码参数长度限制<32
+			// page: components/bytedesk_kefu/chat-scan
+			uni.navigateTo({
+				url: '../../components/bytedesk_kefu/chat-scan?scan=a15'
+			});
 		},
 	}
 }

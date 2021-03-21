@@ -662,7 +662,7 @@ export default {
 			this.loadHistoryMessages(this.uid);
 			//
 			let app = this
-			httpApi.requestThreadScan(this.option.id, function(response) {
+			httpApi.requestThreadScan(this.option.scan, function(response) {
 				console.log('request thread scan success', app.option.id, response)
 				//
 				app.dealWithThread(response);

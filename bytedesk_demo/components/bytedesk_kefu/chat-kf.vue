@@ -175,7 +175,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+// import { mapActions, mapGetters } from 'vuex'
 import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
 import * as stompApi from '@/components/bytedesk_kefu/js/api/stompapi.js'
@@ -436,7 +436,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters([ 'userInfo' ]),
+		// ...mapGetters([ 'userInfo' ]),
 		threadTopic() {
 			return this.thread.topic.replace(/\//g, ".");
 		},
@@ -540,16 +540,16 @@ export default {
 		},
 		my_uid () {
 			// 客服端
-			if (this.option.agentclient === '1') {
-				return this.userInfo.uid;
-			}
+			// if (this.option.agentclient === '1') {
+			// 	return this.userInfo.uid;
+			// }
 			return this.uid
 		},
 		my_nickname () {
 			// 客服端
-			if (this.option.agentclient === '1') {
-				return this.userInfo.nickname;
-			}
+			// if (this.option.agentclient === '1') {
+			// 	return this.userInfo.nickname;
+			// }
 			// 访客端
 			if (this.option.nickname) {
 				return this.option.nickname
@@ -565,9 +565,9 @@ export default {
 		},
 		my_avatar () {
 			// 客服端
-			if (this.option.agentclient === '1') {
-				return this.userInfo.avatar;
-			}
+			// if (this.option.agentclient === '1') {
+			// 	return this.userInfo.avatar;
+			// }
 			// 访客端
 			if (this.option.avatar) {
 				return this.option.avatar
@@ -662,7 +662,7 @@ export default {
 			this.loadHistoryMessages(this.uid);
 			//
 			let app = this
-			httpApi.requestThreadScan(this.option.id, function(response) {
+			httpApi.requestThreadScan(this.option.scan, function(response) {
 				console.log('request thread scan success', app.option.id, response)
 				//
 				app.dealWithThread(response);
@@ -690,7 +690,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				// console.log('loadHistoryMessages: ', response)
+				console.log('loadHistoryMessages: ', response)
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
 						const element = response.data.content[i]

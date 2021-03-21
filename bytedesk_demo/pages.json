@@ -89,6 +89,15 @@
 			}
 		},
 		{
+			"path": "components/bytedesk_kefu/chat-scan",
+			"style": {
+				"navigationBarTitleText": "萝卜丝智能客服",
+				"navigationBarBackgroundColor":"#007AFF",
+				"navigationBarTextStyle":"white",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
 			"path": "components/bytedesk_kefu/webview",
 			"style": {
 				"navigationBarTitleText": "萝卜丝H5",

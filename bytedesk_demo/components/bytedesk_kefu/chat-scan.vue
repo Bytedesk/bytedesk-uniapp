@@ -662,7 +662,7 @@ export default {
 			this.loadHistoryMessages(this.uid);
 			//
 			let app = this
-			httpApi.requestThreadScan(this.option.id, function(response) {
+			httpApi.requestThreadScan(this.option.scan, function(response) {
 				console.log('request thread scan success', app.option.id, response)
 				//
 				app.dealWithThread(response);
@@ -690,7 +690,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				// console.log('loadHistoryMessages: ', response)
+				console.log('loadHistoryMessages: ', response)
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
 						const element = response.data.content[i]
