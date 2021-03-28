@@ -87,7 +87,7 @@
 							<!-- 右-用户名称-时间-消息 -->
 							<view class="right">
 								<view class="username">
-									<view class="name">{{ message.user.nickname }}</view> 
+									<view class="name">{{ message.user.nickname }}[{{ message.client }}]</view> 
 								</view>
 								<!-- 文字消息 -->
 								<view v-if="is_type_text(message)" class="bubble">

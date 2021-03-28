@@ -1302,7 +1302,7 @@ export default {
 			   messageObject.createdAt = messageObject.timestamp;
 			   messageObject.content = messageObject.extra.content;
 			   this.isInviteRate = true;
-			   // this.switchRate()
+			   this.gotoRatePage()
 			} else if (messageObject.type === 'notification_rate_result') { 
 				// 访客评价结果
 				messageObject.createdAt = messageObject.timestamp;
@@ -1470,6 +1470,13 @@ export default {
 				console.log('messageAnswer error', error)
 			})
 		},
+		//
+		gotoRatePage () {
+			//
+			uni.navigateTo({
+				url: './rate?tid=' + this.thread.tid + '&invite=' + this.isInviteRate
+			});
+		},
 		//更多功能(点击+弹出) 
 		showMore() {
 			this.isVoice = false;
@@ -1603,11 +1610,11 @@ export default {
 			this.willStop = false;
 		},
 		// 切换语音/文字输入
-		switchVoice(){
+		switchVoice() {
 			this.hideDrawer();
 			this.isVoice = this.isVoice?false:true;
 		},
-		discard(){
+		discard() {
 			return;
 		},
 		/**

@@ -748,7 +748,6 @@ export function updateAvatar(avatar, successcb, failedcb) {
 	  failedcb('not loggined')
 	  return
 	}
-	
   uni.request({
     url: constants.API_BASE_URL + '/api/user/avatar',
     data: {
@@ -791,6 +790,36 @@ export function sendMessageRest(json, successcb, failedcb) {
     fail (res) {
       // failedcb(res.data)
 	  failedcb(json)
+    }
+  })
+}
+
+// 满意度评价
+export function rate(tid, score, note, invite, successcb, failedcb) {
+  console.log('rate:', tid, score, note, invite);
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/rate/do',
+    data: {
+      'tid': tid,
+	  'score': score,
+	  'note': note,
+	  'invite': invite,
+      'client': constants.client
+    },
+  	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
     }
   })
 }
