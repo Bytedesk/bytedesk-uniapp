@@ -7,6 +7,7 @@
 		</uni-list>
 		<uni-section title="当前会话" type="line"></uni-section>
 		<uni-list :border="true">
+			<!-- 不仅支持对接访客端，也支持作为客服端集成 -->
 			<uni-list-item title="客服端-进行中会话" clickable @click="gotoAgentCurrentThreads()" note="需要登录客服账号" showArrow />
 		</uni-list>
 	</view>

@@ -47,8 +47,16 @@
 						<view class="my" v-if="is_self(message)">
 							<!-- 左-消息 -->
 							<view class="left">
+								<!-- 发送状态 -->
+								<view class="status">
+									<view>{{ formatStatus(message.status) }}</view>
+								</view>
 								<!-- 文字消息 -->
 								<view v-if="is_type_text(message)" class="bubble">
+									<rich-text :nodes="message.content"></rich-text>
+								</view>
+								<!-- 事件消息 -->
+								<view v-if="is_type_event(message)" class="bubble">
 									<rich-text :nodes="message.content"></rich-text>
 								</view>
 								<!-- 语言消息 -->
@@ -83,6 +91,10 @@
 								</view>
 								<!-- 文字消息 -->
 								<view v-if="is_type_text(message)" class="bubble">
+									<rich-text :nodes="message.content"></rich-text>
+								</view>
+								<!-- 事件消息 -->
+								<view v-if="is_type_event(message)" class="bubble">
 									<rich-text :nodes="message.content"></rich-text>
 								</view>
 								<!-- 语音消息 -->
@@ -481,6 +493,24 @@ export default {
 		is_type_voice (message) {
 			return message.type === 'voice'
 		},
+		is_type_video (message) {
+		  return message.type === 'video' || message.type === 'shortvideo'
+		},
+		// is_type_shortvideo (message) {
+		//   return message.type === constants.MESSAGE_TYPE_SHORT_VIDEO
+		// },
+		is_type_location (message) {
+		  return message.type === 'location'
+		},
+		is_type_link (message) {
+		  return message.type === 'link'
+		},
+		is_type_event (message) {
+		  return message.type === 'event'
+		},
+		is_type_custom (message) {
+		  return message.type === 'custom'
+		},
 		is_type_commodity (message) {
 			return message.type === 'commodity'
 		},
@@ -537,6 +567,15 @@ export default {
 		},
 		is_type_notification_rate_result(message) {
 			return message.type === 'notification_rate_result'
+		},
+		formatStatus(status) {
+			if (status === 'read') {
+				return '已读'
+			} else if (status === 'received') {
+				return '送达'
+			} else {
+				return ''
+			}
 		},
 		my_uid () {
 			// 客服端
@@ -1682,5 +1721,10 @@ export default {
 	    margin-top: 2px;
 	    margin-left: 50px;
 	    cursor:pointer;
+	  }
+	  .status {
+	    float: right;
+	    margin-right: 8px;
+		font-size: 5px;
 	  }
 </style>

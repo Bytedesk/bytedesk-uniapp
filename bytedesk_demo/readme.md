@@ -18,7 +18,7 @@
 ## 配置步骤说明（共两步）
 
 - 首先：将 bytedesk_kefu 文件夹拷贝到 components 文件夹，
-- 然后：在pages.json中添加此两个页面，具体可参考demo中pages.json文件
+- 然后：在pages.json中添加此三个页面，具体可参考demo中pages.json文件
 
 ```js
 {
@@ -49,13 +49,13 @@
 
 ## 开发步骤说明（共三步）
 
-- 第一步：在调用客服的vue页面，如：index.vue，引入
+- 第一步：引入文件。在调用客服的vue页面，如：index.vue，引入
 
 ```js
 import * as bytedesk from '@/components/bytedesk_kefu/js/api/bytedesk.js'
 ```
 
-- 第二步：在index.vue页面onLoad函数
+- 第二步：初始化。在index.vue页面onLoad函数
 
 ```js
 // 萝卜丝第二步：初始化
