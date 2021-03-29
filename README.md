@@ -37,6 +37,14 @@
 	}
 },
 {
+	"path": "components/bytedesk_kefu/rate",
+	"style": {
+		"navigationBarTitleText": "满意度评价",
+		"navigationBarBackgroundColor":"#007AFF",
+		"navigationBarTextStyle":"white"
+	}
+},
+{
 	"path": "components/bytedesk_kefu/webview",
 	"style": {
 		"navigationBarTitleText": "萝卜丝H5",
