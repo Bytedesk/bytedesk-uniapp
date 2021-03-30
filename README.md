@@ -79,6 +79,19 @@ bytedesk.init(subDomain, appKey);
 // 第三步：到 客服管理->技能组-有一列 ‘唯一ID（wId）’, 默认设置工作组wid
 // 说明：一个技能组可以分配多个客服，访客会按照一定的规则分配给组内的各个客服账号
 // workGroupWid: '201807171659201', // 默认人工
+// 参数说明：
+// nickname 自定义昵称，可设置为非空字符串，如不设置，会系统生成默认昵称
+// history 是否显示历史聊天记录，默认为显示，设置history=0，则不显示历史聊天记录
+// postscript 附言，在连接成功客服之后，自动将此消息发送给客服
+// lang 语言，默认值为lang=cn,显示中文，如需显示英文设置lang=en
+// goods 是否显示商品信息，如果要显示，设置为goods=1，设置为其他值，则不显示商品信息
+// goods_id 商品信息id，参数goods=1的情况有效
+// goods_title 商品信息标题，参数goods=1的情况有效
+// goods_content 商品信息详情，参数goods=1的情况有效
+// goods_price 商品信息价格，参数goods=1的情况有效
+// goods_url 商品信息网址，参数goods=1的情况有效
+// goods_imageUrl 商品图片，参数goods=1的情况有效
+// goods_categoryCode 可选，商品信息类别，参数goods=1的情况有效
 startChat () {
   // console.log('start chat')
   uni.navigateTo({
