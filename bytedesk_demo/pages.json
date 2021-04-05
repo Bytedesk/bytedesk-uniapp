@@ -102,8 +102,15 @@
 			"style": {
 				"navigationBarTitleText": "满意度评价",
 				"navigationBarBackgroundColor":"#007AFF",
-				"navigationBarTextStyle":"white",
-				"enablePullDownRefresh": true
+				"navigationBarTextStyle":"white"
+			}
+		},
+		{
+			"path": "components/bytedesk_kefu/cuw",
+			"style": {
+				"navigationBarTitleText": "常用语",
+				"navigationBarBackgroundColor":"#007AFF",
+				"navigationBarTextStyle":"white"
 			}
 		},
 		{

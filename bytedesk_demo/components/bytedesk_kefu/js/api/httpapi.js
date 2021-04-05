@@ -715,6 +715,31 @@ export function messageAnswer (wid, type, aid, content, successcb, failedcb) {
   })
 }
 
+//
+export function getCuws (successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/cuw/get',
+    data: {
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 自定义用户昵称
 export function updateNickname(nickname, successcb, failedcb) {
 	//

@@ -20,7 +20,7 @@
 					<!-- 商品消息 -->
 					<view v-if="is_type_commodity(message)" id="goods" class="goods-info">
 						<view class="goods-pic">
-							<img id="goods-pic" alt="" width="50px" height="50px":src="jsonObject(message.content).imageUrl">
+							<image id="goods-pic" alt="" style="width: 100rpx; height: 100rpx;" width="50px" height="50px" :src="jsonObject(message.content).imageUrl"></image>
 						</view>
 						<view class="goods-desc">
 							<view id="goods-name" class="goods-name">{{ jsonObject(message.content).title }}</view>
@@ -146,6 +146,10 @@
 		</view>
 		<!-- 底部输入栏 -->
 		<view class="input-box" :class="popupLayerClass" @touchmove.stop.prevent="discard">
+			<!-- 常用语 -->
+			<view class="more" @tap="showCuw">
+				<image style="width: 60rpx; height: 60rpx;" width="30px" height="30px" src="./image/cuw/cuw_normal.png"></image>
+			</view>
 			<!-- H5下不能录音，输入栏布局改动一下 -->
 			<!-- #ifndef H5 -->
 			<view class="voice">
@@ -380,17 +384,32 @@ export default {
 		if (option.history === '0') {
 			this.loadHistory = '0'
 		}
-	},
-	onShow(){
-		this.scrollTop = 9999999;
-	},
-	onReady () {
 		//
 		let app = this;
 		uni.$on('message',function(messageObject) {
 			// console.log('uni on message');
 			app.onMessageReceived(messageObject)
 		})
+		uni.$on('cuw', function(cuw) {
+			console.log('send cuw:', cuw)
+			if (cuw.type === 'text') {
+				app.sendTextMessageSync(cuw.content)
+			} else if (cuw.type === 'image') {
+				app.sendImageMessageSync(cuw.content)
+			} else {
+				console.log('TODO: 其他类型')
+			}
+		})
+	},
+	onUnload() {  
+	    // 移除监听事件  
+		uni.$off('message'); 
+		uni.$off('cuw'); 
+	},
+	onShow(){
+		this.scrollTop = 9999999;
+	},
+	onReady () {
 		// 登录
 		uni.setNavigationBarTitle({
 		　　title:this.option.title
@@ -1492,6 +1511,12 @@ export default {
 				this.hideMore = true;
 				this.hideEmoji = true;
 			},150);
+		},
+		// 常用语页面
+		showCuw () {
+			uni.navigateTo({
+				url: './cuw'
+			});
 		},
 		// 选择表情
 		// chooseEmoji(){

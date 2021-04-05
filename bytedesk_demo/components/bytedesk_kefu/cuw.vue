@@ -1,0 +1,107 @@
+<template>
+	<view class="bytedesk">
+		<uni-list-item clickable @click="selectCuw(cuw)" v-for="cuw in cuwList" :key="cuw.cid" :title="cuw.name" :note="getDetail(cuw.type, cuw.content)"/>
+		<view class="nodata" v-if="cuwList.length === 0">
+			当前无常用语
+		</view>
+	</view>
+</template>
+
+<script>
+	// 引入js文件
+	import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
+	
+	export default {
+		data() {
+			return {
+				cuwList: [],
+			}
+		},
+		onLoad() {
+			this.getCuws()
+		},
+		onPullDownRefresh() {
+			// 加载数据
+			// this.getCuws()
+			//
+			// setTimeout(function () {
+			// 	uni.stopPullDownRefresh();
+			// }, 1000);
+		},
+		onReachBottom() {
+			// 加载数据
+			// this.getCuws()
+		},
+		methods: {
+			selectCuw (cuw) {
+				console.log('cuw', cuw);
+				uni.$emit('cuw', cuw);
+				uni.navigateBack();
+			},
+			getDetail(type, content) {
+				if (type === "text") {
+					return "[文字]" + content;
+				} else if (type === "image") {
+					return "[图片]";
+				} else if (type === "file") {
+					return "[文件]";
+				} else if (type === "voice") {
+					return "[语音]";
+				} else if (type === "video") {
+					return "[视频]";
+				}
+				return "[文字]" + content;
+			},
+			getCuws () {
+				//
+				let app = this
+				httpApi.getCuws(function(response) {
+					console.log('getCuws success:', response)
+					for (var i = 0; i < response.data.mine.length; i++) {
+						let mineArray = response.data.mine[i]
+						for (var j = 0; j < mineArray.cuwChildren.length; j++) {
+							let cuw = mineArray.cuwChildren[j]
+							// cuw.content = app.getDetail(cuw.type, cuw.content)
+							app.cuwList.push(cuw)
+						}
+					}
+					for (var i = 0; i < response.data.company.length; i++) {
+						let companyArray = response.data.company[i]
+						for (var j = 0; j < companyArray.cuwChildren.length; j++) {
+							let cuw = companyArray.cuwChildren[j]
+							// cuw.content = app.getDetail(cuw.type, cuw.content)
+							app.cuwList.push(cuw)
+						}
+					}
+					for (var i = 0; i < response.data.platform.length; i++) {
+						let platformArray = response.data.platform[i]
+						for (var j = 0; j < platformArray.cuwChildren.length; j++) {
+							let cuw = platformArray.cuwChildren[j]
+							// cuw.content = app.getDetail(cuw.type, cuw.content)
+							app.cuwList.push(cuw)
+						}
+					}
+					app.page += 1;
+					uni.stopPullDownRefresh();
+				}, function(error) {
+					console.log('getCuws error', error)
+					uni.stopPullDownRefresh();
+					uni.showToast({ title: error, duration: 2000 });
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	.nodata {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		height: 400rpx;
+		width: 100%;
+		align-items: center;
+		color: #555555;
+		font-size: 28rpx;
+	}
+</style>

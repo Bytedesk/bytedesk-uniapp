@@ -20,7 +20,7 @@
 					<!-- 商品消息 -->
 					<view v-if="is_type_commodity(message)" id="goods" class="goods-info">
 						<view class="goods-pic">
-							<img id="goods-pic" alt="" width="50px" height="50px":src="jsonObject(message.content).imageUrl">
+							<image id="goods-pic" alt="" style="width: 100rpx; height: 100rpx;" width="50px" height="50px" :src="jsonObject(message.content).imageUrl"></image>
 						</view>
 						<view class="goods-desc">
 							<view id="goods-name" class="goods-name">{{ jsonObject(message.content).title }}</view>
@@ -380,17 +380,22 @@ export default {
 		if (option.history === '0') {
 			this.loadHistory = '0'
 		}
-	},
-	onShow(){
-		this.scrollTop = 9999999;
-	},
-	onReady () {
 		//
 		let app = this;
 		uni.$on('message',function(messageObject) {
 			// console.log('uni on message');
 			app.onMessageReceived(messageObject)
 		})
+	},
+	onUnload() {
+	    // 移除监听事件  
+		uni.$off('message'); 
+	},
+	onShow(){
+		this.scrollTop = 9999999;
+	},
+	onReady () {
+		
 		// 登录
 		uni.setNavigationBarTitle({
 		　　title:this.option.title
