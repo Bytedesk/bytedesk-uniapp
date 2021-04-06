@@ -757,6 +757,11 @@ export function updateNickname(nickname, successcb, failedcb) {
 	header: header,
     method: 'POST',
     success (res) {
+	  try {
+	  	uni.setStorageSync(constants.nickname, nickname);
+	  } catch (e) {
+	      // error
+	  }
       successcb(res.data)
     },
     fail (res) {
@@ -782,6 +787,11 @@ export function updateAvatar(avatar, successcb, failedcb) {
 	header: header,
     method: 'POST',
     success (res) {
+		try {
+			uni.setStorageSync(constants.avatar, avatar);
+		} catch (e) {
+		    // error
+		}
       successcb(res.data)
     },
     fail (res) {
