@@ -1,7 +1,8 @@
 <template>
 	<view class="bytedesk">
-		<uni-list-item clickable @click="selectCuw(cuw)" v-for="cuw in cuwList" :key="cuw.cid" :title="cuw.name" :note="getDetail(cuw.type, cuw.content)"/>
-		<view class="nodata" v-if="cuwList.length === 0">
+		<uni-search-bar @confirm="search" @input="input" @cancel="cancel" />
+		<uni-list-item clickable @click="selectCuw(cuw)" v-for="cuw in filteredCuw" :key="cuw.cid" :title="cuw.name" :note="getDetail(cuw.type, cuw.content)"/>
+		<view class="nodata" v-if="filteredCuw.length === 0">
 			当前无常用语
 		</view>
 	</view>
@@ -15,6 +16,21 @@
 		data() {
 			return {
 				cuwList: [],
+				searchVal: ''
+			}
+		},
+		computed: {
+			///
+			filteredCuw () {
+				return this.cuwList.filter(cuw => {
+					if (cuw.name != null && cuw.content != null) {
+						return cuw.name.includes(this.searchVal) || cuw.content.includes(this.searchVal)
+					} else if (cuw.name != null) {
+						return cuw.name.includes(this.searchVal)
+					} else if (cuw.content != null) {
+						return cuw.content.includes(this.searchVal)
+					}
+				})
 			}
 		},
 		onLoad() {
@@ -33,6 +49,17 @@
 			// this.getCuws()
 		},
 		methods: {
+			search(res) {
+				console.log('search:', res, res.value)
+				this.searchVal = res.value
+			},
+			input(res) {
+				console.log('input:', res, res.value)
+				this.searchVal = res.value
+			},
+			cancel(res) {
+				console.log('cancel:', res, res.value)
+			},
 			selectCuw (cuw) {
 				console.log('cuw', cuw);
 				uni.$emit('cuw', cuw);

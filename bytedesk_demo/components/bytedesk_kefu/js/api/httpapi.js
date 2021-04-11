@@ -859,6 +859,88 @@ export function rate(tid, score, note, invite, successcb, failedcb) {
   })
 }
 
+// 客服端-加载黑名单列表
+export function getBlocks (page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/block/get',
+    data: {
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 客服端-拉黑访客
+export function addBlock(uid, note, successcb, failedcb) {
+  // console.log('add block:', uid, note);
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/block/add',
+    data: {
+      'uid': uid,
+	  'note': note,
+      'client': constants.client
+    },
+  	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 客服端-取消拉黑访客
+export function removeBlock(bid, successcb, failedcb) {
+  // console.log('add block:', uid, note);
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/block/remove',
+    data: {
+      'bid': bid,
+      'client': constants.client
+    },
+  	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 将获取到的小程序openid绑定到当前用户
 export function bindMiniOpenid(openid, successcb, failedcb) {
   console.log('bindMiniOpenid:' + openid)

@@ -141,6 +141,11 @@
 				<view class="list">
 					<view class="box" @tap="chooseImage"><view class="icon tupian2"></view></view>
 					<view class="box" @tap="camera"><view class="icon paizhao"></view></view>
+					<!-- TODO: 拉黑 -->
+					<view v-if="isAgentClient" class="box" @tap="addBlock">拉黑</view>
+					<!-- TODO: 用户信息 -->
+					<!-- TODO: 邀请评价 -->
+					<!-- TODO: 关闭会话 -->
 				</view>
 			</view>
 		</view>
@@ -148,7 +153,8 @@
 		<view class="input-box" :class="popupLayerClass" @touchmove.stop.prevent="discard">
 			<!-- 常用语 -->
 			<view class="more" @tap="showCuw">
-				<image style="width: 60rpx; height: 60rpx;" width="30px" height="30px" src="./image/cuw/cuw_normal.png"></image>
+				<!-- <image style="width: 60rpx; height: 60rpx;" width="30px" height="30px" src="./image/cuw/cuw_normal.png"></image> -->
+				<image style="width: 60rpx; height: 60rpx;" width="30px" height="30px" src="/static/img/cuw/cuw_normal.png"></image>
 			</view>
 			<!-- H5下不能录音，输入栏布局改动一下 -->
 			<!-- #ifndef H5 -->
@@ -187,6 +193,10 @@
 			<view class="cancel" :class="willStop?'':'hidden'"><view class="icon chehui" ></view></view>
 			<view class="tis" :class="willStop?'change':''">{{recordTis}}</view>
 		</view>
+		<!-- 提交信息 -->
+		<uni-popup id="dialogInput" ref="dialogInput" type="dialog" @change="blockDialogChange">
+			<uni-popup-dialog mode="input" title="添加备注" value="垃圾用户" placeholder="添加备注" @confirm="blockDialogInputConfirm"></uni-popup-dialog>
+		</uni-popup>
 	</view>
 </template>
 
@@ -360,6 +370,7 @@ export default {
 			showRate: false,
 			showForm: false,
 			//
+			isAgentClient: false,
 			visitorUid: '',
 			timer: ''
 		};
@@ -416,6 +427,7 @@ export default {
 		})
 		if (this.option.agentclient === '1') {
 			console.log('客服端打开会话')
+			this.isAgentClient = true
 			this.thread.tid = this.option.tid
 			this.thread.topic = this.option.topic
 			this.thread.type = this.option.type
@@ -1387,6 +1399,30 @@ export default {
 			// return ''
 		},
 		///
+		// 拉黑
+		addBlock() {
+			// 只有客服端
+			if (this.isAgentClient) {
+				//
+				this.$refs.dialogInput.open()
+			}
+		},
+		blockDialogChange(e) {
+			console.log('popup ' + e.type + ' 状态', e.show)
+		},
+		blockDialogInputConfirm(done, val) {
+			console.log(val);
+			//
+			httpApi.addBlock(this.visitorUid, val, function(response) {
+				console.log('add block success:', response)
+				uni.showToast({ title: '拉黑成功', duration: 2000 });
+				// 关闭窗口
+				done()
+			}, function(error) {
+				console.log('add block error:', error)
+				uni.showToast({ title: '拉黑失败', duration: 2000 });
+			})
+		},
 		// 选择图片发送
 		chooseImage(){
 			this.getImage('album');
@@ -1750,6 +1786,7 @@ export default {
 	  .status {
 	    float: right;
 	    margin-right: 8px;
-	  	font-size: 5px;
+	  	// font-size: 5px;
+		font-size: 10px;
 	  }
 </style>

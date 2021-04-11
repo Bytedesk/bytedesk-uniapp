@@ -1737,6 +1737,7 @@ export default {
 	  .status {
 	    float: right;
 	    margin-right: 8px;
-		font-size: 5px;
+		// font-size: 5px;
+		font-size: 10px;
 	  }
 </style>
