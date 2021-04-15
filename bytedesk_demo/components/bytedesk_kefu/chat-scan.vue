@@ -52,7 +52,7 @@
 									<view>{{ formatStatus(message.status) }}</view>
 								</view>
 								<!-- 文字消息 -->
-								<view v-if="is_type_text(message)" class="bubble">
+								<view v-if="is_type_text(message)" class="bubble" @longtap="longtap(message)">
 									<rich-text :nodes="message.content"></rich-text>
 								</view>
 								<!-- 事件消息 -->
@@ -90,7 +90,7 @@
 									<view class="name">{{ message.user.nickname }}</view> 
 								</view>
 								<!-- 文字消息 -->
-								<view v-if="is_type_text(message)" class="bubble">
+								<view v-if="is_type_text(message)" class="bubble" @longtap="longtap(message)">
 									<rich-text :nodes="message.content"></rich-text>
 								</view>
 								<!-- 事件消息 -->
@@ -1614,6 +1614,20 @@ export default {
 		},
 		discard(){
 			return;
+		},
+		// 长按复制消息
+		longtap (message){
+		    console.log('longtap',message);
+			// #ifndef H5
+			uni.setClipboardData({
+			  data: message.content,//要被复制的内容
+			  success:() => { //复制成功的回调函数
+			    uni.showToast({ //提示
+			      title:'复制成功'
+			    })
+			  }
+			});
+			// #endif
 		},
 		/**
 		 * 1. 首先判断是否已经注册过
