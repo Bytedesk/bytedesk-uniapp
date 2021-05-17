@@ -344,7 +344,10 @@ export default {
 			// focusStatus: true,
 			leaveMessageTip: '',
 			loadHistory: '1',
+			//
 			postscript: '',
+			isPostscriptSend: false, // 是否已经发送过附言
+			//
 			hideNav: false,
 			backUrl: '',
 			topTip: '',
@@ -1242,8 +1245,9 @@ export default {
 					// 发送附言信息
 					if (app.option.postscript !== null 
 						&& app.option.postscript !== undefined 
-						&& app.option.postscript !== '') {
+						&& app.option.postscript !== '' && !app.isPostscriptSend) {
 						app.sendTextMessageSync(app.option.postscript)
+						app.isPostscriptSend = true
 					}
 					// 发送商品信息
 					app.sendCommodityMessageSync()

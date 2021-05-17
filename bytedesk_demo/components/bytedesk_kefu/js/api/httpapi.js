@@ -166,7 +166,7 @@ export function wechatOauth(unionid, successcb, failedcb) {
       if (res.data != null && res.data.access_token != null) {
       		try {
       			uni.setStorageSync(constants.isLogin, true);
-      		uni.setStorageSync(constants.isLoginMobile, true);
+				uni.setStorageSync(constants.isLoginMobile, true);
       			uni.setStorageSync(constants.accessToken, res.data.access_token)
       		} catch (e) {
       			// error
