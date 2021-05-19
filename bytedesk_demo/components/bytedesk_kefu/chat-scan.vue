@@ -891,7 +891,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"content": jsonContent,
 				"thread": {
@@ -950,7 +953,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"text": {
 					"content": content
@@ -981,7 +987,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"image": {
 					"imageUrl": imageUrl
@@ -1012,7 +1021,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"voice": {
 					"voiceUrl": voiceUrl,
@@ -1045,7 +1057,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"video": {
 					"videoOrShortUrl": videoUrl
@@ -1079,7 +1094,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"text": {
 					"content": jsonContent
@@ -1109,7 +1127,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"preview": {
 					"content": this.localPreviewContent === undefined ? " " : this.localPreviewContent
@@ -1139,7 +1160,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"receipt": {
 					"mid": mid,
@@ -1169,7 +1193,10 @@ export default {
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
-					"avatar": this.my_avatar()
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
 				},
 				"recall": {
 					"mid": mid
