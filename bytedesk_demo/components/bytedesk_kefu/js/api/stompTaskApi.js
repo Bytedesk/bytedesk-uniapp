@@ -9,6 +9,8 @@ let socketConnected = false;
 // 是否断线重连
 let reconnect = true;
 //
+let socketTask;
+//
 let currentThread = {
 	tid: '',
 	topic: ''
@@ -26,53 +28,6 @@ var stompApi = {
 		return
 	}
 
-    // 发送消息
-    function sendSocketMessage(msg) {
-	  // printLog('sendSocketMessage:', msg)
-      // 如果socket已连接则发送消息
-      if (socketConnected) {
-        uni.sendSocketMessage({
-          data: msg
-        })
-      } else {
-        stompApi.printLog('提示连接断开，无法发送消息')
-		// 重连
-		setTimeout(function () {
-			connectWebSocket();
-		}, 5000)
-      }
-    }
-
-    // 关闭连接
-    function close() {
-	  stompApi.printLog('close')
-      if (socketConnected) {
-        uni.closeSocket()
-        socketConnected = false;
-		// 为断开重连做准备
-		subscribedTopics = [];
-      }
-    }
-	
-	//
-	function onopen() {
-		stompApi.printLog('onopen');
-		// stompApi.stompConnect(webSocket)
-	}
-	
-	//
-	function onmessage(message) {
-		// printLog('onmessage:', message)
-	}
-
-    // 符合WebSocket定义的对象
-    var webSocket = {
-      send: sendSocketMessage,
-      close: close,
-	  onopen: onopen,
-	  onmessage: onmessage
-    }
-
     // 创建一个 WebSocket 连接
     function connectWebSocket() {
 	  //
@@ -80,19 +35,11 @@ var stompApi = {
 		  return
 	  }
 	  //
-	  uni.connectSocket({
+      socketTask = uni.connectSocket({
         url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessToken),
-		// #ifdef MP
-		header: {
-			'content-type': 'application/json'
-		},
-		// #endif
-		// #ifdef MP-WEIXIN
-		method: 'GET',
-		// #endif
-        // header: {
-        //   // access_token: app.globalData.token.access_token
-        // },
+        header: {
+          // access_token: app.globalData.token.access_token
+        },
         success() {
           stompApi.printLog("socket连接成功")
         },
@@ -104,47 +51,49 @@ var stompApi = {
         }
       })
     }
-
-    // 监听 WebSocket 连接打开事件
-    uni.onSocketOpen(function (result) {
-      stompApi.printLog("SocketOpen:" + result)
-      socketConnected = true;
-      webSocket.onopen();
-    })
-
-    // 监听 WebSocket 接受到服务器的消息事件
-    uni.onSocketMessage(function (result) {
-      webSocket.onmessage(result);
-    })
-
-    // 监听 WebSocket 错误事件
-    uni.onSocketError(function (result) {
-      stompApi.printLog("SocketError:" + result)
-      if (!socketConnected) {
+	
+	// 监听 WebSocket 连接打开事件
+	// FIXME: Cannot read property 'onOpen' of undefined
+	socketTask.onOpen((res) => {
+		socketConnected = true
+		console.log('onOpen', res);
+	})
+	
+	// 监听 WebSocket 错误事件
+	socketTask.onError((err) => {
+		if (!socketConnected) {
+		   // 为断开重连做准备
+		   subscribedTopics = [];
+		   // 断线重连
+		   if (reconnect) {
+		     setTimeout(function () {
+			   connectWebSocket();
+			 }, 5000)
+		   }
+		}
+		console.log('onError', err);
+	})
+	
+	// 监听 WebSocket 接受到服务器的消息事件
+	socketTask.onMessage((res) => {
+		// this.msg = res.data
+		console.log('onMessage', res)
+	})
+	
+	// 监听 WebSocket 连接关闭事件
+	socketTask.onClose((res) => {
+		socketTask = false
+		socketConnected = false;
 		// 为断开重连做准备
 		subscribedTopics = [];
-        // 断线重连
-        if (reconnect) {
-          setTimeout(function () {
-			  connectWebSocket();
+		// 断线重连
+		if (reconnect) {
+		  setTimeout(function () {
+		  	connectWebSocket();
 		  }, 5000)
-        }
-      }
-    })
-
-    // 监听 WebSocket 连接关闭事件
-    uni.onSocketClose(function (result) {
-      stompApi.printLog("SocketClose:" + result)
-      socketConnected = false;
-	  // 为断开重连做准备
-	  subscribedTopics = [];
-      // 断线重连
-      if (reconnect) {
-        setTimeout(function () {
-        	connectWebSocket();
-        }, 5000)
-      }
-    })
+		}
+		console.log('onClose', res)
+	})
     //
     connectWebSocket();
     stompApi.stompConnect(webSocket, callback)
