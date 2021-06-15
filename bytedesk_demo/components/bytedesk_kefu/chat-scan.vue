@@ -1704,7 +1704,7 @@ export default {
 	},
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
-	  this.timer = setInterval(this.loadLatestMessage, 1000 * 5);
+	  this.timer = setInterval(this.loadLatestMessage, 1000 * 10);
 	},
 	beforeDestroy() {
 	  clearInterval(this.timer);

@@ -738,7 +738,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				console.log('loadHistoryMessages: ', response)
+				// console.log('loadHistoryMessages: ', response)
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
 						const element = response.data.content[i]
@@ -1712,7 +1712,7 @@ export default {
 	},
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
-	  this.timer = setInterval(this.loadLatestMessage, 1000 * 5);
+	  this.timer = setInterval(this.loadLatestMessage, 1000 * 10);
 	},
 	beforeDestroy() {
 	  clearInterval(this.timer);
