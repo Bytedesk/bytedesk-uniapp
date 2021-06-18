@@ -754,26 +754,31 @@ export default {
 		},
 		// 加载最新10条消息，用于定时拉取最新消息
 		loadLatestMessage () {
-			let uid = ''
-			if (this.option.agentclient === '1') {
-				uid = this.visitorUid
-			} else {
-				uid = this.uid
-			}
-			let app = this
-			httpApi.loadHistoryMessages(uid, 0, 10, function(response) {
-				// console.log('load recent Messages: ', response)
-				if (response.status_code === 200) {
-					for (let i = 0; i < response.data.content.length; i++) {
-						const element = response.data.content[i]
-						// console.log('element:', element);
-						app.pushToMessageArray(element)
-						// app.scrollToBottom()
-					}
+			// 长连接断开的情况拉取
+			if (!stompApi.isConnected()) {
+				//
+				let uid = ''
+				if (this.option.agentclient === '1') {
+					uid = this.visitorUid
+				} else {
+					uid = this.uid
 				}
-			}, function(error) {
-				console.log('load recent messages error', error)
-			})
+				let app = this
+				let count = this.loadHistory ? 10 : 1
+				httpApi.loadHistoryMessages(uid, 0, count, function(response) {
+					// console.log('load recent Messages: ', response)
+					if (response.status_code === 200) {
+						for (let i = 0; i < response.data.content.length; i++) {
+							const element = response.data.content[i]
+							// console.log('element:', element);
+							app.pushToMessageArray(element)
+							// app.scrollToBottom()
+						}
+					}
+				}, function(error) {
+					console.log('load recent messages error', error)
+				})
+			}
 		},
 		// 加载从某条消息记录之后的消息
 		loadMessagesFrom (uid, id) {
@@ -1257,6 +1262,16 @@ export default {
 			// 如果不存在，则保存
 			if (!contains) {
 				this.messages.push(message);
+				// 排序
+				this.messages.sort(function (a, b) {
+					if (a.createdAt > b.createdAt) {
+					  return 1
+					}
+					if (a.createdAt < b.createdAt) {
+					  return -1
+					}
+					return 0
+				});
 			}
 		},
 		// 建立长连接

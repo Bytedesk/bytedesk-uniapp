@@ -606,6 +606,35 @@ export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
   })
 }
 
+// 根据用户id加载聊天记录
+export function loadHistoryMessagesById(id, page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/user/id',
+    data: {
+	  id: id,
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  // console.log('loadHistoryMessages:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 加载从某条消息记录之后的消息
 export function loadMessagesFrom(uid, id, successcb, failedcb) {
   //

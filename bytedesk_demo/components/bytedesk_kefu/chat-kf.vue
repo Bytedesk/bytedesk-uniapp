@@ -348,6 +348,7 @@ export default {
 			//
 			postscript: '',
 			isPostscriptSend: false, // 是否已经发送过附言
+			isCommoditySend: false, // 是否已经发送过商品
 			//
 			hideNav: false,
 			backUrl: '',
@@ -360,6 +361,7 @@ export default {
 			showRate: false,
 			showForm: false,
 			//
+			// app: this,
 			visitorUid: '',
 			timer: ''
 		};
@@ -727,6 +729,7 @@ export default {
 		},
 		// 加载更多聊天记录
 		loadHistoryMessages (uid) {
+			//
 			if (this.isManulRequestThread || this.loadHistory === '0') {
 				return;
 			}
@@ -738,7 +741,8 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				// console.log('loadHistoryMessages: ', response)
+				console.log('loadHistoryMessages: ', response)
+				//
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
 						const element = response.data.content[i]
@@ -755,26 +759,31 @@ export default {
 		},
 		// 加载最新10条消息，用于定时拉取最新消息
 		loadLatestMessage () {
-			let uid = ''
-			if (this.option.agentclient === '1') {
-				uid = this.visitorUid
-			} else {
-				uid = this.uid
-			}
-			let app = this
-			httpApi.loadHistoryMessages(uid, 0, 10, function(response) {
-				// console.log('load recent Messages: ', response)
-				if (response.status_code === 200) {
-					for (let i = 0; i < response.data.content.length; i++) {
-						const element = response.data.content[i]
-						// console.log('element:', element);
-						app.pushToMessageArray(element)
-						// app.scrollToBottom()
-					}
+			// 长连接断开的情况拉取
+			if (!stompApi.isConnected()) {
+				//
+				let uid = ''
+				if (this.option.agentclient === '1') {
+					uid = this.visitorUid
+				} else {
+					uid = this.uid
 				}
-			}, function(error) {
-				console.log('load recent messages error', error)
-			})
+				let app = this
+				let count = this.loadHistory ? 10 : 1
+				httpApi.loadHistoryMessages(uid, 0, count, function(response) {
+					// console.log('load recent Messages: ', response)
+					if (response.status_code === 200) {
+						for (let i = 0; i < response.data.content.length; i++) {
+							const element = response.data.content[i]
+							// console.log('element:', element);
+							app.pushToMessageArray(element)
+							// app.scrollToBottom()
+						}
+					}
+				}, function(error) {
+					console.log('load recent messages error', error)
+				})
+			}
 		},
 		// 加载从某条消息记录之后的消息
 		loadMessagesFrom (uid, id) {
@@ -1258,6 +1267,16 @@ export default {
 			// 如果不存在，则保存
 			if (!contains) {
 				this.messages.push(message);
+				// 排序
+				this.messages.sort(function (a, b) {
+					if (a.createdAt > b.createdAt) {
+					  return 1
+					}
+					if (a.createdAt < b.createdAt) {
+					  return -1
+					}
+					return 0
+				});
 			}
 		},
 		// 建立长连接
@@ -1267,19 +1286,21 @@ export default {
 				let topic = this.thread.topic.replace(/\//g, ".");
 				stompApi.subscribeTopic(topic);
 			} else {
-				let app = this
 				stompApi.connect(this.thread, function() {
 					// 长连接成功回调
-					// 发送附言信息
-					if (app.option.postscript !== null 
-						&& app.option.postscript !== undefined 
-						&& app.option.postscript !== '' && !app.isPostscriptSend) {
-						app.sendTextMessageSync(app.option.postscript)
-						app.isPostscriptSend = true
-					}
-					// 发送商品信息
-					app.sendCommodityMessageSync()
 				})
+			}
+			// 发送附言信息
+			if (this.option.postscript !== null 
+				&& this.option.postscript !== undefined 
+				&& this.option.postscript !== '' && !this.isPostscriptSend) {
+				this.sendTextMessageSync(this.option.postscript)
+				this.isPostscriptSend = true
+			}
+			// 发送商品信息
+			if (!this.isCommoditySend) {
+				this.sendCommodityMessageSync()
+				this.isCommoditySend = true
 			}
 		},
 		onMessageReceived (messageObject) {

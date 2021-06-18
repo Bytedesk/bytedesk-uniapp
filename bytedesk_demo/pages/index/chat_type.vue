@@ -76,14 +76,32 @@ export default {
 		startWorkGroupChatRobot () {
 			// 服务器端设置此技能组为默认机器人
 			// 管理后台-》客服管理-》技能组-》点击某个技能组最右边‘编辑’按钮-》开启默认机器人或离线机器人
+			// 如何开启机器人：https://www.bytedesk.com/support/article?sub=vip&uid=201808221551193&aid=202104291459561&ph=ph
 			uni.navigateTo({
 				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWidRobot + '&type=workGroup&aid=&title=萝卜丝&history=0'
 			});
 		},
 		startWorkGroupChatShop () {
 			// 增加商品信息参数
+			// uni.navigateTo({
+			// 	url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&&goods=1&goods_categoryCode=101&goods_content=商品详情&goods_id=123&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp&goods_price=1000&goods_title=商品标题&goods_url=https://item.m.jd.com/product/12172344.html&history=0&lang=cn'
+			// });
+			// url编码
+			let goodsUrl = encodeURI('https://item.m.jd.com/product/12172344.html')
+			// 增加商品信息参数
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝&&goods=1&goods_categoryCode=101&goods_content=商品详情&goods_id=123&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp&goods_price=1000&goods_title=商品标题&goods_url=https://item.m.jd.com/product/12172344.html&history=0&lang=cn'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid 
+					+ '&type=workGroup&aid=&title=萝卜丝' 
+					+ '&goods=1' 
+					+ '&goods_categoryCode=101' 
+					+ '&goods_content=商品详情' 
+					+ '&goods_id=123' 
+					+ '&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp' 
+					+ '&goods_price=1000' 
+					+ '&goods_title=商品标题' 
+					+ '&goods_url=' + goodsUrl 
+					+ '&history=0' 
+					+ '&lang=cn'
 			});
 		},
 		startWorkGroupChatPostscript () {
@@ -106,8 +124,24 @@ export default {
 		},
 		startAppointedChatShop () {
 			// 增加商品信息参数
+			// uni.navigateTo({
+			// 	url: '../../components/bytedesk_kefu/chat-kf?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&goods=1&goods_categoryCode=101&goods_content=商品详情&goods_id=123&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp&goods_price=1000&goods_title=商品标题哈哈哈哈哈哈哈哈哈哈或或或或或或或或或&goods_url=https://item.m.jd.com/product/12172344.html&history=0&lang=cn'
+			// });
+			// url编码
+			let goodsUrl = encodeURI('https://item.m.jd.com/product/12172344.html')
+			// 增加商品信息参数
 			uni.navigateTo({
-				url: '../../components/bytedesk_kefu/chat-kf?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&goods=1&goods_categoryCode=101&goods_content=商品详情&goods_id=123&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp&goods_price=1000&goods_title=商品标题哈哈哈哈哈哈哈哈哈哈或或或或或或或或或&goods_url=https://item.m.jd.com/product/12172344.html&history=0&lang=cn'
+				url: '../../components/bytedesk_kefu/chat-kf?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝' 
+				+ '&goods=1' 
+				+ '&goods_categoryCode=101' 
+				+ '&goods_content=商品详情' 
+				+ '&goods_id=123' 
+				+ '&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp' 
+				+ '&goods_price=1000' 
+				+ '&goods_title=商品标题哈哈哈哈哈哈哈哈哈哈或或或或或或或或或' 
+				+ '&goods_url=' + goodsUrl 
+				+ '&history=0' 
+				+ '&lang=cn'
 			});
 		},
 		startAppointedChatPostscript () {
