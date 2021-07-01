@@ -577,7 +577,7 @@ export function getAgentStatus(agentUid, successcb, failedcb) {
   })
 }
 
-// 加载更多聊天记录
+// 根据uid加载更多聊天记录
 export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
@@ -590,6 +590,36 @@ export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
     url: constants.API_BASE_URL + '/api/messages/user',
     data: {
 	  uid: uid,
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  // console.log('loadHistoryMessages:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 根据topic加载更多聊天记录
+export function loadHistoryMessagesByTopic(topic, page, size, successcb, failedcb) {
+  console.log('loadHistoryMessagesByTopic:', topic, page, size)
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/topic',
+    data: {
+	  topic: topic,
 	  page: page,
 	  size: size,
       client: constants.client

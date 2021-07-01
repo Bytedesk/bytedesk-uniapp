@@ -438,9 +438,10 @@ export default {
 			this.thread.visitor.nickname = this.option.nickname
 			this.thread.visitor.avatar = this.option.avatar
 			//
-			this.visitorUid = this.option.topic.split('/')[1]
-			console.log('visitorUid:', this.visitorUid)
-			this.loadHistoryMessages(this.visitorUid);
+			// this.visitorUid = this.option.topic.split('/')[1]
+			// console.log('visitorUid:', this.visitorUid)
+			// this.loadHistoryMessages(this.visitorUid);
+			this.loadHistoryMessagesByTopic(this.option.topic)
 			// 添加订阅topic
 			let topic = this.thread.topic.replace(/\//g, ".");
 			stompApi.subscribeTopic(topic)
@@ -692,7 +693,7 @@ export default {
 			    console.error('read uid/username error', error)
 			}
 			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
-			this.loadHistoryMessages(this.uid);
+			// this.loadHistoryMessages(this.uid);
 			//
 			let app = this
 			httpApi.requestThread(this.option.wid, this.option.type, this.option.aid, function(response) {
@@ -732,7 +733,7 @@ export default {
 			    console.error('read uid/username error', error)
 			}
 			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
-			this.loadHistoryMessages(this.uid);
+			// this.loadHistoryMessages(this.uid);
 			//
 			let app = this
 			httpApi.requestThreadScan(this.option.scan, function(response) {
@@ -744,11 +745,12 @@ export default {
 			})
 		},
 		loadMoreMessages () {
-			if (this.option.agentclient === '1') {
-				this.loadHistoryMessages(this.visitorUid)
-			} else {
-				this.loadHistoryMessages(this.uid)
-			}
+			// if (this.option.agentclient === '1') {
+			// 	this.loadHistoryMessages(this.visitorUid)
+			// } else {
+			// 	this.loadHistoryMessages(this.uid)
+			// }
+			this.loadHistoryMessagesByTopic(this.thread.topic)
 		},
 		// 加载更多聊天记录
 		loadHistoryMessages (uid) {
@@ -778,52 +780,99 @@ export default {
 				console.log('load history messages error', error)
 			})
 		},
+		loadHistoryMessagesByTopic (topic) {
+			//
+			if (this.isManulRequestThread || this.loadHistory === '0') {
+				return;
+			}
+			if(this.isHistoryLoading){
+				return ;
+			}
+			// TODO: 加载历史聊天记录
+			this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
+			this.scrollAnimation = false;//关闭滑动动画
+			let app = this
+			httpApi.loadHistoryMessagesByTopic(topic, this.page, 10, function(response) {
+				console.log('loadHistoryMessagesByTopic: ', response)
+				//
+				if (response.status_code === 200) {
+					for (let i = 0; i < response.data.content.length; i++) {
+						const element = response.data.content[i]
+						// console.log('element:', element);
+						app.messages.unshift(element)
+					}
+				}
+				app.scrollToBottom()
+				app.page += 1
+				app.isHistoryLoading = false;
+			}, function(error) {
+				console.log('load history messages error', error)
+			})
+		},
 		// 加载最新10条消息，用于定时拉取最新消息
 		loadLatestMessage () {
 			// 长连接断开的情况拉取
 			if (!stompApi.isConnected()) {
 				//
-				let uid = ''
-				if (this.option.agentclient === '1') {
-					uid = this.visitorUid
-				} else {
-					uid = this.uid
-				}
+				// this.loadHistoryMessagesByTopic(this.thread.topic)
 				let app = this
 				let count = this.loadHistory ? 10 : 1
-				httpApi.loadHistoryMessages(uid, 0, count, function(response) {
-					// console.log('load recent Messages: ', response)
+				httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
+					console.log('loadHistoryMessagesByTopic: ', response)
+					//
 					if (response.status_code === 200) {
 						for (let i = 0; i < response.data.content.length; i++) {
 							const element = response.data.content[i]
 							// console.log('element:', element);
+							// app.messages.unshift(element)
 							app.pushToMessageArray(element)
-							// app.scrollToBottom()
 						}
 					}
+					// app.scrollToBottom()
 				}, function(error) {
-					console.log('load recent messages error', error)
+					console.log('load history messages error', error)
 				})
+				// let uid = ''
+				// if (this.option.agentclient === '1') {
+				// 	uid = this.visitorUid
+				// } else {
+				// 	uid = this.uid
+				// }
+				// let app = this
+				// let count = this.loadHistory ? 10 : 1
+				// httpApi.loadHistoryMessages(uid, 0, count, function(response) {
+				// 	// console.log('load recent Messages: ', response)
+				// 	if (response.status_code === 200) {
+				// 		for (let i = 0; i < response.data.content.length; i++) {
+				// 			const element = response.data.content[i]
+				// 			// console.log('element:', element);
+				// 			app.pushToMessageArray(element)
+				// 			// app.scrollToBottom()
+				// 		}
+				// 	}
+				// }, function(error) {
+				// 	console.log('load recent messages error', error)
+				// })
 			}
 		},
 		// 加载从某条消息记录之后的消息
-		loadMessagesFrom (uid, id) {
-			let app = this
-			httpApi.loadMessagesFrom(uid, id, function(response) {
-				// console.log('loadMessagesFrom: ', response)
-				if (response.status_code === 200) {
-					for (let i = 0; i < response.data.content.length; i++) {
-						const element = response.data.content[i]
-						// console.log('element:', element);
-						// app.messages.unshift(element)
-						app.pushToMessageArray(element)
-					}
-				}
-				app.scrollToBottom()
-			}, function(error) {
-				console.log('load messages from error', error)
-			})
-		},
+		// loadMessagesFrom (uid, id) {
+		// 	let app = this
+		// 	httpApi.loadMessagesFrom(uid, id, function(response) {
+		// 		// console.log('loadMessagesFrom: ', response)
+		// 		if (response.status_code === 200) {
+		// 			for (let i = 0; i < response.data.content.length; i++) {
+		// 				const element = response.data.content[i]
+		// 				// console.log('element:', element);
+		// 				// app.messages.unshift(element)
+		// 				app.pushToMessageArray(element)
+		// 			}
+		// 		}
+		// 		app.scrollToBottom()
+		// 	}, function(error) {
+		// 		console.log('load messages from error', error)
+		// 	})
+		// },
 		// 
 		dealWithThread (response) {
 			// console.log('')
