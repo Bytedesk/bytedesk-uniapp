@@ -81,6 +81,7 @@
 			},
 			getCuws () {
 				//
+				uni.showLoading({title: '加载中', mask:true});
 				let app = this
 				httpApi.getCuws(function(response) {
 					console.log('getCuws success:', response)
@@ -110,10 +111,12 @@
 					}
 					app.page += 1;
 					uni.stopPullDownRefresh();
+					uni.hideLoading();
 				}, function(error) {
 					console.log('getCuws error', error)
 					uni.stopPullDownRefresh();
 					uni.showToast({ title: error, duration: 2000 });
+					uni.hideLoading();
 				})
 			}
 		}

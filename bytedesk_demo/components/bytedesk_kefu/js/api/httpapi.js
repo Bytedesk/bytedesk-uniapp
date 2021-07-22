@@ -918,6 +918,33 @@ export function rate(tid, score, note, invite, successcb, failedcb) {
   })
 }
 
+// 查询被评价会话详情
+export function rateDetail(tid, successcb, failedcb) {
+  console.log('rateDetail:', tid);
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/rate/detail',
+    data: {
+  	  tid: tid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 客服端-加载黑名单列表
 export function getBlocks (page, size, successcb, failedcb) {
   //

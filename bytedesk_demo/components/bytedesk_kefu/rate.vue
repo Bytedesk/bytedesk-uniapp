@@ -2,15 +2,15 @@
 	<view class='issue'>
 		<view class="issue-head">
 			<slot name="headPic"></slot>
-			<image v-if="headPicShow" :src="headPicValue" class="issue-head-pic" mode=""></image>
-			<text v-if="headTitleShow" class="issue-head-title">{{ headTitleValue.slice(0,5) }}</text>
+			<image v-if="headPicShow" :src="thread.agent.avatar" class="issue-head-pic" mode=""></image>
+			<text v-if="headTitleShow" class="issue-head-title">{{ thread.agent.nickname.slice(0,5) }}</text>
 			<view class="issue-head-star-box" v-if="starsShow">
 				<image v-for="(item,index) in starsMax" :key="index" :src="(index+1)>formatScore?starDefault:starActive" :class="formatScore==index+1?'active':''" mode="" @click="setScore(index+1)"></image>
 			</view>
 		</view>
 		 <textarea v-if="textareaShow" @blur="blur" :value="infoReceive.textareaValue" :placeholder="textareaPlaceholder"/>
 		 <view class="issue-btn-box">
-		 	<button v-if="submitShow" class="submit-btn" type="primary" @click="doSubmit">{{submitText}}</button>
+		 	<button v-if="submitShow" class="submit-btn" type="primary" @click="doSubmit" :disabled="thread.rated">{{ rateButtonText }}</button>
 			<slot name="submit"></slot>
 		 </view>
 	</view>
@@ -28,7 +28,7 @@
 			},
 			headPicValue:{
 				type:String,
-				default:require('./image/rate/rate_pic.png')
+				default:require('@/components/bytedesk_kefu/image/rate/rate_pic.png')
 			},
 			headTitleShow:{ //标题
 				type:[String,Boolean],
@@ -48,11 +48,11 @@
 			},
 			starDefault:{ //未选中
 				type:String,
-				default:require('./image/rate/rate_star.png'),
+				default:require('@/components/bytedesk_kefu/image/rate/rate_star.png'),
 			},
 			starActive:{
 				type:String,
-				default:require('./image/rate/rate_star_active.png'),
+				default:require('@/components/bytedesk_kefu/image/rate/rate_star_active.png'),
 			},
 			score:{  //默认分数
 				type:[Number,String],
@@ -76,7 +76,7 @@
 			},
 			submitText:{
 				type:String,
-				default:"发布",
+				default:"提交",
 			},
 			infoReceive:{ // 获取值
 				type:Object,
@@ -90,6 +90,14 @@
 		},
 		data () {
 			return {
+				//
+				thread: {
+					agent: {
+						nickname: '评价客服',
+						avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png'
+					},
+					rated: false
+				},
 				// 
 				option: {
 					tid: '',
@@ -106,10 +114,15 @@
 			//
 			this.option = option;
 			console.log('option:', this.option);
+			//
+			this.getRateDetail()
 		},
 		computed:{
 			formatScore() {
 				return this.infoReceive.score
+			},
+			rateButtonText () {
+				return this.thread.rated ? '已经评价过' : '提交评价'
 			}
 		},
 		methods: {
@@ -121,18 +134,43 @@
 			blur(e) {
 				this.infoReceive.textareaValue=e.detail.value
 			},
+			getRateDetail () {
+				//
+				let app = this
+				uni.showLoading({title: '提交中', mask:true});
+				httpApi.rateDetail(this.option.tid, function(response) {
+					console.log('rateDetail success:', response);
+					// uni.showToast({ title: response.message, duration: 2000 });
+					// uni.navigateBack();
+					if (response.status_code === 200) {
+						app.thread = response.data
+					}
+					uni.hideLoading();
+				}, function(error) {
+					console.log('rateDetail error:', error)
+					// uni.showToast({ title: "提交评价错误", icon: "none"});
+					uni.hideLoading();
+				});
+			},
 			doSubmit() {
 				// this.$emit('submit',this.infoReceive)
 				console.log('submit:', this.infoReceive);
 				// uni.navigateBack();
+				if (this.thread.rated) {
+					uni.showToast({ title: "意见评价，无需重复评价", icon: "none" });
+					return
+				}
 				//
+				uni.showLoading({title: '提交中', mask:true});
 				httpApi.rate(this.option.tid, this.infoReceive.score, this.infoReceive.textareaValue, this.option.invite, function(response) {
 					console.log('rate success:', response);
 					uni.showToast({ title: response.message, duration: 2000 });
 					uni.navigateBack();
+					uni.hideLoading();
 				}, function(error) {
 					console.log('rate error:', error)
 					uni.showToast({ title: "提交评价错误", icon: "none"});
+					uni.hideLoading();
 				});
 			}
 		},
