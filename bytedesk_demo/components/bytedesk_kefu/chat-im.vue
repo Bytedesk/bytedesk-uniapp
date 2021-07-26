@@ -438,7 +438,7 @@ export default {
 			this.thread.visitor.nickname = this.option.nickname
 			this.thread.visitor.avatar = this.option.avatar
 			//
-			// this.visitorUid = this.option.topic.split('/')[1]
+			this.visitorUid = this.option.topic.split('/')[1]
 			// console.log('visitorUid:', this.visitorUid)
 			// this.loadHistoryMessages(this.visitorUid);
 			this.loadHistoryMessagesByTopic(this.option.topic)
@@ -1510,7 +1510,11 @@ export default {
 			//
 			httpApi.addBlock(this.visitorUid, val, function(response) {
 				console.log('add block success:', response)
-				uni.showToast({ title: '拉黑成功', duration: 2000 });
+				if (response.status_code === 200) {
+					uni.showToast({ title: '拉黑成功', duration: 2000 });
+				} else {
+					uni.showToast({ title: response.message, duration: 2000 });
+				}
 				// 关闭窗口
 				done()
 			}, function(error) {

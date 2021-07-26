@@ -1452,7 +1452,33 @@ export default {
 					  this.messages.splice(i, 1)
 				  }
 			  }
-			}
+			} else if (messageObject.type === 'notification_form_request') {
+                // 收到客服端表单请求
+                messageObject.content = '表单请求'
+                let formContent = messageObject.extra.content
+                console.log('form:' + formContent)
+                // let formContentObject = JSON.parse(formContent)
+                if (formContent.indexOf('姓名') !== -1) {
+                    console.log('showRealname')
+                    this.showRealname = true
+                }
+                if (formContent.indexOf('手机') !== -1) {
+                    this.showMobile = true
+                }
+                if (formContent.indexOf('邮箱') !== -1) {
+                    this.showEmail = true
+                }
+                if (formContent.indexOf('年龄') !== -1) {
+                    this.showAge = true
+                }
+                if (formContent.indexOf('职业') !== -1) {
+                    this.showJob = true
+                }
+                // app.switchForm()
+            } else if (messageObject.type === 'notification_form_result') {
+                // 自己发送的表单结果
+                messageObject.content = '发送表单'
+            }
 			//
 			if (messageObject.type !== 'notification_preview'
 			    && messageObject.type !== 'notification_receipt'

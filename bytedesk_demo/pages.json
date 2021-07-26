@@ -128,6 +128,22 @@
 				"navigationBarBackgroundColor":"#007AFF",
 				"navigationBarTextStyle":"white"
 			}
+		},
+		{
+			"path": "components/bytedesk_kefu/user-detail",
+			"style": {
+				"navigationBarTitleText": "访客详情",
+				"navigationBarBackgroundColor":"#007AFF",
+				"navigationBarTextStyle":"white"
+			}
+		},
+		{
+			"path": "components/bytedesk_kefu/agent-detail",
+			"style": {
+				"navigationBarTitleText": "客服详情",
+				"navigationBarBackgroundColor":"#007AFF",
+				"navigationBarTextStyle":"white"
+			}
 		}
 		
 	],
