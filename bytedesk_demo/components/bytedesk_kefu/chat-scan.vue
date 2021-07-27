@@ -1739,15 +1739,37 @@ export default {
 		// 长按复制消息
 		longtap (message){
 		    console.log('longtap',message);
+			let app = this
+			uni.showActionSheet({
+				title:'选择操作',
+				itemList: ['复制', '撤回'],
+				success: (e) => {
+					console.log(e.tapIndex);
+					if (e.tapIndex === 0) {
+						// #ifndef H5
+						uni.setClipboardData({
+						  data: message.content,//要被复制的内容
+						  success:() => { //复制成功的回调函数
+						    uni.showToast({ //提示
+						      title:'复制成功'
+						    })
+						  }
+						});
+						// #endif
+					} else {
+						app.sendRecallMessage(message.mid)
+					}
+				}
+			})
 			// #ifndef H5
-			uni.setClipboardData({
-			  data: message.content,//要被复制的内容
-			  success:() => { //复制成功的回调函数
-			    uni.showToast({ //提示
-			      title:'复制成功'
-			    })
-			  }
-			});
+			// uni.setClipboardData({
+			//   data: message.content,//要被复制的内容
+			//   success:() => { //复制成功的回调函数
+			//     uni.showToast({ //提示
+			//       title:'复制成功'
+			//     })
+			//   }
+			// });
 			// #endif
 		},
 		/**
