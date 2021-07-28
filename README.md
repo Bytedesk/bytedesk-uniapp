@@ -1,6 +1,7 @@
 # 萝卜丝智能客服-uniapp sdk
 
 - [官网](https://www.bytedesk.com/)
+- 萝卜丝官方技术支持
 - 全部基于vuejs开发，不依赖原生SDK，100%全部开源，支持自定义界面
 - 支持web/h5/小程序/安卓/iOS等全平台
 - 支持人工客服
@@ -8,6 +9,8 @@
 - 支持文字、图片、语音
 - 支持消息预知：对方正在输入
 - 支持消息状态：送达、已读
+- 支持消息撤回
+- 支持发送商品信息
 
 ## Demo下载
 
@@ -17,7 +20,7 @@
 ## 配置步骤说明（共两步）
 
 - 首先：将 bytedesk_kefu 文件夹拷贝到 components 文件夹，
-- 然后：在pages.json中添加此两个页面，具体可参考demo中pages.json文件
+- 然后：在pages.json中添加此三个页面，具体可参考demo中pages.json文件
 
 ```js
 {
@@ -64,13 +67,13 @@
 
 ## 开发步骤说明（共三步）
 
-- 第一步：在调用客服的vue页面，如：index.vue，引入
+- 第一步：引入文件。在调用客服的vue页面，如：index.vue，引入
 
 ```js
 import * as bytedesk from '@/components/bytedesk_kefu/js/api/bytedesk.js'
 ```
 
-- 第二步：在index.vue页面onLoad函数
+- 第二步：初始化。在index.vue页面onLoad函数
 
 ```js
 // 萝卜丝第二步：初始化
@@ -103,7 +106,7 @@ bytedesk.init(subDomain, appKey);
 startChat () {
   // console.log('start chat')
   uni.navigateTo({
-	url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
+  	url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
   });
 }
 ```
@@ -133,7 +136,3 @@ startChat () {
 - [微信公众号/小程序接口](https://github.com/bytedesk/bytedesk-wechat)
 - [服务器端接口](https://github.com/bytedesk/bytedesk-server)
 - [机器人](https://github.com/bytedesk/bytedesk-chatbot)
-
-## TODO
-
-- 支持国际化
