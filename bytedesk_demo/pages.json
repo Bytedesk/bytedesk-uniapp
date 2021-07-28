@@ -124,7 +124,7 @@
 		{
 			"path": "components/bytedesk_kefu/leavemsg",
 			"style": {
-				"navigationBarTitleText": "萝卜丝留言",
+				"navigationBarTitleText": "留言",
 				"navigationBarBackgroundColor":"#007AFF",
 				"navigationBarTextStyle":"white"
 			}

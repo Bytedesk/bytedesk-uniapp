@@ -1054,6 +1054,38 @@ export function bindMiniOpenid(openid, successcb, failedcb) {
   })
 }
 
+// 提交留言
+export function saveLeaveMessage(workGroupWid, agentUid, type, mobile, email, content, successcb, failedcb) {
+  console.log('saveLeaveMessage:' + content)
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not loggined')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/leavemsg/save',
+    data: {
+      'wid': workGroupWid,
+	  'uid': agentUid,
+	  'type': type,
+	  'mobile': mobile,
+	  'email': email,
+	  'content': content,
+      'client': constants.client
+    },
+  	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 /**
  * 登出
  * @param {*} successcb 成功回调

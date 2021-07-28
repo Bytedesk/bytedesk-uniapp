@@ -401,7 +401,6 @@ export default {
 		this.scrollTop = 9999999;
 	},
 	onReady () {
-		
 		// 登录
 		uni.setNavigationBarTitle({
 		　　title:this.option.title
@@ -891,19 +890,19 @@ export default {
 			} else if (response.status_code === 203) {
 				// 当前非工作时间，请自助查询或留言
 				this.pushToMessageArray(message);
-		// 		this.leaveMessageTip = message.content;
+				this.leaveMessageTip = message.content;
 		// 		// 1. 保存thread
 				this.thread = message.thread;
 		// 		// 显示留言界面
-		// 		this.switchLeaveMessage();
+				this.switchLeaveMessage();
 			} else if (response.status_code === 204) {
 				// 当前无客服在线，请自助查询或留言
 				this.pushToMessageArray(message);
-				// this.leaveMessageTip = message.content;
+				this.leaveMessageTip = message.content;
 				// // 1. 保存thread
 				this.thread = message.thread;
 				// // 显示留言界面
-				// this.switchLeaveMessage();
+				this.switchLeaveMessage();
 			} else if (response.status_code === 205) {
 				// 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
 				this.pushToMessageArray(message);
@@ -933,6 +932,12 @@ export default {
 			this.scrollToBottom();
 			// // 建立长连接
 			this.byteDeskConnect();
+		},
+		// 留言页面
+		switchLeaveMessage () {
+			uni.navigateTo({
+				url: '../../components/bytedesk_kefu/leavemsg?wid=' + this.option.wid + '&type=' + this.option.type + '&aid=' + this.option.aid + '&tip=' + this.leaveMessageTip
+			});
 		},
 		appendCommodityInfo () {
 			let goods = this.option.goods
