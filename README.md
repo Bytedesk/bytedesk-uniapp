@@ -51,6 +51,14 @@
 		"navigationBarBackgroundColor":"#007AFF",
 		"navigationBarTextStyle":"white"
 	}
+},
+{
+	"path": "components/bytedesk_kefu/leavemsg",
+	"style": {
+		"navigationBarTitleText": "留言",
+		"navigationBarBackgroundColor":"#007AFF",
+		"navigationBarTextStyle":"white"
+	}
 }
 ```
 
