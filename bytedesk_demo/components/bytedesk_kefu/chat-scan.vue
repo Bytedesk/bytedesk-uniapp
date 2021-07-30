@@ -1736,41 +1736,62 @@ export default {
 		discard(){
 			return;
 		},
+		can_recall(message) {
+		  return (
+			this.callRecallMessage(message) &&
+			this.is_self(message)
+		  );
+		},
+		// 检测是否在3分钟之内，允许撤回消息
+		callRecallMessage(message) {
+		  let now = moment(new Date(), "YYYY-MM-DD HH:mm:ss");
+		  let createdAt = moment(message.createdAt, "YYYY-MM-DD HH:mm:ss");
+		  let seconds = now.diff(createdAt, "seconds");
+		  // 现在距消息发送的时间差
+		  // console.log('seconds passed: ', seconds)
+		  if (seconds < 180) {
+			return true;
+		  }
+		  return false;
+		},
 		// 长按复制消息
 		longtap (message){
 		    console.log('longtap',message);
 			let app = this
-			uni.showActionSheet({
-				title:'选择操作',
-				itemList: ['复制', '撤回'],
-				success: (e) => {
-					console.log(e.tapIndex);
-					if (e.tapIndex === 0) {
-						// #ifndef H5
-						uni.setClipboardData({
-						  data: message.content,//要被复制的内容
-						  success:() => { //复制成功的回调函数
-						    uni.showToast({ //提示
-						      title:'复制成功'
-						    })
-						  }
-						});
-						// #endif
-					} else {
-						app.sendRecallMessage(message.mid)
+			if (this.can_recall(message)) {
+				uni.showActionSheet({
+					title:'选择操作',
+					itemList: ['复制', '撤回'],
+					success: (e) => {
+						console.log(e.tapIndex);
+						if (e.tapIndex === 0) {
+							// #ifndef H5
+							uni.setClipboardData({
+							  data: message.content,//要被复制的内容
+							  success:() => { //复制成功的回调函数
+							    uni.showToast({ //提示
+							      title:'复制成功'
+							    })
+							  }
+							});
+							// #endif
+						} else {
+							app.sendRecallMessage(message.mid)
+						}
 					}
-				}
-			})
-			// #ifndef H5
-			// uni.setClipboardData({
-			//   data: message.content,//要被复制的内容
-			//   success:() => { //复制成功的回调函数
-			//     uni.showToast({ //提示
-			//       title:'复制成功'
-			//     })
-			//   }
-			// });
-			// #endif
+				})
+			} else {
+				// #ifndef H5
+				uni.setClipboardData({
+				  data: message.content,//要被复制的内容
+				  success:() => { //复制成功的回调函数
+				    uni.showToast({ //提示
+				      title:'复制成功'
+				    })
+				  }
+				});
+				// #endif
+			}
 		},
 		/**
 		 * 1. 首先判断是否已经注册过
