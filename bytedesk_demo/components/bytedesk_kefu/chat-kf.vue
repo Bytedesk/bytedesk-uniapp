@@ -18,7 +18,7 @@
 						<view class="text"> {{ message.createdAt }}</view>
 					</view>
 					<!-- 商品消息 -->
-					<view v-if="is_type_commodity(message)" id="goods" class="goods-info">
+					<view v-if="is_type_commodity(message)" id="goods" class="goods-info" @click="commodityCallback(message)">
 						<view class="goods-pic">
 							<image id="goods-pic" alt="" style="width: 100rpx; height: 100rpx;" width="50px" height="50px" :src="jsonObject(message.content).imageUrl"></image>
 						</view>
@@ -724,7 +724,7 @@ export default {
 			// if (this.option.agentclient === '1') {
 			// 	this.loadHistoryMessages(this.visitorUid)
 			// } else {
-			// 	this.loadHistoryMessages(this.uid)
+				// this.loadHistoryMessages(this.uid)
 			// }
 			this.loadHistoryMessagesByTopic(this.thread.topic)
 		},
@@ -1506,6 +1506,11 @@ export default {
 			// return ''
 		},
 		///
+		// 点击商品回调
+		commodityCallback (message) {
+			// console.log('commodity:', message)
+			uni.$emit('commodity', message.content);
+		},
 		// 选择图片发送
 		chooseImage(){
 			this.getImage('album');

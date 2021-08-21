@@ -45,6 +45,16 @@ export default {
 			agentUid: '201808221551193'
 		}
 	},
+	onLoad(option) {
+		// 监听点击商品回调
+		uni.$on('commodity',function(content) {
+			console.log('点击商品回调:', content);
+		})
+	},
+	onUnload() {
+	    // 移除点击商品回调监听
+		uni.$off('commodity'); 
+	},
 	methods: {
 		// 萝卜丝第三步：开始会话
 		// 参数说明：
