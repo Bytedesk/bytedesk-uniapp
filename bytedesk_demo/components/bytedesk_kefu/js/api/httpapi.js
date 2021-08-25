@@ -205,6 +205,30 @@ export function wechatOauth(unionid, successcb, failedcb) {
 //   })
 // }
 
+//
+export function emailRegister(email, password, successcb, failedcb) {
+  // console.log('register:', email, password)
+  uni.request({
+    url: constants.API_BASE_URL + '/visitor/api/register',
+    data: {
+      'email': email,
+	  'password': password,
+      'client': constants.client
+    },
+    method: 'POST',
+    header: {
+      'content-type': 'application/json' // 默认值
+    },
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 
 export function mobileRegister(mobile, nickname, successcb, failedcb) {
   // console.log('register:', mobile, password)
   uni.request({
