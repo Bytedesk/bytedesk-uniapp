@@ -361,7 +361,7 @@ export function requestThread(wid, type, aid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -390,7 +390,7 @@ export function requestAgent(wid, type, aid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -418,7 +418,7 @@ export function requestThreadScan(id, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -445,7 +445,7 @@ export function getThreads(page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -472,7 +472,7 @@ export function getHistoryThreads(uid, page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -500,7 +500,7 @@ export function getThreadHistoryRecords(page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -527,7 +527,7 @@ export function getVisitorThreads(page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -554,7 +554,7 @@ export function getWorkGroupStatus(workGroupWid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -580,7 +580,7 @@ export function getAgentStatus(agentUid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -606,7 +606,7 @@ export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -636,7 +636,7 @@ export function loadHistoryMessagesByTopic(topic, page, size, successcb, failedc
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -665,7 +665,7 @@ export function loadHistoryMessagesById(id, page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -694,7 +694,7 @@ export function loadMessagesFrom(uid, id, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -722,7 +722,7 @@ export function getProfile (successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -747,7 +747,7 @@ export function queryAnswer (tid, aid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -774,7 +774,7 @@ export function messageAnswer (wid, type, aid, content, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -803,7 +803,7 @@ export function getCuws (successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -828,7 +828,7 @@ export function updateNickname(nickname, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not loggined')
+	  failedcb('not login')
 	  return
 	}
   uni.request({
@@ -858,7 +858,7 @@ export function updateAvatar(avatar, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not loggined')
+	  failedcb('not login')
 	  return
 	}
   uni.request({
@@ -889,7 +889,7 @@ export function sendMessageRest(json, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -918,7 +918,7 @@ export function rate(tid, score, note, invite, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -948,7 +948,7 @@ export function rateDetail(tid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -974,7 +974,7 @@ export function getBlocks (page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -1002,7 +1002,7 @@ export function addBlock(uid, note, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -1030,7 +1030,7 @@ export function removeBlock(bid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -1057,7 +1057,7 @@ export function bindMiniOpenid(openid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -1084,7 +1084,7 @@ export function saveLeaveMessage(workGroupWid, agentUid, type, mobile, email, co
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not loggined')
+    failedcb('not login')
     return
   }
   //
@@ -1111,6 +1111,72 @@ export function saveLeaveMessage(workGroupWid, agentUid, type, mobile, email, co
 }
 
 /**
+ * 会话免打扰
+ * uid：当前用户uid
+ * tid：会话tid
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function markNodisturb(uid, tid, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+	//
+	uni.request({
+	  url: constants.API_BASE_URL + '/api/v2/thread/mark/nodisturb',
+	  data: {
+	    'uid': uid,
+		'tid': tid,
+	    'client': constants.client
+	  },
+	  header: header,
+	  method: 'POST',
+	  success (res) {
+	    successcb(res.data)
+	  },
+	  fail (res) {
+	    failedcb(res.data)
+	  }
+	})
+}
+
+/**
+ * 取消会话免打扰
+ * uid：当前用户uid
+ * tid：会话tid
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function unmarkNodisturb(uid, tid, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+	//
+	uni.request({
+	  url: constants.API_BASE_URL + '/api/v2/thread/unmark/nodisturb',
+	  data: {
+	    'uid': uid,
+		'tid': tid,
+	    'client': constants.client
+	  },
+	  header: header,
+	  method: 'POST',
+	  success (res) {
+	    successcb(res.data)
+	  },
+	  fail (res) {
+	    failedcb(res.data)
+	  }
+	})
+}
+
+/**
  * 登出
  * @param {*} successcb 成功回调
  * @param {*} failedcb 失败回调
@@ -1119,7 +1185,7 @@ export function logout(successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not loggined')
+	  failedcb('not login')
 	  return
 	}
 	uni.request({

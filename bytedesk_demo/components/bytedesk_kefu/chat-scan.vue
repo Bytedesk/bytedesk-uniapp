@@ -39,6 +39,7 @@
 						<view class="text" v-else-if="is_type_notification_offline(message)">{{ message.content }}</view>
 						<view class="text" v-else-if="is_type_notification_invite_rate(message)">{{ message.content }}</view>
 						<view class="text" v-else-if="is_type_notification_rate_result(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_queue_accept(message)">接入队列会话</view>
 						<view class="text" v-else-if="is_type_notification(message)">{{ message.content }}</view>
 					</view>
 					<!-- 用户消息 -->
@@ -576,6 +577,9 @@ export default {
 		},
 		is_type_notification_rate_result(message) {
 			return message.type === 'notification_rate_result'
+		},
+		is_type_notification_queue_accept(message) {
+		  return message.type === 'notification_queue_accept'
 		},
 		formatStatus(status) {
 			if (status === 'read') {
@@ -1849,10 +1853,11 @@ export default {
 	}
 }
 </script>
+
 <style lang="scss">
-	@import "colorui/main.css";
-	@import "colorui/icon.css";
-	@import "css/index-app.css";
+	// @import "colorui/main.css";
+	// @import "colorui/icon.css";
+	// @import "css/index-app.css";
 	@import "css/style.scss";
 	
 	 .goods-info {

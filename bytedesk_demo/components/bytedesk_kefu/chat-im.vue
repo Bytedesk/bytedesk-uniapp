@@ -39,6 +39,7 @@
 						<view class="text" v-else-if="is_type_notification_offline(message)">{{ message.content }}</view>
 						<view class="text" v-else-if="is_type_notification_invite_rate(message)">{{ message.content }}</view>
 						<view class="text" v-else-if="is_type_notification_rate_result(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_queue_accept(message)">接入队列会话</view>
 						<view class="text" v-else-if="is_type_notification(message)">{{ message.content }}</view>
 					</view>
 					<!-- 用户消息 -->
@@ -141,8 +142,10 @@
 				<view class="list">
 					<view class="box" @tap="chooseImage"><view class="icon tupian2"></view></view>
 					<view class="box" @tap="camera"><view class="icon paizhao"></view></view>
-					<!-- TODO: 拉黑 -->
-					<view v-if="isAgentClient" class="box" @tap="addBlock">拉黑</view>
+					<!-- 拉黑 -->
+					<view v-if="isAgentClient" class="box" @tap="addBlock()">拉黑</view>
+					<!-- 免打扰 -->
+					<view v-if="isAgentClient" class="box" @tap="markNodisturb()">免打扰</view>
 					<!-- TODO: 用户信息 -->
 					<!-- TODO: 邀请评价 -->
 					<!-- TODO: 关闭会话 -->
@@ -602,6 +605,9 @@ export default {
 		},
 		is_type_notification_rate_result(message) {
 			return message.type === 'notification_rate_result'
+		},
+		is_type_notification_queue_accept(message) {
+		  return message.type === 'notification_queue_accept'
 		},
 		formatStatus(status) {
 			if (status === 'read') {
@@ -1491,14 +1497,12 @@ export default {
 		//
 		currentTimestamp () {
 			return moment().format('YYYY-MM-DD HH:mm:ss')
-			// return ''
 		},
 		///
 		// 拉黑
 		addBlock() {
 			// 只有客服端
 			if (this.isAgentClient) {
-				//
 				this.$refs.dialogInput.open()
 			}
 		},
@@ -1520,6 +1524,28 @@ export default {
 			}, function(error) {
 				console.log('add block error:', error)
 				uni.showToast({ title: '拉黑失败', duration: 2000 });
+			})
+		},
+		// 设置会话免打扰
+		markNodisturb () {
+			let uid = this.my_uid()
+			let tid = this.thread.tid
+			httpApi.markNodisturb(uid, tid, response => {
+				uni.showToast({ title: '设置免打扰成功', duration: 2000 });
+			}, error => {
+				console.log('mark nodisturb error:', error);
+				uni.showToast({ title: '设置免打扰失败', duration: 2000 });
+			})
+		},
+		// 取消会话免打扰
+		unmarkNodisturb () {
+			let uid = this.my_uid()
+			let tid = this.thread.tid
+			httpApi.unmarkNodisturb(uid, tid, response => {
+				uni.showToast({ title: '取消免打扰成功', duration: 2000 });
+			}, error => {
+				console.log('unmark nodisturb error:', error)
+				uni.showToast({ title: '取消免打扰失败', duration: 2000 });
 			})
 		},
 		// 点击商品回调
@@ -1883,10 +1909,11 @@ export default {
 	}
 }
 </script>
+
 <style lang="scss">
-	@import "colorui/main.css";
-	@import "colorui/icon.css";
-	@import "css/index-app.css";
+	// @import "colorui/main.css";
+	// @import "colorui/icon.css";
+	// @import "css/index-app.css";
 	@import "css/style.scss";
 	
 	 .goods-info {

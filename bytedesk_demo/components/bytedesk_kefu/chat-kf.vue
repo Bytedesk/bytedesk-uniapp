@@ -39,6 +39,7 @@
 						<view class="text" v-else-if="is_type_notification_offline(message)">{{ message.content }}</view>
 						<view class="text" v-else-if="is_type_notification_invite_rate(message)">{{ message.content }}</view>
 						<view class="text" v-else-if="is_type_notification_rate_result(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_queue_accept(message)">接入队列会话</view>
 						<view class="text" v-else-if="is_type_notification(message)">{{ message.content }}</view>
 					</view>
 					<!-- 用户消息 -->
@@ -128,7 +129,7 @@
 		</view>
 		<!-- 抽屉栏 -->
 		<view class="popup-layer" :class="popupLayerClass" @touchmove.stop.prevent="discard">
-			<!-- 表情 --> 
+			<!-- 表情 -->
 			<!-- <swiper class="emoji-swiper" :class="{hidden:hideEmoji}" indicator-dots="true" duration="150">
 				<swiper-item v-for="(page,pid) in emojiList" :key="pid">
 					<view v-for="(em,eid) in page" :key="eid" @tap="addEmoji(em)">
@@ -578,6 +579,9 @@ export default {
 		},
 		is_type_notification_rate_result(message) {
 			return message.type === 'notification_rate_result'
+		},
+		is_type_notification_queue_accept(message) {
+			return message.type === 'notification_queue_accept'
 		},
 		formatStatus(status) {
 			if (status === 'read') {
@@ -1816,48 +1820,7 @@ export default {
 				});
 				// #endif
 			}
-		},
-		/**
-		 * 1. 首先判断是否已经注册过
-		 * 2. 如果已经注册过，则直接调用登录接口
-		 * 3. 如果没有注册过，则从服务器请求用户名
-		 */
-		requestUsername () {
-			// this.username = localStorage.bd_kfe_username;
-			// this.password = this.username;
-			if (this.username) {
-				// this.login();
-			} else {
-				//
-				// $.ajax({
-				// 	url: this.HTTP_HOST + '/visitor/api/username',
-				// 	contentType: "application/json; charset=utf-8",
-				// 	type: "get",
-				// 	data: {
-				// 		nickname: this.nickname,
-				// 		subDomain: this.subDomain,
-				// 		client: this.client
-				// 	},
-				// 	success: function (response) {
-				// 		console.log('user:', response.data);
-				// 		// 登录
-				// 		app.uid = response.data.uid;
-				// 		app.username = response.data.username;
-				// 		app.password = app.username;
-				// 		app.nickname = response.data.nickname;
-				// 		// 本地存储
-				// 		localStorage.bd_kfe_uid = app.uid;
-				// 		localStorage.bd_kfe_username = app.username;
-				// 		// 登录
-				// 		app.login();
-				// 	},
-				// 	error: function (error) {
-				// 		//Do Something to handle error
-				// 		console.log(error);
-				// 	}
-				// });
-			}
-		},
+		}
 	},
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
@@ -1868,10 +1831,11 @@ export default {
 	}
 }
 </script>
+
 <style lang="scss">
-	@import "colorui/main.css";
-	@import "colorui/icon.css";
-	@import "css/index-app.css";
+	// @import "colorui/main.css";
+	// @import "colorui/icon.css";
+	// @import "css/index-app.css";
 	@import "css/style.scss";
 	
 	 .goods-info {
