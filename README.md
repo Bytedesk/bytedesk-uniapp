@@ -117,7 +117,7 @@ startChat () {
 | 首页 | 聊天 | H5 |
 | :----------: | :----------: | :----------: |
 | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/index.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/robot.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/h5.jpg?raw=true" width="250"> |
-| <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat_type.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/user_info.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/setting.jpg?raw=true" width="250"> |
+| <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/user_info.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/setting.jpg?raw=true" width="250"> |
 
 ## 技术支持
 
@@ -128,7 +128,6 @@ startChat () {
 
 ## 其他
 
-- [Flutter SDK](https://github.com/bytedesk/bytedesk-flutter)
 - [UniApp SDK](https://github.com/bytedesk/bytedesk-uniapp)
 - [iOS SDK](https://github.com/bytedesk/bytedesk-ios)
 - [Android SDK](https://github.com/bytedesk/bytedesk-android)
