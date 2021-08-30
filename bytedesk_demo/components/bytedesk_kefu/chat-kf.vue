@@ -111,9 +111,11 @@
 									<!-- <rich-text :nodes="message.content"></rich-text> -->
 									<view class="flex-column-start" style="color: #2fa39b;">
 										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx;cmargin-top: 20rpx;"></rich-text>
-										<text @click="queryAnswer(item)" style="margin-top: 20rpx;" v-for="(item, index) in message.answers" :key="index">
-											{{item.question}}
-										</text>
+										<view class="flex-row-start  padding-top-sm" v-for="(item, index) in message.answers" :key="index">
+											<text @click="queryAnswer(item)" style="margin-top: 20rpx;">
+												{{item.question}}
+											</text>
+										</view>
 										<!-- TODO: 首先选择是否有帮助，如果用户选择没有帮助，则出现‘人工客服’按钮-->
 										<view class="flex-row-start  padding-top-sm">
 											<text class="my-neirong-sm">没有你要的答案?</text>
