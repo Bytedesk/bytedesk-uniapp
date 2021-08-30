@@ -941,7 +941,7 @@ export default {
 		},
 		// 留言页面
 		switchLeaveMessage () {
-			uni.navigateTo({
+			uni.redirectTo({
 				url: '../../components/bytedesk_kefu/leavemsg?wid=' + this.option.wid + '&type=' + this.option.type + '&aid=' + this.option.aid + '&tip=' + this.leaveMessageTip
 			});
 		},
