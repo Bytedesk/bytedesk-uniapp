@@ -1,9 +1,5 @@
 // 常量
 module.exports = {
-  // 测试
-  // IS_PRODUCTION: false,
-  // API_BASE_URL: 'http://172.16.0.223:8000',
-  // WEBSOCKET_URL: 'ws://172.16.0.223:8000/stomp/mini?access_token=',
   // 本地测试
   // IS_PRODUCTION: false,
   // API_BASE_URL: 'http://127.0.0.1:8000',
