@@ -119,6 +119,20 @@ startChat () {
 | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/index.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/robot.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/h5.jpg?raw=true" width="250"> |
 | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/user_info.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/setting.jpg?raw=true" width="250"> |
 
+## 微信小程序
+
+- 配置服务器域名：
+- request合法域名添加：https://stomp.bytedesk.com;https://www.bytedesk.com;
+- socket合法域名添加：wss://www.bytedesk.com;
+- uploadFile合法域名：https://stomp.bytedesk.com;https://www.bytedesk.com;
+- downloadFile合法域名：https://stomp.bytedesk.com;https://www.bytedesk.com;
+
+## 减小体积
+
+- 第一步：删除 agent-detail.vue、chat-im.vue、chat-scan.vue、cuw.vue、feedback.vue、ticket.vue、user-detail.vue、webview.vue 以及 image/cuw文件夹
+- 第二步：如果上面还不能满足，则可以考虑删除 leavemsg.vue 、rate.vue 和 image/rate文件夹
+- 注意：chat-kf.vue为对话页面，不能删除
+
 ## 技术支持
 
 - QQ-3群: 825257535

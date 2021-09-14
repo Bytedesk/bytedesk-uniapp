@@ -194,7 +194,6 @@
 import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
 import * as stompApi from '@/components/bytedesk_kefu/js/api/stompapi.js'
-// import * as stompApi from '@/components/bytedesk_kefu/js/api/stompTaskApi.js'
 import moment from '@/components/bytedesk_kefu/js/api/moment.min.js'
 import Vue from 'vue'
 // 
