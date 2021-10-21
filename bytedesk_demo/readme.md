@@ -133,6 +133,24 @@ startChat () {
 - 第二步：如果上面还不能满足，则可以考虑删除 leavemsg.vue 、rate.vue 和 image/rate文件夹
 - 注意：chat-kf.vue为对话页面，不能删除
 
+## 点击商品回调
+
+- 可用于点击商品后，跳转自定义页面
+
+```js
+// 具体参考demo中chat_type.vue页面
+onLoad(option) {
+	// 监听点击商品回调
+	uni.$on('commodity',function(content) {
+		console.log('点击商品回调:', content);
+	})
+},
+onUnload() {
+	// 移除点击商品回调监听
+	uni.$off('commodity'); 
+}
+```
+
 ## 消息推送
 
 - 技能组：登录管理后台-》客服管理-》技能组-》编辑，滚动到最下方，填写webhook URL网址，客服消息会额外推送到此地址
