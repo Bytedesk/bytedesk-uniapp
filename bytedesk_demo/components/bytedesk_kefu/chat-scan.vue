@@ -1922,4 +1922,7 @@ export default {
 	    margin-right: 8px;
 	  	font-size: 5px;
 	  }
+	  .padding-top-sm {
+	  	margin-top: 10px;
+	  }
 </style>

@@ -1979,4 +1979,7 @@ export default {
 	  	// font-size: 5px;
 		font-size: 10px;
 	  }
+	  .padding-top-sm {
+	  	margin-top: 10px;
+	  }
 </style>

@@ -110,13 +110,16 @@
 								<view v-if="is_type_robot(message)" class="bubble">
 									<!-- <rich-text :nodes="message.content"></rich-text> -->
 									<view class="flex-column-start" style="color: #2fa39b;">
-										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx;cmargin-top: 20rpx;"></rich-text>
+										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx; margin-top:20rpx;margin-bottom:10rpx;"></rich-text>
+										<!-- <hr class="hr-solid"> -->
 										<view class="flex-row-start  padding-top-sm" v-for="(item, index) in message.answers" :key="index">
+											<!-- <hr class="hr-solid"> -->
 											<text @click="queryAnswer(item)" style="margin-top: 20rpx;">
 												{{item.question}}
 											</text>
 										</view>
 										<!-- TODO: 首先选择是否有帮助，如果用户选择没有帮助，则出现‘人工客服’按钮-->
+										<hr class="hr-solid">
 										<view class="flex-row-start  padding-top-sm">
 											<text class="my-neirong-sm">没有你要的答案?</text>
 											<text class="padding-left" style="color: #007AFF;" @click="requestAgent()">人工客服</text>
@@ -1899,5 +1902,14 @@ export default {
 	    margin-right: 8px;
 		// font-size: 5px;
 		font-size: 10px;
+	  }
+	  .padding-top-sm {
+		margin-top: 5px;
+		margin-bottom: 5px;
+	  }
+	  .hr-solid {
+		border: 0;
+		border-top: 1px solid #d0d0d5;
+		margin-top: 5px;
 	  }
 </style>
