@@ -117,7 +117,7 @@ startChat () {
 | 首页 | 聊天 | H5 |
 | :----------: | :----------: | :----------: |
 | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/index.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/robot.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/h5.jpg?raw=true" width="250"> |
-| <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/user_info.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/setting.jpg?raw=true" width="250"> |
+| <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/rate.png?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/setting.jpg?raw=true" width="250"> |
 
 ## 微信小程序
 
