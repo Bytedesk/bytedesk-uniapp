@@ -147,6 +147,7 @@
 				<view class="list">
 					<view class="box" @tap="chooseImage"><view class="icon tupian2"></view></view>
 					<view class="box" @tap="camera"><view class="icon paizhao"></view></view>
+					<view class="box" @tap="showRatePage()">评价</view>
 				</view>
 			</view>
 		</view>
@@ -1620,6 +1621,11 @@ export default {
 			}, function(error) {
 				console.log('messageAnswer error', error)
 			})
+		},
+		//
+		showRatePage () {
+			this.isInviteRate = false;
+			this.gotoRatePage()
 		},
 		//
 		gotoRatePage () {

@@ -7,6 +7,32 @@
 			<view class="issue-head-star-box" v-if="starsShow">
 				<image v-for="(item,index) in starsMax" :key="index" :src="(index+1)>formatScore?starDefault:starActive" :class="formatScore==index+1?'active':''" mode="" @click="setScore(index+1)"></image>
 			</view>
+			<text style="margin-left: 50rpx; font-size: 12rpx;">{{ tip }}</text>
+		</view>
+		<view class="example-body">
+			<!-- 好 -->
+			<view v-if="greaterThan3" class="tag-view">
+				<button class="mini-btn" size="mini" @click="clickButton1">服务态度好</button>
+			</view>
+			<view v-if="greaterThan3" class="tag-view">
+				<button class="mini-btn" size="mini" @click="clickButton2">回复速度快</button>
+			</view>
+			<view v-if="greaterThan3" class="tag-view">
+				<button class="mini-btn" size="mini" @click="clickButton3">问题已解决</button>
+			</view>
+			<!-- 坏 -->
+			<view v-if="!greaterThan3" class="tag-view">
+				<button class="mini-btn" size="mini" @click="clickButton4">服务态度差</button>
+			</view>
+			<view v-if="!greaterThan3" class="tag-view">
+				<button class="mini-btn" size="mini" @click="clickButton5">回复不及时</button>
+			</view>
+			<view v-if="!greaterThan3" class="tag-view">
+				<button class="mini-btn" size="mini" @click="clickButton6">没解决问题</button>
+			</view>
+			<view v-if="!greaterThan3" class="tag-view">
+				<button class="mini-btn" size="mini" @click="clickButton7">不礼貌</button>
+			</view>
 		</view>
 		 <textarea v-if="textareaShow" @blur="blur" :value="infoReceive.textareaValue" :placeholder="textareaPlaceholder"/>
 		 <view class="issue-btn-box">
@@ -98,6 +124,12 @@
 					},
 					rated: false
 				},
+				greaterThan3: true,
+				tip: '非常满意，完美',
+				// 满意，仍可改善
+				// 一般，还需改善
+				// 不满意，有点失望
+				// 非常不满意
 				// 
 				option: {
 					tid: '',
@@ -130,6 +162,50 @@
 				if(this.starsDisabled!==false)return
 				this.infoReceive.score=score
 				// this.$emit("scoreChange",score)
+				if (score === 5) {
+					this.tip = '非常满意，完美'
+					this.greaterThan3 = true
+				} else if (score === 4) {
+					this.tip = '满意，仍可改善'
+					this.greaterThan3 = true
+				} else if (score === 3) {
+					this.tip = '一般，还需改善'
+					this.greaterThan3 = false
+				} else if (score === 2) {
+					this.tip = '不满意，有点失望'
+					this.greaterThan3 = false
+				} else if (score === 1) {
+					this.tip = '非常不满意'
+					this.greaterThan3 = false
+				}
+			},
+			clickButton1 () {
+				console.log('服务态度好')
+				this.infoReceive.textareaValue += '服务态度好'
+			},
+			clickButton2 () {
+				console.log('回复速度快')
+				this.infoReceive.textareaValue += '回复速度快'
+			},
+			clickButton3 () {
+				console.log('问题已解决')
+				this.infoReceive.textareaValue += '问题已解决'
+			},
+			clickButton4 () {
+				console.log('服务态度差')
+				this.infoReceive.textareaValue += '服务态度差'
+			},
+			clickButton5 () {
+				console.log('回复不及时')
+				this.infoReceive.textareaValue += '回复不及时'
+			},
+			clickButton6 () {
+				console.log('没解决问题')
+				this.infoReceive.textareaValue += '没解决问题'
+			},
+			clickButton7 () {
+				console.log('不礼貌')
+				this.infoReceive.textareaValue += '不礼貌'
 			},
 			blur(e) {
 				this.infoReceive.textareaValue=e.detail.value
@@ -137,7 +213,7 @@
 			getRateDetail () {
 				//
 				let app = this
-				uni.showLoading({title: '提交中', mask:true});
+				uni.showLoading({title: '加载中', mask:true});
 				httpApi.rateDetail(this.option.tid, function(response) {
 					console.log('rateDetail success:', response);
 					// uni.showToast({ title: response.message, duration: 2000 });
@@ -165,7 +241,9 @@
 				httpApi.rate(this.option.tid, this.infoReceive.score, this.infoReceive.textareaValue, this.option.invite, function(response) {
 					console.log('rate success:', response);
 					uni.showToast({ title: response.message, duration: 2000 });
-					uni.navigateBack();
+					if (response.status_code === 200) {
+						uni.navigateBack();
+					}
 					uni.hideLoading();
 				}, function(error) {
 					console.log('rate error:', error)
@@ -175,7 +253,7 @@
 			}
 		},
 		created() {
-			this.infoReceive.score=this.score
+			this.infoReceive.score = this.score
 		}
 	}
 </script>
@@ -226,7 +304,7 @@
 		}
 		textarea{
 			width: 100%;
-			height: 420upx;
+			height: 220upx;
 			background-color: $white;
 			font-size: $fontSize;
 			color: #898989;
@@ -267,5 +345,22 @@
 		100%{
 			transform: rotateY(180deg)
 		}
+	}
+	.example-body {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		justify-content: flex-start;
+		flex-wrap: wrap;
+		padding: 20rpx;
+	}
+	.tag-view {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: column;
+		margin: 10rpx 8rpx;
+		justify-content: center;
 	}
 </style>
