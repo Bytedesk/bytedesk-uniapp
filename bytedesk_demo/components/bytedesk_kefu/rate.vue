@@ -7,7 +7,7 @@
 			<view class="issue-head-star-box" v-if="starsShow">
 				<image v-for="(item,index) in starsMax" :key="index" :src="(index+1)>formatScore?starDefault:starActive" :class="formatScore==index+1?'active':''" mode="" @click="setScore(index+1)"></image>
 			</view>
-			<text style="margin-left: 50rpx; font-size: 12rpx;">{{ tip }}</text>
+			<text style="margin-left: 50rpx; font-size: 12px;">{{ tip }}</text>
 		</view>
 		<view class="example-body">
 			<!-- 好 -->

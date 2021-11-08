@@ -351,6 +351,11 @@ export default {
 			// focusStatus: true,
 			leaveMessageTip: '',
 			loadHistory: '1',
+			robotUser: {
+				uid: '',
+				nickname: '',
+				avatar: ''
+			},
 			//
 			postscript: '',
 			isPostscriptSend: false, // 是否已经发送过附言
@@ -930,6 +935,8 @@ export default {
 				this.thread = message.thread;
 				// 2. 设置当前状态为机器人问答
 				this.isRobot = true;
+				this.robotUser = message.user
+				//
 			} else if (response.status_code === -1) {
 				this.login();
 			} else if (response.status_code === -2) {
@@ -1292,6 +1299,7 @@ export default {
 			if (this.inputContent.trim().length === 0) {
 				return;
 			}
+			console.log('robot:', this.isRobot)
 			if (this.isRobot) {
 				this.messageAnswer(this.inputContent);
 			} else {
@@ -1501,7 +1509,7 @@ export default {
 				&& messageObject.type !== 'notification_form_result'
 			    && messageObject.type !== 'notification_connect'
 			    && messageObject.type !== 'notification_disconnect') {
-			    this.isRobot = false;
+			    // this.isRobot = false;
 			    this.pushToMessageArray(messageObject);
 			    // this.scrollToBottom()
 				this.scrollToMessage(messageObject)
@@ -1512,9 +1520,7 @@ export default {
 		//
 		currentTimestamp () {
 			return moment().format('YYYY-MM-DD HH:mm:ss')
-			// return ''
 		},
-		///
 		// 点击商品回调
 		commodityCallback (message) {
 			// console.log('commodity:', message)
@@ -1570,22 +1576,95 @@ export default {
 			}
 			return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 		},
+		//
+		appendQueryMessage (content) {
+			//
+			let localId = this.guid();
+			var json = {
+				"mid": localId,
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'text',
+				"user": {
+					"uid": this.my_uid(),
+					"nickname": this.my_nickname(),
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
+				},
+				"text": {
+					"content": content
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": content,
+					"nickname": this.thread_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			// 插入本地
+			this.onMessageReceived(json)
+			// this.scrollToMessage(json)
+		},
+		appendReplyMessage (content) {
+			//
+			let localId = this.guid();
+			var json = {
+				"mid": localId,
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'text',
+				"user": {
+					"uid": this.robotUser.uid,
+					"nickname": this.robotUser.nickname,
+					"avatar": this.robotUser.avatar,
+					"extra": {
+						"agent": true
+					}
+				},
+				"text": {
+					"content": content
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": content,
+					"nickname": this.thread_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			// 插入本地
+			this.onMessageReceived(json)
+			// this.scrollToMessage(json)
+		},
+		//
 		queryAnswer (answer) {
 			console.log('answer:', answer);
+			this.appendQueryMessage(answer.question)
+			this.appendReplyMessage(answer.answer)
 			let app = this
 			httpApi.queryAnswer(this.thread.tid, answer.aid, function(response) {
 				console.log('queryAnswer success', response)
 				//
 				if (response.status_code === 200)  {
 					//
-					let queryMessage = response.data.query;
-					let replyMessage = response.data.reply;
-					//
-					app.pushToMessageArray(queryMessage);
-					app.pushToMessageArray(replyMessage);
-					//
+					// let queryMessage = response.data.query;
+					// let replyMessage = response.data.reply;
+					// //
+					// app.pushToMessageArray(queryMessage);
+					// app.pushToMessageArray(replyMessage);
 					// app.scrollToBottom()
-					app.scrollToMessage(replyMessage)
+					// app.scrollToMessage(replyMessage)
 				} else {
 					// app.$message.warning(response.message)
 					uni.showToast({ title: response.message, duration: 2000 });
@@ -1595,22 +1674,26 @@ export default {
 			})
 		},
 		messageAnswer (content) {
+			//
+			this.appendQueryMessage(content)
 			let app = this;
 			// 包含’人工‘二字
 			if (content.indexOf('人工') !== -1) {
+				// this.sendTextMessageSync(content)
 				// 请求人工客服
 				app.requestAgent()
 				return;
 			} 
+			//
 			httpApi.messageAnswer(this.option.wid, this.option.type, this.option.aid, content, function(response) {
 				console.log('messageAnswer success', response)
 				if (response.status_code === 200 ||
 					response.status_code === 201)  {
 					//
-					let queryMessage = response.data.query;
+					// let queryMessage = response.data.query;
 					let replyMessage = response.data.reply;
 					//
-					app.pushToMessageArray(queryMessage);
+					// app.pushToMessageArray(queryMessage);
 					app.pushToMessageArray(replyMessage);
 					// app.scrollToBottom()
 					app.scrollToMessage(replyMessage)
