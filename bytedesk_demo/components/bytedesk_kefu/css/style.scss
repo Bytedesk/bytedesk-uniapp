@@ -109,6 +109,19 @@ page{
 		}
 	}
 }
+.quick-button{
+	width: 100%;
+	min-height: 100upx;
+	// padding: 0 1%;
+	background-color: #f2f2f2;
+	display: flex;
+	position: fixed;
+	z-index: 20;
+	bottom: 30px;
+	&.showLayer{transform: translate3d(0,-42vw,0);}
+	transition: all .15s linear;
+	border-bottom: solid 1upx #ddd;
+}
 .input-box{
 	width: 100%;
 	min-height: 100upx;
@@ -129,7 +142,6 @@ page{
 		justify-content: center;
 		align-items: center;
 	}
-	
 	.send{
 		//H5发送按钮左边距
 		/* #ifdef H5 */
@@ -614,4 +626,74 @@ page{
 			color: #f8d757;
 		}
 	}
+}
+ .goods-info {
+	background: #e6f9ff; 
+	margin: 0 auto; 
+	margin-top: 10px; 
+	margin-bottom: 10px;
+	width: 80%; 
+	height: 75px; 
+	border-radius: 5px; 
+	font-size: 15px; 
+	border:1px solid #c2dfe7;
+	}
+
+.goods-pic {
+	float:left;
+	margin-left: 10px;
+	margin-top: 10px;
+}
+
+.goods-desc {
+	float:left;
+	margin-left: 10px;
+	margin-top: 10px;
+	width: 70%;
+}
+
+.goods-name {
+	float:left;
+	margin-top: 5px;
+	margin-left: 10px;
+	width: 90%;
+	overflow: hidden;
+	white-space: nowrap;
+	display: block;
+	text-overflow: ellipsis;
+}
+
+.goods-more {
+	clear:both;
+	margin-top: 2px;
+	margin-left: 2px;
+}
+
+.goods-price {
+	float:left;
+	margin-top: 2px;
+	margin-left: 2px;
+	color: red;
+}
+
+.goods-sendlink {
+	float:left;
+	margin-top: 2px;
+	margin-left: 50px;
+	cursor:pointer;
+}
+.status {
+	float: right;
+	margin-right: 8px;
+	// font-size: 5px;
+	font-size: 10px;
+}
+.padding-top-sm {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+.hr-solid {
+	border: 0;
+	border-top: 1px solid #d0d0d5;
+	margin-top: 5px;
 }

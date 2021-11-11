@@ -1,6 +1,8 @@
 # 萝卜丝智能客服-uniapp sdk
 
 - [官网](https://www.bytedesk.com/)
+- [管理后台](https://www.bytedesk.com/antv/user/login)
+- [客服工作台](https://www.bytedesk.com/chaty)
 - 萝卜丝官方技术支持
 - 全部基于vuejs开发，不依赖原生SDK，100%全部开源，支持自定义界面
 - 支持web/h5/小程序/安卓/iOS等全平台

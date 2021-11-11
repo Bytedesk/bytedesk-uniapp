@@ -94,7 +94,7 @@
 			},
 			textareaPlaceholder:{
 				type:[String],
-				default:"说的什么吧"
+				default:"说点什么吧"
 			},
 			submitShow:{ // 发布按钮
 				type:[String,Boolean],

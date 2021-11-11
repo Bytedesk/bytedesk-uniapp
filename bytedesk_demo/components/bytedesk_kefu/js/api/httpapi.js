@@ -1200,6 +1200,32 @@ export function unmarkNodisturb(uid, tid, successcb, failedcb) {
 	})
 }
 
+// 拉取技能组-快捷按钮
+export function getQuickButtons (workGroupWid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/quickbutton/query/workGroup',
+    data: {
+	  wid: workGroupWid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 /**
  * 登出
  * @param {*} successcb 成功回调

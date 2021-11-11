@@ -151,6 +151,12 @@
 				</view>
 			</view>
 		</view>
+		<!-- 底部快捷按钮 -->
+<!-- 		<view class="quick-button">
+			<view>
+				<button class="mini-btn" size="mini">123</button>
+			</view>
+		</view> -->
 		<!-- 底部输入栏 -->
 		<view class="input-box" :class="popupLayerClass" @touchmove.stop.prevent="discard">
 			<!-- H5下不能录音，输入栏布局改动一下 -->
@@ -467,6 +473,8 @@ export default {
 		} else {
 			// 正常打开
 			this.requestThread()
+			// 加载快捷按钮
+			// this.getQuickButtons()
 		}
 	},
 	computed: {
@@ -1913,6 +1921,15 @@ export default {
 				});
 				// #endif
 			}
+		},
+		getQuickButtons () {
+			let app = this
+			httpApi.getQuickButtons(this.option.wid, function(response) {
+				console.log('getQuickButtons success:', app.option.wid, response)
+				
+			}, function(error) {
+				console.log('getQuickButtons error', error)
+			})
 		}
 	},
 	mounted() {
@@ -1926,79 +1943,5 @@ export default {
 </script>
 
 <style lang="scss">
-	// @import "colorui/main.css";
-	// @import "colorui/icon.css";
-	// @import "css/index-app.css";
 	@import "css/style.scss";
-	
-	 .goods-info {
-	    background: #e6f9ff; 
-	    margin: 0 auto; 
-	    margin-top: 10px; 
-	    margin-bottom: 10px;
-	    width: 80%; 
-	    height: 75px; 
-	    border-radius: 5px; 
-	    font-size: 15px; 
-	    border:1px solid #c2dfe7;
-	  }
-	  
-	  .goods-pic {
-	    float:left;
-	    margin-left: 10px;
-	    margin-top: 10px;
-	  }
-	  
-	  .goods-desc {
-	    float:left;
-	    margin-left: 10px;
-	    margin-top: 10px;
-	    width: 70%;
-	  }
-	  
-	  .goods-name {
-	    float:left;
-	    margin-top: 5px;
-	    margin-left: 10px;
-	    width: 90%;
-	    overflow: hidden;
-	    white-space: nowrap;
-	    display: block;
-	    text-overflow: ellipsis;
-	  }
-	  
-	  .goods-more {
-	    clear:both;
-	    margin-top: 2px;
-	    margin-left: 2px;
-	  }
-	  
-	  .goods-price {
-	    float:left;
-	    margin-top: 2px;
-	    margin-left: 2px;
-	    color: red;
-	  }
-	  
-	  .goods-sendlink {
-	    float:left;
-	    margin-top: 2px;
-	    margin-left: 50px;
-	    cursor:pointer;
-	  }
-	  .status {
-	    float: right;
-	    margin-right: 8px;
-		// font-size: 5px;
-		font-size: 10px;
-	  }
-	  .padding-top-sm {
-		margin-top: 5px;
-		margin-bottom: 5px;
-	  }
-	  .hr-solid {
-		border: 0;
-		border-top: 1px solid #d0d0d5;
-		margin-top: 5px;
-	  }
 </style>

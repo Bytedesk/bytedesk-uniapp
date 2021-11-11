@@ -36,6 +36,7 @@
 export default {
 	data() {
 		return {
+			// [管理后台](https://www.bytedesk.com/antv/user/login)
 			// 第二步：到 客服管理->技能组-有一列 ‘唯一ID（wId）’
 			// 说明：一个技能组可以分配多个客服，访客会按照一定的规则分配给组内的各个客服账号
 			workGroupWid: '201807171659201', // 默认人工
