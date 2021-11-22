@@ -157,6 +157,33 @@ onUnload() {
 
 - 技能组：登录管理后台-》客服管理-》技能组-》编辑，滚动到最下方，填写webhook URL网址，客服消息会额外推送到此地址
 - 指定客服：登录管理后台-》客服管理-》客服账号-》编辑，滚动到最下方，填写webhook URL网址，客服消息会额外推送到此地址
+```js
+{
+    "mid": "658835ef-69af-e231-eb3c-4e6685ffc4d3",
+    "timestamp": "2021-05-11 17:19:34",
+    "client": "web",
+    "version": "1",
+    "type": "text",
+    "user": {
+        "uid": "201808221551193",
+        "nickname": "客服001",
+        "avatar": "https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png",
+        "extra": "{\"agent\":true}" // 说明：true 为客服发送消息，false 为访客发送消息
+    },
+    "text": {
+        "content": "2"
+    },
+    "thread": {
+        "tid": "202105111719261_20210507193724225efbd47566648d1bb1608b4d1f1a3f2", // 格式说明：时间戳_访客uid
+        "type": "workgroup",
+        "nickname": "局域网7241[172.16.0.75]",
+        "avatar": "https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/chrome_default_avatar.png",
+        "content": "2",
+        "timestamp": "2021-05-11 17:19:34",
+        "topic": "201809061716221/20210507193724225efbd47566648d1bb1608b4d1f1a3f2" // 格式说明：技能组wid/访客uid
+    }
+}
+```
 
 ## 技术支持
 
