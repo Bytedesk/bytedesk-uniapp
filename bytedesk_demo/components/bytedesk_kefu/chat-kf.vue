@@ -1657,7 +1657,7 @@ export default {
 		},
 		//
 		queryAnswer (answer) {
-			console.log('answer:', answer);
+			// console.log('answer:', answer);
 			this.appendQueryMessage(answer.question)
 			this.appendReplyMessage(answer.answer)
 			let app = this
@@ -1687,7 +1687,6 @@ export default {
 			let app = this;
 			// 包含’人工‘二字
 			if (content.indexOf('人工') !== -1) {
-				// this.sendTextMessageSync(content)
 				// 请求人工客服
 				app.requestAgent()
 				return;

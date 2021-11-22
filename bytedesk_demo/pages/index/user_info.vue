@@ -2,6 +2,7 @@
 	<view class="bytedesk">
 		<uni-section title="自定义用户信息" type="line"></uni-section>
 		<uni-list :border="true">
+			<uni-list-item title="唯一Uid" :note="uid" />
 			<uni-list-item title="设置昵称" clickable @click="setNickname()" :note="nickname" />
 			<uni-list-chat title="设置头像" clickable @click="setAvatar()" :avatar="avatar" :avatar-circle="true" />
 		</uni-list>
@@ -15,6 +16,7 @@
 	export default {
 		data() {
 			return {
+				uid: '',
 				nickname: '',
 				avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png' // 默认显示
 			}
@@ -28,6 +30,7 @@
 				let app = this
 				httpApi.getProfile(function(response) {
 					console.log('getProfile success:', response)
+					app.uid = response.data.uid
 					app.nickname = response.data.nickname
 					app.avatar = response.data.avatar
 				}, function(error) {
