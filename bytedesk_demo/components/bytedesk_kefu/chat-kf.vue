@@ -69,6 +69,10 @@
 								<view v-if="is_type_image(message)" class="bubble img" @tap="previewImageMessage(message)">
 									<image :src="message.imageUrl"></image>
 								</view>
+								<!-- 文件消息 -->
+								<div v-if="is_type_file(message)" class="bubble">
+								    <view><a :href="message.fileUrl" target="_blank">查看文件</a></view>
+								</div>
 								<!-- 机器人消息 -->
 								<view v-if="is_type_robot(message)" class="bubble">
 									<rich-text :nodes="message.content"></rich-text>
@@ -107,6 +111,10 @@
 								<view v-if="is_type_image(message)" class="bubble img" @tap="previewImageMessage(message)">
 									<image :src="message.imageUrl"></image>
 								</view>
+								<!-- 文件消息 -->
+								<div v-if="is_type_file(message)" class="bubble">
+								    <view><a :href="message.fileUrl" target="_blank">查看文件</a></view>
+								</div>
 								<view v-if="is_type_robot(message)" class="bubble">
 									<!-- <rich-text :nodes="message.content"></rich-text> -->
 									<view class="flex-column-start" style="color: #2fa39b;">
@@ -174,7 +182,7 @@
 				<view class="voice-mode" :class="[isVoice?'':'hidden',recording?'recording':'']" @touchstart="voiceBegin" @touchmove.stop.prevent="voiceIng" @touchend="voiceEnd" @touchcancel="voiceCancel">{{voiceTis}}</view>
 				<view class="text-mode"  :class="isVoice?'hidden':''">
 					<view class="box">
-						<textarea auto-height="true" v-model="inputContent" @focus="textareaFocus"/>
+						<textarea auto-height="true" v-model="inputContent" @input="onInputChange" @focus="textareaFocus"/>
 					</view>
 <!-- 					<view class="em" @tap="chooseEmoji">
 						<view class="icon biaoqing"></view>
@@ -785,7 +793,7 @@ export default {
 			if (this.isManulRequestThread || this.loadHistory === '0') {
 				return;
 			}
-			if(this.isHistoryLoading){
+			if(this.isHistoryLoading) {
 				return ;
 			}
 			// TODO: 加载历史聊天记录
@@ -811,14 +819,13 @@ export default {
 		},
 		// 加载最新10条消息，用于定时拉取最新消息
 		loadLatestMessage () {
-			// 长连接断开的情况拉取
-			if (!stompApi.isConnected()) {
+			// 长连接断开的情况拉取。机器人对话不需要拉取
+			if (!stompApi.isConnected() && !this.isRobot) {
 				//
-				// this.loadHistoryMessagesByTopic(this.thread.topic)
 				let app = this
 				let count = this.loadHistory ? 10 : 1
 				httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
-					console.log('loadHistoryMessagesByTopic: ', response)
+					console.log('loadLatestMessage: ', response)
 					//
 					if (response.status_code === 200) {
 						for (let i = 0; i < response.data.content.length; i++) {
@@ -1012,13 +1019,9 @@ export default {
 			}
 			return JSON.stringify(commodidy)
 		},
-		onInputChange (content) {
-			console.log('onInputChange:', content);
-			// if (this.isRobot || this.isThreadClosed) {
-			// 	return;
-			// }
-			// this.localPreviewContent = content
-			// this.delaySendPreviewMessage()
+		// 输入框内容发生变化
+		onInputChange (event) {
+			console.log('onInputChange:', event.detail.value)
 		},
 		sendTextMessageSync(content) {
 			// this.sendMessageSync('text', content)
@@ -1307,7 +1310,7 @@ export default {
 			if (this.inputContent.trim().length === 0) {
 				return;
 			}
-			console.log('robot:', this.isRobot)
+			// console.log('robot:', this.isRobot)
 			if (this.isRobot) {
 				this.messageAnswer(this.inputContent);
 			} else {
@@ -1665,7 +1668,6 @@ export default {
 				console.log('queryAnswer success', response)
 				//
 				if (response.status_code === 200)  {
-					//
 					// let queryMessage = response.data.query;
 					// let replyMessage = response.data.reply;
 					// //
@@ -1710,6 +1712,36 @@ export default {
 				}
 			}, function(error) {
 				console.log('messageAnswer error', error)
+			})
+		},
+		// 评价机器人答案：有帮助
+		rateAnswerHelpful (aid, mid) {
+			//
+			let app = this
+			httpApi.rateAnswer(aid, mid, true, function(response) {
+				if (response.status_code === 200) {
+					var message = response.data;
+					app.pushToMessageArray(message);
+				} else {
+					uni.showToast({ title: response.message, duration: 2000 });
+				}
+			}, function(error) {
+				console.log('rateAnswerHelpful error', error)
+			})
+		},
+		// 评价机器人答案：无帮助
+		rateAnswerUseless (aid, mid) {
+			//
+			let app = this
+			httpApi.rateAnswer(aid, mid, false, function(response) {
+				if (response.status_code === 200) {
+					var message = response.data;
+					app.pushToMessageArray(message);
+				} else {
+					uni.showToast({ title: response.message, duration: 2000 });
+				}
+			}, function(error) {
+				console.log('rateAnswerUseless error', error)
 			})
 		},
 		//

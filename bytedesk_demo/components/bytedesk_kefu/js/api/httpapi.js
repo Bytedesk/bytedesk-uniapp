@@ -822,6 +822,35 @@ export function messageAnswer (wid, type, aid, content, successcb, failedcb) {
   })
 }
 
+// 评价智能问答结果
+export function rateAnswer(aid, mid, rate, successcb, failedcb) {
+  console.log('rateAnswer:', aid, mid, rate);
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/answer/rate',
+    data: {
+      'aid': aid,
+	  'mid': mid,
+	  'rate': rate,
+      'client': constants.client
+    },
+  	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 //
 export function getCuws (successcb, failedcb) {
   //
