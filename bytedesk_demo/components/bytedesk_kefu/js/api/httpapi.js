@@ -767,7 +767,7 @@ export function getProfile (successcb, failedcb) {
 }
 
 // 通过aid，请求智能答案
-export function queryAnswer (tid, aid, successcb, failedcb) {
+export function queryAnswer (tid, aid, mid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
@@ -776,10 +776,11 @@ export function queryAnswer (tid, aid, successcb, failedcb) {
   }
   //
   uni.request({
-    url: constants.API_BASE_URL + '/api/answer/query',
+    url: constants.API_BASE_URL + '/api/v2/answer/query',
     data: {
 	  tid: tid,
 	  aid: aid,
+	  mid: mid,
       client: constants.client
     },
     header: header,
@@ -824,7 +825,7 @@ export function messageAnswer (wid, type, aid, content, successcb, failedcb) {
 
 // 评价智能问答结果
 export function rateAnswer(aid, mid, rate, successcb, failedcb) {
-  console.log('rateAnswer:', aid, mid, rate);
+  // console.log('rateAnswer:', aid, mid, rate);
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
@@ -1245,6 +1246,25 @@ export function getQuickButtons (workGroupWid, successcb, failedcb) {
       client: constants.client
     },
     header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 技能组设置-如：置顶语
+export function getPrechatSettings (workGroupWid, successcb, failedcb) {
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/visitor/api/prechat/settings',
+    data: {
+	  wid: workGroupWid,
+      client: constants.client
+    },
     method: 'GET',
     success (res) {
       successcb(res.data)

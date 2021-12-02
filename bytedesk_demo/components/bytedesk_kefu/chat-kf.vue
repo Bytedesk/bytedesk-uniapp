@@ -1,5 +1,7 @@
 <template>
 	<view>
+		<!-- -->
+		<uni-notice-bar :show-close="true" :show-icon="true" :single="true" :scrollable="true" v-if="showTopTip" :text="topTip" @close="closeTopTip" />
 		<view class="content" @touchstart="hideDrawer">
 			<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView" @scrolltoupper="loadMoreMessages" upper-threshold="50">
 				<!-- 加载历史数据 waitingUI -->
@@ -39,6 +41,13 @@
 						<view class="text" v-else-if="is_type_notification_offline(message)">{{ message.content }}</view>
 						<view class="text" v-else-if="is_type_notification_invite_rate(message)">{{ message.content }}</view>
 						<view class="text" v-else-if="is_type_notification_rate_result(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_rate_helpful(message)">{{ message.content }}</view>
+						<view class="text" v-else-if="is_type_notification_rate_helpless(message)">
+							{{ message.content }}
+							<view class="flex-row-start  padding-top-sm">
+								<text class="padding-left" style="color: #007AFF;" @click="requestAgent()">人工客服</text>
+							</view>
+						</view>
 						<view class="text" v-else-if="is_type_notification_queue_accept(message)">接入队列会话</view>
 						<view class="text" v-else-if="is_type_notification(message)">{{ message.content }}</view>
 					</view>
@@ -123,14 +132,29 @@
 										<view class="flex-row-start  padding-top-sm" v-for="(item, index) in message.answers" :key="index">
 											<!-- <hr class="hr-solid"> -->
 											<text @click="queryAnswer(item)" style="margin-top: 20rpx;">
-												{{item.question}}
+												{{ item.question }}
+											</text>
+										</view>
+										<hr class="hr-solid">
+										<view class="flex-row-start padding-top-sm">
+											<text class="my-neirong-sm">没有你要的答案?</text>
+											<text class="padding-left" style="color: #007AFF;" @click="requestAgent()">人工客服</text>
+										</view>
+									</view>
+								</view>
+								<view v-if="is_type_robot_result(message)" class="bubble">
+									<view class="flex-column-start" style="color: #2fa39b;">
+										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx; margin-top:20rpx;margin-bottom:10rpx;"></rich-text>
+										<view class="flex-row-start  padding-top-sm" v-for="(item, index) in message.answers" :key="index">
+											<text @click="queryAnswer(item)" style="margin-top: 20rpx;">
+												{{ item.question }}
 											</text>
 										</view>
 										<!-- TODO: 首先选择是否有帮助，如果用户选择没有帮助，则出现‘人工客服’按钮-->
 										<hr class="hr-solid">
-										<view class="flex-row-start  padding-top-sm">
-											<text class="my-neirong-sm">没有你要的答案?</text>
-											<text class="padding-left" style="color: #007AFF;" @click="requestAgent()">人工客服</text>
+										<view class="flex-row-start padding-top-sm">
+											<text style="color: #007AFF; font-size: 5px;" @click="rateAnswerHelpful(message.answer.aid, message.mid)">有帮助</text>
+											<text class="padding-left" style="color: #007AFF; margin-left: 10px; font-size: 5px;" @click="rateAnswerHelpless(message.answer.aid, message.mid)">没帮助</text>
 										</view>
 									</view>
 								</view>
@@ -385,7 +409,6 @@ export default {
 			showLeaveMessage: false,
 			showRate: false,
 			showForm: false,
-			//
 			// app: this,
 			visitorUid: '',
 			timer: ''
@@ -417,6 +440,10 @@ export default {
 			// console.log('uni on message');
 			app.onMessageReceived(messageObject)
 		})
+		// uni.$on('close',function() {
+		// 	console.log('close top tip');
+		// 	this.showTopTip = false
+		// })
 	},
 	onUnload() {
 	    // 移除监听事件  
@@ -483,6 +510,10 @@ export default {
 			this.requestThread()
 			// 加载快捷按钮
 			// this.getQuickButtons()
+			// 获取技能组设置，如：置顶语
+			if (this.option.type === 'workGroup') {
+				this.getPrechatSettings()
+			}
 		}
 	},
 	computed: {
@@ -521,6 +552,9 @@ export default {
 		},
 		is_type_robot (message) {
 			return message.type === 'robot'
+		},
+		is_type_robot_result (message) {
+			return message.type === 'robot_result'
 		},
 		is_type_image (message) {
 			return message.type === 'image'
@@ -605,6 +639,12 @@ export default {
 		},
 		is_type_notification_rate_result(message) {
 			return message.type === 'notification_rate_result'
+		},
+		is_type_notification_rate_helpful(message) {
+			return message.type === 'notification_rate_helpful'
+		},
+		is_type_notification_rate_helpless(message) {
+			return message.type === 'notification_rate_helpless'
 		},
 		is_type_notification_queue_accept(message) {
 			return message.type === 'notification_queue_accept'
@@ -839,47 +879,8 @@ export default {
 				}, function(error) {
 					console.log('load history messages error', error)
 				})
-				// let uid = ''
-				// if (this.option.agentclient === '1') {
-				// 	uid = this.visitorUid
-				// } else {
-				// 	uid = this.uid
-				// }
-				// let app = this
-				// let count = this.loadHistory ? 10 : 1
-				// httpApi.loadHistoryMessages(uid, 0, count, function(response) {
-				// 	// console.log('load recent Messages: ', response)
-				// 	if (response.status_code === 200) {
-				// 		for (let i = 0; i < response.data.content.length; i++) {
-				// 			const element = response.data.content[i]
-				// 			// console.log('element:', element);
-				// 			app.pushToMessageArray(element)
-				// 			// app.scrollToBottom()
-				// 		}
-				// 	}
-				// }, function(error) {
-				// 	console.log('load recent messages error', error)
-				// })
 			}
 		},
-		// 加载从某条消息记录之后的消息
-		// loadMessagesFrom (uid, id) {
-		// 	let app = this
-		// 	httpApi.loadMessagesFrom(uid, id, function(response) {
-		// 		// console.log('loadMessagesFrom: ', response)
-		// 		if (response.status_code === 200) {
-		// 			for (let i = 0; i < response.data.content.length; i++) {
-		// 				const element = response.data.content[i]
-		// 				// console.log('element:', element);
-		// 				// app.messages.unshift(element)
-		// 				app.pushToMessageArray(element)
-		// 			}
-		// 		}
-		// 		app.scrollToBottom()
-		// 	}, function(error) {
-		// 		console.log('load messages from error', error)
-		// 	})
-		// },
 		// 
 		dealWithThread (response) {
 			// console.log('')
@@ -1389,6 +1390,8 @@ export default {
 			// console.log('onMessageReceived:', messageObject)
 			//
 			if ((messageObject.type === 'text'
+			  || messageObject.type === 'robot'
+			  || messageObject.type === 'robot_result'
 			  || messageObject.type === 'image'
 			  || messageObject.type === 'file'
 			  || messageObject.type === 'voice'
@@ -1399,6 +1402,10 @@ export default {
 			  // 新protobuf转换json
 			  messageObject.createdAt = messageObject.timestamp;
 			  if (messageObject.type === "text") {
+			    messageObject.content = messageObject.text.content;
+			  } else if (messageObject.type === "robot") {
+			    messageObject.content = messageObject.text.content;
+			  } else if (messageObject.type === "robot_result") {
 			    messageObject.content = messageObject.text.content;
 			  } else if (messageObject.type === "image") {
 			    messageObject.imageUrl = messageObject.image.imageUrl;
@@ -1416,8 +1423,6 @@ export default {
 			  let mid = messageObject.mid;
 			  // this.thread.topic = messageObject.thread.topic;
 			  // 非自己发送的消息，发送消息回执: 消息已读
-			  // console.log('uid 2:', messageObject.user.uid)
-			  // console.log('uid 3:', this.uid)
 			  if (messageObject.user.uid !== this.uid) {
 				  // console.log('do send receipt');
 				  this.sendReceiptMessage(mid, "read");
@@ -1596,7 +1601,7 @@ export default {
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
-				"type": 'text',
+				"type": 'robot',
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
@@ -1623,15 +1628,15 @@ export default {
 			this.onMessageReceived(json)
 			// this.scrollToMessage(json)
 		},
-		appendReplyMessage (content) {
+		appendReplyMessage (aid, mid, content) {
 			//
-			let localId = this.guid();
+			// let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": mid,
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
-				"type": 'text',
+				"type": 'robot_result',
 				"user": {
 					"uid": this.robotUser.uid,
 					"nickname": this.robotUser.nickname,
@@ -1642,6 +1647,9 @@ export default {
 				},
 				"text": {
 					"content": content
+				},
+				"answer": {
+					"aid": aid
 				},
 				"thread": {
 					"tid": this.thread.tid,
@@ -1662,9 +1670,11 @@ export default {
 		queryAnswer (answer) {
 			// console.log('answer:', answer);
 			this.appendQueryMessage(answer.question)
-			this.appendReplyMessage(answer.answer)
+			//
+			let mid = this.guid();
+			this.appendReplyMessage(answer.aid, mid, answer.answer)
 			let app = this
-			httpApi.queryAnswer(this.thread.tid, answer.aid, function(response) {
+			httpApi.queryAnswer(this.thread.tid, answer.aid, mid, function(response) {
 				console.log('queryAnswer success', response)
 				//
 				if (response.status_code === 200)  {
@@ -1701,6 +1711,7 @@ export default {
 					//
 					// let queryMessage = response.data.query;
 					let replyMessage = response.data.reply;
+					replyMessage.type = 'robot_result';
 					//
 					// app.pushToMessageArray(queryMessage);
 					app.pushToMessageArray(replyMessage);
@@ -1719,9 +1730,11 @@ export default {
 			//
 			let app = this
 			httpApi.rateAnswer(aid, mid, true, function(response) {
+				console.log('rateAnswerHelpful success：', response)
 				if (response.status_code === 200) {
 					var message = response.data;
 					app.pushToMessageArray(message);
+					app.scrollToMessage(message);
 				} else {
 					uni.showToast({ title: response.message, duration: 2000 });
 				}
@@ -1730,13 +1743,15 @@ export default {
 			})
 		},
 		// 评价机器人答案：无帮助
-		rateAnswerUseless (aid, mid) {
+		rateAnswerHelpless (aid, mid) {
 			//
 			let app = this
 			httpApi.rateAnswer(aid, mid, false, function(response) {
+				console.log('rateAnswerHelpless success：', response)
 				if (response.status_code === 200) {
 					var message = response.data;
 					app.pushToMessageArray(message);
+					app.scrollToMessage(message);
 				} else {
 					uni.showToast({ title: response.message, duration: 2000 });
 				}
@@ -1953,6 +1968,10 @@ export default {
 				// #endif
 			}
 		},
+		closeTopTip () {
+			console.log('closeTopTip');
+			this.showTopTip = false
+		},
 		getQuickButtons () {
 			let app = this
 			httpApi.getQuickButtons(this.option.wid, function(response) {
@@ -1960,6 +1979,16 @@ export default {
 				
 			}, function(error) {
 				console.log('getQuickButtons error', error)
+			})
+		},
+		getPrechatSettings () {
+			let app = this
+			httpApi.getPrechatSettings(this.option.wid, function(response) {
+				console.log('getPrechatSettings success:', app.option.wid, response)
+				app.showTopTip = response.data.showTopTip
+				app.topTip = response.data.topTip
+			}, function(error) {
+				console.log('getPrechatSettings error', error)
 			})
 		}
 	},
