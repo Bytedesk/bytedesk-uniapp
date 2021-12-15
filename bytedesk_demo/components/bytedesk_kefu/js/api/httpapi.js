@@ -573,6 +573,91 @@ export function getVisitorThreads(page, size, successcb, failedcb) {
   })
 }
 
+// 加载排队列表
+export function getQueues(page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/queue/get',
+    data: {
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+/**
+ * 接入排队访客
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function acceptQueue(qid, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+  uni.request({
+    url: constants.API_BASE_URL + '/api/queue/accept',
+    data: {
+      'qid': qid,
+      'client': constants.client
+    },
+	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+/**
+ * 忽略排队访客
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function ignoreQueue(qid, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+  uni.request({
+    url: constants.API_BASE_URL + '/api/queue/ignore',
+    data: {
+      'qid': qid,
+      'client': constants.client
+    },
+	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 查询技能组在线状态
 export function getWorkGroupStatus(workGroupWid, successcb, failedcb) {
   //
@@ -795,7 +880,7 @@ export function queryAnswer (tid, aid, mid, successcb, failedcb) {
 }
 
 // 输入内容，请求智能答案
-export function messageAnswer (wid, type, aid, content, successcb, failedcb) {
+export function messageAnswer (wid, content, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
@@ -806,9 +891,7 @@ export function messageAnswer (wid, type, aid, content, successcb, failedcb) {
   uni.request({
     url: constants.API_BASE_URL + '/api/v2/answer/message',
     data: {
-	  type: type,
 	  wid: wid,
-	  aid: aid,
 	  content: content,
       client: constants.client
     },

@@ -1666,7 +1666,7 @@ export default {
 			this.onMessageReceived(json)
 			// this.scrollToMessage(json)
 		},
-		//
+		// 点击聊天界面问题-查询答案
 		queryAnswer (answer) {
 			// console.log('answer:', answer);
 			this.appendQueryMessage(answer.question)
@@ -1693,8 +1693,9 @@ export default {
 				console.log('queryAnswer error', error)
 			})
 		},
+		// 输入框输入机器人问答-查询答案
 		messageAnswer (content) {
-			//
+			// 直接在界面显示输入问题
 			this.appendQueryMessage(content)
 			let app = this;
 			// 包含’人工‘二字
@@ -1703,22 +1704,22 @@ export default {
 				app.requestAgent()
 				return;
 			} 
-			//
-			httpApi.messageAnswer(this.option.wid, this.option.type, this.option.aid, content, function(response) {
+			// 从服务器请求答案
+			httpApi.messageAnswer(this.option.wid, content, function(response) {
 				console.log('messageAnswer success', response)
 				if (response.status_code === 200 ||
 					response.status_code === 201)  {
 					//
 					// let queryMessage = response.data.query;
-					let replyMessage = response.data.reply;
-					replyMessage.type = 'robot_result';
-					//
 					// app.pushToMessageArray(queryMessage);
+					// 
+					let replyMessage = response.data.reply;
+					replyMessage.type = 'robot_result'; // 返回类型特殊处理一下
+					// 在界面显示
 					app.pushToMessageArray(replyMessage);
-					// app.scrollToBottom()
+					// 滚动界面到此消息
 					app.scrollToMessage(replyMessage)
 				} else {
-					// app.$message.warning(response.data.message)
 					uni.showToast({ title: response.message, duration: 2000 });
 				}
 			}, function(error) {
