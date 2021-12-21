@@ -4,8 +4,9 @@
 		<uni-list :border="true">
 			<!-- 技能组客服会话-支持多个客服 -->
 			<uni-list-item title="技能组客服" clickable @click="startWorkGroupChat()" note="默认人工" showArrow />
-			<uni-list-item title="技能组客服-无历史消息记录" clickable @click="startWorkGroupChatNoHistory()" note="默认人工" showArrow />
-			<uni-list-item title="技能组客服-机器人" clickable @click="startWorkGroupChatRobot()" note="默认机器人(服务器设置)" showArrow />
+			<uni-list-item title="技能组客服" clickable @click="startWorkGroupChatNoHistory()" note="默认不显示历史消息记录" showArrow />
+			<uni-list-item title="技能组客服-机器人" clickable @click="startWorkGroupChatRobot()" note="默认显示热门问题" showArrow />
+			<uni-list-item title="技能组客服-机器人2" clickable @click="startWorkGroupChatRobotV2()" note="默认显示分类" showArrow />
 			<uni-list-item title="技能组客服-电商" clickable @click="startWorkGroupChatShop()" note="自动发送商品信息" showArrow />
 			<uni-list-item title="技能组客服-附言" clickable @click="startWorkGroupChatPostscript()" note="自动发送附言" showArrow />
 			<uni-list-item title="技能组客服-自定义昵称" clickable @click="startWorkGroupChatNickname()" note="客服所见昵称" showArrow />
@@ -86,11 +87,21 @@ export default {
 			});
 		},
 		startWorkGroupChatRobot () {
+			// 默认显示 热门问题
 			// 服务器端设置此技能组为默认机器人
 			// 管理后台-》客服管理-》技能组-》点击某个技能组最右边‘编辑’按钮-》开启默认机器人或离线机器人
 			// 如何开启机器人：https://www.bytedesk.com/support/article?sub=vip&uid=201808221551193&aid=202104291459561&ph=ph
 			uni.navigateTo({
 				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWidRobot + '&type=workGroup&aid=&title=萝卜丝&history=0'
+			});
+		},
+		startWorkGroupChatRobotV2 () {
+			// 默认显示 问题类别，需要设置参数：v2robot=true
+			// 服务器端设置此技能组为默认机器人
+			// 管理后台-》客服管理-》技能组-》点击某个技能组最右边‘编辑’按钮-》开启默认机器人或离线机器人
+			// 如何开启机器人：https://www.bytedesk.com/support/article?sub=vip&uid=201808221551193&aid=202104291459561&ph=ph
+			uni.navigateTo({
+				url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWidRobot + '&type=workGroup&aid=&title=萝卜丝&history=0&v2robot=true'
 			});
 		},
 		startWorkGroupChatShop () {
@@ -164,6 +175,7 @@ export default {
 		},
 		startAppointedChatNickname () {
 			// 增加参数：nickname=自定义昵称
+			// 修改用户头像昵称等，请到user_info.vue用户信息页面查看相关接口
 			uni.navigateTo({
 				url: '../../components/bytedesk_kefu/chat-kf?wid=&type=appointed&aid=' + this.agentUid + '&title=萝卜丝&nickname=自定义昵称'
 			});

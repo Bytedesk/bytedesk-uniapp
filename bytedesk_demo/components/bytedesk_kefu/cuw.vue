@@ -1,7 +1,29 @@
 <template>
 	<view class="bytedesk">
 		<uni-search-bar @confirm="search" @input="input" @cancel="cancel" />
-		<uni-list-item clickable @click="selectCuw(cuw)" v-for="cuw in filteredCuw" :key="cuw.cid" :title="cuw.name" :note="getDetail(cuw.type, cuw.content)"/>
+		<!-- 客服自己添加常用语 -->
+		<view v-if="searchVal.length === 0" v-for="category in mineList" :key="category.cid">
+			<uni-section :title="category.name" type="line"></uni-section>
+			<uni-list>
+				<uni-list-item clickable @click="selectCuw(cuw)" v-for="cuw in category.cuwChildren"  :key="cuw.cid" :title="cuw.name" :note="getDetail(cuw.type, cuw.content)"/>
+			</uni-list>
+		</view>
+		<!-- 公司常用语 -->
+		<view v-if="searchVal.length === 0" v-for="category in companyList" :key="category.cid">
+			<uni-section :title="category.name" type="line"></uni-section>
+			<uni-list>
+				<uni-list-item clickable @click="selectCuw(cuw)" v-for="cuw in category.cuwChildren"  :key="cuw.cid" :title="cuw.name" :note="getDetail(cuw.type, cuw.content)"/>
+			</uni-list>
+		</view>
+		<!-- 平台常用语 -->
+		<view v-if="searchVal.length === 0" v-for="category in platformList" :key="category.cid">
+			<uni-section :title="category.name" type="line"></uni-section>
+			<uni-list>
+				<uni-list-item clickable @click="selectCuw(cuw)" v-for="cuw in category.cuwChildren"  :key="cuw.cid" :title="cuw.name" :note="getDetail(cuw.type, cuw.content)"/>
+			</uni-list>
+		</view>
+		<!-- 搜索结果 -->
+		<uni-list-item v-if="searchVal.length > 0" clickable @click="selectCuw(cuw)" v-for="cuw in filteredCuw" :key="cuw.cid" :title="cuw.name" :note="getDetail(cuw.type, cuw.content)"/>
 		<view class="nodata" v-if="filteredCuw.length === 0">
 			当前无常用语
 		</view>
@@ -16,6 +38,13 @@
 		data() {
 			return {
 				cuwList: [],
+				//
+				mineList: [],
+				//
+				companyList: [],
+				//
+				platformList: [],
+				//
 				searchVal: ''
 			}
 		},
@@ -85,6 +114,11 @@
 				let app = this
 				httpApi.getCuws(function(response) {
 					console.log('getCuws success:', response)
+					//
+					app.mineList = response.data.mine
+					app.companyList = response.data.company
+					app.platformList = response.data.platform
+					//
 					for (var i = 0; i < response.data.mine.length; i++) {
 						let mineArray = response.data.mine[i]
 						for (var j = 0; j < mineArray.cuwChildren.length; j++) {

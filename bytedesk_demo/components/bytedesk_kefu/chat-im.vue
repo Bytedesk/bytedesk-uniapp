@@ -60,7 +60,7 @@
 								<view v-if="is_type_event(message)" class="bubble">
 									<rich-text :nodes="message.content"></rich-text>
 								</view>
-								<!-- 语言消息 -->
+								<!-- 语音消息 -->
 								<view v-if="message.type=='voice'" class="bubble voice" @tap="playVoice(message)" :class="playMsgid == message.mid ? 'play' : ''">
 									<view class="length">{{message.length}}</view>
 									<view class="icon my-voice"></view>
@@ -69,6 +69,14 @@
 								<view v-if="is_type_image(message)" class="bubble img" @tap="previewImageMessage(message)">
 									<image :src="message.imageUrl"></image>
 								</view>
+								<!-- 文件消息 -->
+								<div v-if="is_type_file(message)" class="bubble">
+								    <view><a :href="message.fileUrl" target="_blank">查看文件</a></view>
+								</div>
+								<!-- 视频消息 -->
+								<div v-if="is_type_video(message)" class="bubble">
+								    <view><a :href="message.videoOrShortUrl" target="_blank">查看视频</a></view>
+								</div>
 								<!-- 机器人消息 -->
 								<view v-if="is_type_robot(message)" class="bubble">
 									<rich-text :nodes="message.content"></rich-text>
@@ -107,6 +115,14 @@
 								<view v-if="is_type_image(message)" class="bubble img" @tap="previewImageMessage(message)">
 									<image :src="message.imageUrl"></image>
 								</view>
+								<!-- 文件消息 -->
+								<div v-if="is_type_file(message)" class="bubble">
+								    <view><a :href="message.fileUrl" target="_blank">查看文件</a></view>
+								</div>
+								<!-- 视频消息 -->
+								<div v-if="is_type_video(message)" class="bubble">
+								    <view><a :href="message.videoOrShortUrl" target="_blank">查看视频</a></view>
+								</div>
 								<view v-if="is_type_robot(message)" class="bubble">
 									<!-- <rich-text :nodes="message.content"></rich-text> -->
 									<view class="flex-column-start" style="color: #2fa39b;">
@@ -148,9 +164,12 @@
 					<view v-if="isAgentClient" class="box" @tap="addBlock()">拉黑</view>
 					<!-- 免打扰 -->
 					<view v-if="isAgentClient" class="box" @tap="markNodisturb()">免打扰</view>
-					<!-- TODO: 用户信息 -->
+					<!-- TODO: 转接会话 -->
+					<view v-if="isAgentClient" class="box" @tap="getOnlineAgents()">转接</view>
 					<!-- TODO: 邀请评价 -->
+					<view v-if="isAgentClient" class="box" @tap="inviteRate()">邀评</view>
 					<!-- TODO: 关闭会话 -->
+					<view v-if="isAgentClient" class="box" @tap="closeThread()">关闭</view>
 				</view>
 			</view>
 		</view>
@@ -378,6 +397,8 @@ export default {
 			showRate: false,
 			showForm: false,
 			//
+			onlineAgents: [],
+			//
 			isAgentClient: false,
 			visitorUid: '',
 			timer: ''
@@ -410,13 +431,19 @@ export default {
 			app.onMessageReceived(messageObject)
 		})
 		uni.$on('cuw', function(cuw) {
-			console.log('send cuw:', cuw)
+			// console.log('send cuw:', cuw)
 			if (cuw.type === 'text') {
 				app.sendTextMessageSync(cuw.content)
 			} else if (cuw.type === 'image') {
 				app.sendImageMessageSync(cuw.content)
+			} else if (cuw.type === 'file') {
+				app.sendFileMessageSync(cuw.content)
+			} else if (cuw.type === 'voice') {
+				app.sendVoiceMessageSync(cuw.content)
+			} else if (cuw.type === 'video') {
+				app.sendVideoMessageSync(cuw.content)
 			} else {
-				console.log('TODO: 其他类型')
+				uni.showToast({ title: '暂不支持消息类型', duration: 2000 });
 			}
 		})
 	},
@@ -1031,9 +1058,8 @@ export default {
 				return;
 			}
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1063,11 +1089,10 @@ export default {
 			this.doSendMessage(json);
 		},
 		sendImageMessageSync(imageUrl) {
-			console.log('sendImageMessageSync:', imageUrl);
+			// console.log('sendImageMessageSync:', imageUrl);
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1096,12 +1121,44 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		sendFileMessageSync(fileUrl) {
+			// console.log('sendFileMessageSync:', fileUrl);
+			//
+			var json = {
+				"mid": this.guid(),
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'file',
+				"user": {
+					"uid": this.my_uid(),
+					"nickname": this.my_nickname(),
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
+				},
+				"file": {
+					"fileUrl": fileUrl
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[文件]",
+					"nickname": this.thread_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+		},
 		sendVoiceMessageSync(voiceUrl, length, format) {
 			// console.log('sendVoiceMessageSync:', voiceUrl);
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1135,9 +1192,8 @@ export default {
 		sendVideoMessageSync(videoUrl) {
 			// console.log('sendVideoMessageSync:', videoUrl);
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1205,9 +1261,8 @@ export default {
 		},
 		sendPreviewMessage() {
 			//
-			var localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1238,9 +1293,8 @@ export default {
 			this.doSendMessage(json);
 		},
 		sendReceiptMessage (mid, status) {
-			var localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1271,9 +1325,8 @@ export default {
 			this.doSendMessage(json);
 		},
 		sendRecallMessage (mid) {
-			var localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1500,7 +1553,6 @@ export default {
 		currentTimestamp () {
 			return moment().format('YYYY-MM-DD HH:mm:ss')
 		},
-		///
 		// 拉黑
 		addBlock() {
 			// 只有客服端
@@ -1548,6 +1600,189 @@ export default {
 			}, error => {
 				console.log('unmark nodisturb error:', error)
 				uni.showToast({ title: '取消免打扰失败', duration: 2000 });
+			})
+		},
+		// 加载当前在线客服
+		getOnlineAgents () {
+			// 
+			let app = this
+			httpApi.getOnlineAgents(function(response) {
+				//
+				app.onlineAgents = response.data
+				if (app.onlineAgents.length > 0) {
+					//
+					let agentRealNames = []
+					for (var i = 0; i < app.onlineAgents.length; i++) {
+						let agent = app.onlineAgents[i]
+						agentRealNames.push(agent.realName)
+					}
+					uni.showActionSheet({
+						title:'请选择要转接的客服',
+						itemList: agentRealNames,
+						success: (e) => {
+							// console.log(e.tapIndex);
+							let topic = app.onlineAgents[e.tapIndex].uid
+							app.sendTransferMessage(topic)
+						}
+					})
+				} else {
+					uni.showToast({ title: '无其他客服在线', duration: 2000 });
+				}
+			}, function(error) {
+				console.log('getOnlineAgents error', error)
+			})
+		},
+		// 发送转接会话信息
+		sendTransferMessage (topic) {
+			//
+			var json = {
+				"mid": this.guid(),
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'notification_transfer',
+				"user": {
+					"uid": this.my_uid(),
+					"nickname": this.my_nickname(),
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": true
+					}
+				},
+				"transfer": {
+					"topic": topic,
+					"content": "转接会话"
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": '转接会话',
+					"nickname": this.thread_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+			uni.showToast({ title: '发送成功', duration: 2000 });
+		},
+		// 接受转接会话
+		acceptTransfer (topic) {
+			//
+			var json = {
+				"mid": this.guid(),
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'notification_transfer_accept',
+				"user": {
+					"uid": this.my_uid(),
+					"nickname": this.my_nickname(),
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": true
+					}
+				},
+				"transfer": {
+					"topic": topic,
+					"accept": true
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "接受转接",
+					"nickname": this.thread_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+			uni.showToast({ title: '发送成功', duration: 2000 });
+		},
+		// 拒绝转接会话
+		rejectTransfer (topic) {
+			//
+			var json = {
+				"mid": this.guid(),
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'notification_transfer_reject',
+				"user": {
+					"uid": this.my_uid(),
+					"nickname": this.my_nickname(),
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": true
+					}
+				},
+				"transfer": {
+					"topic": topic,
+					"accept": false
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "拒绝转接",
+					"nickname": this.thread_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+			uni.showToast({ title: '发送成功', duration: 2000 });
+		},
+		// 邀请评价
+		inviteRate () {
+			//
+			var json = {
+				"mid": this.guid(),
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'notification_invite_rate',
+				"user": {
+					"uid": this.my_uid(),
+					"nickname": this.my_nickname(),
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": true
+					}
+				},
+				"extra": {
+					"content": '请对客服的服务做出评价'
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": '请对客服的服务做出评价',
+					"nickname": this.thread_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+			uni.showToast({ title: '发送成功', duration: 2000 });
+		},
+		// 客服关闭会话
+		closeThread () {
+			//
+			httpApi.agentCloseThread(this.thread.tid, function(response) {
+				if (response.status_code === 200) {
+					uni.showToast({ title: '关闭会话成功', duration: 2000 });
+					uni.navigateBack()
+				} else {
+					uni.showToast({ title: response.message, duration: 2000 });
+				}
+			}, function(error) {
+				console.log('agentCloseThread error', error)
 			})
 		},
 		// 点击商品回调

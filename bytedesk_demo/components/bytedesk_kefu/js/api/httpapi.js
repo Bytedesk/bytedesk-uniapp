@@ -464,6 +464,33 @@ export function requestThreadScan(id, successcb, failedcb) {
   })
 }
 
+// 请求技能组客服会话
+export function requestWorkGroupThreadV2(wid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/v2/thread/workGroup',
+    data: {
+      wId: wid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+
 // 客服端：当前进行中会话
 export function getThreads(page, size, successcb, failedcb) {
   //
@@ -658,6 +685,95 @@ export function ignoreQueue(qid, successcb, failedcb) {
   })
 }
 
+/**
+ * 设置客服接待状态
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function setAcceptStatus(status, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+  uni.request({
+    url: constants.API_BASE_URL + '/api/status/set',
+    data: {
+      'status': status,
+      'client': constants.client
+    },
+	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+/**
+ * 设置 自动回复内容
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function updateAutoReply(autoReply, content, imageUrl, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+  uni.request({
+	url: constants.API_BASE_URL + '/api/v1/autoreply/update',
+	data: {
+	  'autoReply': autoReply,
+	  'content': content,
+	  'imageUrl': imageUrl,
+	  'client': constants.client
+	},
+	header: header,
+	method: 'POST',
+	success (res) {
+	  successcb(res.data)
+	},
+	fail (res) {
+	  failedcb(res.data)
+	}
+  })
+}
+
+/**
+ * 客服关闭会话
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function agentCloseThread(tid, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+  uni.request({
+	url: constants.API_BASE_URL + '/api/thread/agent/close',
+	data: {
+	  'tid': tid,
+	  'client': constants.client
+	},
+	header: header,
+	method: 'POST',
+	success (res) {
+	  successcb(res.data)
+	},
+	fail (res) {
+	  failedcb(res.data)
+	}
+  })
+}
+
 // 查询技能组在线状态
 export function getWorkGroupStatus(workGroupWid, successcb, failedcb) {
   //
@@ -709,6 +825,32 @@ export function getAgentStatus(agentUid, successcb, failedcb) {
     }
   })
 }
+
+// 加载同一个公司内-全部当前在线客服
+export function getOnlineAgents(successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/user/online/list',
+    data: {
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 
 // 根据uid加载更多聊天记录
 export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
@@ -866,6 +1008,33 @@ export function queryAnswer (tid, aid, mid, successcb, failedcb) {
 	  tid: tid,
 	  aid: aid,
 	  mid: mid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 查询某分类下 所有问题列表
+export function queryCategoryAnswers (tid, cid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/v2/answer/category',
+    data: {
+	  tid: tid,
+	  cid: cid,
       client: constants.client
     },
     header: header,

@@ -1,6 +1,5 @@
 <template>
 	<view>
-		<!-- -->
 		<uni-notice-bar :show-close="true" :show-icon="true" :single="true" :scrollable="true" v-if="showTopTip" :text="topTip" @close="closeTopTip" />
 		<view class="content" @touchstart="hideDrawer">
 			<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :scroll-into-view="scrollToView" @scrolltoupper="loadMoreMessages" upper-threshold="50">
@@ -82,6 +81,10 @@
 								<div v-if="is_type_file(message)" class="bubble">
 								    <view><a :href="message.fileUrl" target="_blank">查看文件</a></view>
 								</div>
+								<!-- 视频消息 -->
+								<div v-if="is_type_video(message)" class="bubble">
+								    <view><a :href="message.videoOrShortUrl" target="_blank">查看视频</a></view>
+								</div>
 								<!-- 机器人消息 -->
 								<view v-if="is_type_robot(message)" class="bubble">
 									<rich-text :nodes="message.content"></rich-text>
@@ -124,13 +127,15 @@
 								<div v-if="is_type_file(message)" class="bubble">
 								    <view><a :href="message.fileUrl" target="_blank">查看文件</a></view>
 								</div>
+								<!-- 视频消息 -->
+								<div v-if="is_type_video(message)" class="bubble">
+								    <view><a :href="message.videoOrShortUrl" target="_blank">查看视频</a></view>
+								</div>
 								<view v-if="is_type_robot(message)" class="bubble">
 									<!-- <rich-text :nodes="message.content"></rich-text> -->
 									<view class="flex-column-start" style="color: #2fa39b;">
 										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx; margin-top:20rpx;margin-bottom:10rpx;"></rich-text>
-										<!-- <hr class="hr-solid"> -->
 										<view class="flex-row-start  padding-top-sm" v-for="(item, index) in message.answers" :key="index">
-											<!-- <hr class="hr-solid"> -->
 											<text @click="queryAnswer(item)" style="margin-top: 20rpx;">
 												{{ item.question }}
 											</text>
@@ -139,6 +144,16 @@
 										<view class="flex-row-start padding-top-sm">
 											<text class="my-neirong-sm">没有你要的答案?</text>
 											<text class="padding-left" style="color: #007AFF;" @click="requestAgent()">人工客服</text>
+										</view>
+									</view>
+								</view>
+								<view v-if="is_type_robot_v2(message)" class="bubble">
+									<view class="flex-column-start" style="color: #2fa39b;">
+										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx; margin-top:20rpx;margin-bottom:10rpx;"></rich-text>
+										<view class="flex-row-start  padding-top-sm" v-for="(item, index) in message.categories" :key="index">
+											<text @click="queryCategory(item)" style="margin-top: 20rpx;">
+												{{ item.name }}
+											</text>
 										</view>
 									</view>
 								</view>
@@ -303,7 +318,8 @@ export default {
 				agentclient: '0',
 				lang: 'cn',
 				//
-				scan: ''
+				scan: '',
+				v2robot: false
 			},
 			isInputingVisible: false,
 			localPreviewContent: '',
@@ -553,6 +569,9 @@ export default {
 		is_type_robot (message) {
 			return message.type === 'robot'
 		},
+		is_type_robot_v2 (message) {
+			return message.type === 'robotv2'
+		},
 		is_type_robot_result (message) {
 			return message.type === 'robot_result'
 		},
@@ -738,17 +757,27 @@ export default {
 			} catch (error) {
 			    console.error('read uid/username error', error)
 			}
-			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
-			// this.loadHistoryMessages(this.uid);
 			//
 			let app = this
-			httpApi.requestThread(this.option.wid, this.option.type, this.option.aid, function(response) {
-				console.log('request thread success', app.option.wid, app.option.type, app.option.aid, response)
-				//
-				app.dealWithThread(response);
-			}, function(error) {
-				console.log('request thread error', error)
-			})
+			if (this.option.v2robot === undefined || this.option.v2robot === null || this.option.v2robot === false) {
+				httpApi.requestThread(this.option.wid, this.option.type, this.option.aid, function(response) {
+					// console.log('request thread success', app.option.wid, app.option.type, app.option.aid, response)
+					//
+					app.dealWithThread(response);
+				}, function(error) {
+					console.log('request thread error', error)
+				})
+			} else {
+				// v2robot = true
+				httpApi.requestWorkGroupThreadV2(this.option.wid, function(response) {
+					console.log('request thread v2 success', app.option.wid, response)
+					//
+					app.dealWithThread(response);
+				}, function(error) {
+					console.log('request thread v2 error', error)
+				})
+			}
+			
 		},
 		// 请求人工客服
 		requestAgent () {
@@ -1035,9 +1064,8 @@ export default {
 				return;
 			}
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1067,11 +1095,10 @@ export default {
 			this.doSendMessage(json);
 		},
 		sendImageMessageSync(imageUrl) {
-			console.log('sendImageMessageSync:', imageUrl);
+			// console.log('sendImageMessageSync:', imageUrl);
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1100,12 +1127,44 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		sendFileMessageSync(fileUrl) {
+			// console.log('sendFileMessageSync:', fileUrl);
+			//
+			var json = {
+				"mid": this.guid(),
+				"timestamp": this.currentTimestamp(),
+				"client": this.client,
+				"version": "1",
+				"type": 'file',
+				"user": {
+					"uid": this.my_uid(),
+					"nickname": this.my_nickname(),
+					"avatar": this.my_avatar(),
+					"extra": {
+						"agent": false
+					}
+				},
+				"file": {
+					"fileUrl": fileUrl
+				},
+				"thread": {
+					"tid": this.thread.tid,
+					"type": this.thread.type,
+					"content": "[文件]",
+					"nickname": this.thread_nickname(),
+					"avatar": this.thread.visitor.avatar,
+					"topic": this.threadTopic,
+					"timestamp": this.currentTimestamp(),
+					"unreadCount": 0
+				}
+			};
+			this.doSendMessage(json);
+		},
 		sendVoiceMessageSync(voiceUrl, length, format) {
 			// console.log('sendVoiceMessageSync:', voiceUrl);
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1139,9 +1198,8 @@ export default {
 		sendVideoMessageSync(videoUrl) {
 			// console.log('sendVideoMessageSync:', videoUrl);
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1209,9 +1267,8 @@ export default {
 		},
 		sendPreviewMessage() {
 			//
-			var localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1242,9 +1299,8 @@ export default {
 			this.doSendMessage(json);
 		},
 		sendReceiptMessage (mid, status) {
-			var localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1275,9 +1331,8 @@ export default {
 			this.doSendMessage(json);
 		},
 		sendRecallMessage (mid) {
-			var localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1595,9 +1650,8 @@ export default {
 		//
 		appendQueryMessage (content) {
 			//
-			let localId = this.guid();
 			var json = {
-				"mid": localId,
+				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
 				"client": this.client,
 				"version": "1",
@@ -1630,7 +1684,6 @@ export default {
 		},
 		appendReplyMessage (aid, mid, content) {
 			//
-			// let localId = this.guid();
 			var json = {
 				"mid": mid,
 				"timestamp": this.currentTimestamp(),
@@ -1691,6 +1744,28 @@ export default {
 				}
 			}, function(error) {
 				console.log('queryAnswer error', error)
+			})
+		},
+		// 查询类别下-所属问答
+		queryCategory (category) {
+			// console.log('category:', category);
+			this.appendQueryMessage(category.name)
+			//
+			let app = this
+			httpApi.queryCategoryAnswers(this.thread.tid, category.cid, function(response) {
+				console.log('queryCategoryAnswers success', response)
+				//
+				if (response.status_code === 200)  {
+					// 
+					let replyMessage = response.data.reply;
+					//
+					app.pushToMessageArray(replyMessage);
+					app.scrollToBottom()
+				} else {
+					uni.showToast({ title: response.message, duration: 2000 });
+				}
+			}, function(error) {
+				console.log('queryCategoryAnswers error', error)
 			})
 		},
 		// 输入框输入机器人问答-查询答案
@@ -1970,7 +2045,7 @@ export default {
 			}
 		},
 		closeTopTip () {
-			console.log('closeTopTip');
+			// console.log('closeTopTip');
 			this.showTopTip = false
 		},
 		getQuickButtons () {
@@ -1985,7 +2060,7 @@ export default {
 		getPrechatSettings () {
 			let app = this
 			httpApi.getPrechatSettings(this.option.wid, function(response) {
-				console.log('getPrechatSettings success:', app.option.wid, response)
+				// console.log('getPrechatSettings success:', app.option.wid, response)
 				app.showTopTip = response.data.showTopTip
 				app.topTip = response.data.topTip
 			}, function(error) {
