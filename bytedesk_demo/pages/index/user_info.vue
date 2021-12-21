@@ -4,6 +4,7 @@
 		<uni-list :border="true">
 			<uni-list-item title="唯一Uid" :note="uid" />
 			<uni-list-item title="设置昵称" clickable @click="setNickname()" :note="nickname" />
+			<uni-list-item title="设置备注" clickable @click="setDescription()" :note="description" />
 			<uni-list-chat title="设置头像" clickable @click="setAvatar()" :avatar="avatar" :avatar-circle="true" />
 		</uni-list>
 	</view>
@@ -18,6 +19,7 @@
 			return {
 				uid: '',
 				nickname: '',
+				description: '',
 				avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png' // 默认显示
 			}
 		},
@@ -32,6 +34,7 @@
 					console.log('getProfile success:', response)
 					app.uid = response.data.uid
 					app.nickname = response.data.nickname
+					app.description = response.data.description
 					app.avatar = response.data.avatar
 				}, function(error) {
 					console.log('getProfile error', error)
@@ -47,6 +50,18 @@
 					app.nickname = mynickname
 				}, function(error) {
 					console.log('updateNickname error', error)
+					uni.showToast({ title: error, duration: 2000 });
+				})
+			},
+			setDescription () {
+				// 可自定义用户备注信息-客服端可见
+				let mydescription = '自定义APP用户备注信息uniapp'
+				let app = this
+				httpApi.updateDescription(mydescription, function(response) {
+					console.log('updateDescription success:', response)
+					app.description = mydescription
+				}, function(error) {
+					console.log('updateDescription error', error)
 					uni.showToast({ title: error, duration: 2000 });
 				})
 			},

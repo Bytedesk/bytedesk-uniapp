@@ -1159,6 +1159,36 @@ export function updateNickname(nickname, successcb, failedcb) {
   })
 }
 
+// 自定义用户备注
+export function updateDescription(description, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+  uni.request({
+    url: constants.API_BASE_URL + '/api/user/description',
+    data: {
+      'description': description,
+      'client': constants.client
+    },
+	header: header,
+    method: 'POST',
+    success (res) {
+	  try {
+	  	uni.setStorageSync(constants.description, description);
+	  } catch (e) {
+	      // error
+	  }
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 自定义用户头像
 export function updateAvatar(avatar, successcb, failedcb) {
 	//
