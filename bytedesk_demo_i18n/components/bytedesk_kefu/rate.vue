@@ -12,26 +12,26 @@
 		<view class="example-body">
 			<!-- 好 -->
 			<view v-if="greaterThan3" class="tag-view">
-				<button class="mini-btn" size="mini" @click="clickButton1">服务态度好</button>
+				<button class="mini-btn" size="mini" @click="clickButton1">{{ $t('atitudeGood') }}</button>
 			</view>
 			<view v-if="greaterThan3" class="tag-view">
-				<button class="mini-btn" size="mini" @click="clickButton2">回复速度快</button>
+				<button class="mini-btn" size="mini" @click="clickButton2">{{ $t('replyQuick') }}</button>
 			</view>
 			<view v-if="greaterThan3" class="tag-view">
-				<button class="mini-btn" size="mini" @click="clickButton3">问题已解决</button>
+				<button class="mini-btn" size="mini" @click="clickButton3">{{ $t('problemSolved') }}</button>
 			</view>
 			<!-- 坏 -->
 			<view v-if="!greaterThan3" class="tag-view">
-				<button class="mini-btn" size="mini" @click="clickButton4">服务态度差</button>
+				<button class="mini-btn" size="mini" @click="clickButton4">{{ $t('atitudeBad') }}</button>
 			</view>
 			<view v-if="!greaterThan3" class="tag-view">
-				<button class="mini-btn" size="mini" @click="clickButton5">回复不及时</button>
+				<button class="mini-btn" size="mini" @click="clickButton5">{{ $t('replySlow') }}</button>
 			</view>
 			<view v-if="!greaterThan3" class="tag-view">
-				<button class="mini-btn" size="mini" @click="clickButton6">没解决问题</button>
+				<button class="mini-btn" size="mini" @click="clickButton6">{{ $t('problemUnsolved') }}</button>
 			</view>
 			<view v-if="!greaterThan3" class="tag-view">
-				<button class="mini-btn" size="mini" @click="clickButton7">不礼貌</button>
+				<button class="mini-btn" size="mini" @click="clickButton7">{{ $t('rude') }}</button>
 			</view>
 		</view>
 		 <textarea v-if="textareaShow" @blur="blur" :value="infoReceive.textareaValue" :placeholder="textareaPlaceholder"/>
@@ -62,7 +62,7 @@
 			},
 			headTitleValue:{
 				type:String,
-				default:"评价客服"
+				default: this.$t('rate') //"评价客服"
 			},
 			starsShow:{
 				type:[String,Boolean],
@@ -94,7 +94,7 @@
 			},
 			textareaPlaceholder:{
 				type:[String],
-				default:"说点什么吧"
+				default: this.$t('saySomething') //"说点什么吧"
 			},
 			submitShow:{ // 发布按钮
 				type:[String,Boolean],
@@ -102,7 +102,7 @@
 			},
 			submitText:{
 				type:String,
-				default:"提交",
+				default: this.$t('submit') //"提交",
 			},
 			infoReceive:{ // 获取值
 				type:Object,
@@ -119,13 +119,13 @@
 				//
 				thread: {
 					agent: {
-						nickname: '评价客服',
+						nickname: this.$t('rate'), //'评价客服',
 						avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png'
 					},
 					rated: false
 				},
 				greaterThan3: true,
-				tip: '非常满意，完美',
+				tip: this.$t('score5') //'非常满意，完美',
 				// 满意，仍可改善
 				// 一般，还需改善
 				// 不满意，有点失望
@@ -154,7 +154,7 @@
 				return this.infoReceive.score
 			},
 			rateButtonText () {
-				return this.thread.rated ? '已经评价过' : '提交评价'
+				return this.thread.rated ? this.$t('rated') : this.$t('submitRate')
 			}
 		},
 		methods: {
@@ -163,49 +163,49 @@
 				this.infoReceive.score=score
 				// this.$emit("scoreChange",score)
 				if (score === 5) {
-					this.tip = '非常满意，完美'
+					this.tip = this.$t('score5') //'非常满意，完美'
 					this.greaterThan3 = true
 				} else if (score === 4) {
-					this.tip = '满意，仍可改善'
+					this.tip = this.$t('score4') //'满意，仍可改善'
 					this.greaterThan3 = true
 				} else if (score === 3) {
-					this.tip = '一般，还需改善'
+					this.tip = this.$t('score3') //'一般，还需改善'
 					this.greaterThan3 = false
 				} else if (score === 2) {
-					this.tip = '不满意，有点失望'
+					this.tip = this.$t('score2') //'不满意，有点失望'
 					this.greaterThan3 = false
 				} else if (score === 1) {
-					this.tip = '非常不满意'
+					this.tip = this.$t('score1') //'非常不满意'
 					this.greaterThan3 = false
 				}
 			},
 			clickButton1 () {
-				console.log('服务态度好')
-				this.infoReceive.textareaValue += '服务态度好'
+				// console.log('服务态度好')
+				this.infoReceive.textareaValue += this.$t('atitudeGood') //'服务态度好'
 			},
 			clickButton2 () {
-				console.log('回复速度快')
-				this.infoReceive.textareaValue += '回复速度快'
+				// console.log('回复速度快')
+				this.infoReceive.textareaValue += this.$t('replyQuick') //'回复速度快'
 			},
 			clickButton3 () {
-				console.log('问题已解决')
-				this.infoReceive.textareaValue += '问题已解决'
+				// console.log('问题已解决')
+				this.infoReceive.textareaValue += this.$t('problemSolved') //'问题已解决'
 			},
 			clickButton4 () {
-				console.log('服务态度差')
-				this.infoReceive.textareaValue += '服务态度差'
+				// console.log('服务态度差')
+				this.infoReceive.textareaValue += this.$t('atitudeBad') //'服务态度差'
 			},
 			clickButton5 () {
-				console.log('回复不及时')
-				this.infoReceive.textareaValue += '回复不及时'
+				// console.log('回复不及时')
+				this.infoReceive.textareaValue += this.$t('replySlow') //'回复不及时'
 			},
 			clickButton6 () {
-				console.log('没解决问题')
-				this.infoReceive.textareaValue += '没解决问题'
+				// console.log('没解决问题')
+				this.infoReceive.textareaValue += this.$t('problemUnsolved') //'没解决问题'
 			},
 			clickButton7 () {
-				console.log('不礼貌')
-				this.infoReceive.textareaValue += '不礼貌'
+				// console.log('不礼貌')
+				this.infoReceive.textareaValue += this.$t('rude') //'不礼貌'
 			},
 			blur(e) {
 				this.infoReceive.textareaValue=e.detail.value
@@ -213,7 +213,7 @@
 			getRateDetail () {
 				//
 				let app = this
-				uni.showLoading({title: '加载中', mask:true});
+				uni.showLoading({title: this.$t('loading'), mask:true});
 				httpApi.rateDetail(this.option.tid, function(response) {
 					console.log('rateDetail success:', response);
 					// uni.showToast({ title: response.message, duration: 2000 });
@@ -233,11 +233,11 @@
 				console.log('submit:', this.infoReceive);
 				// uni.navigateBack();
 				if (this.thread.rated) {
-					uni.showToast({ title: "意见评价，无需重复评价", icon: "none" });
+					uni.showToast({ title: this.$t('rated'), icon: "none" });
 					return
 				}
 				//
-				uni.showLoading({title: '提交中', mask:true});
+				uni.showLoading({title: this.$t('submiting'), mask:true});
 				httpApi.rate(this.option.tid, this.infoReceive.score, this.infoReceive.textareaValue, this.option.invite, function(response) {
 					console.log('rate success:', response);
 					uni.showToast({ title: response.message, duration: 2000 });
@@ -247,7 +247,7 @@
 					uni.hideLoading();
 				}, function(error) {
 					console.log('rate error:', error)
-					uni.showToast({ title: "提交评价错误", icon: "none"});
+					uni.showToast({ title: this.$t('submitError'), icon: "none"});
 					uni.hideLoading();
 				});
 			}
