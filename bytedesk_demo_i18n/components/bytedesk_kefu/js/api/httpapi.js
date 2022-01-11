@@ -351,7 +351,7 @@ export function registerAnonymous(subDomain, successcb, failedcb) {
 export function registerUser(username, nickname, password, subDomain, successcb, failedcb) {
   //
   uni.request({
-    url: constants.API_BASE_URL + '/visitor/api/username',
+    url: constants.API_BASE_URL + '/visitor/api/register/user',
     data: {
 	  'username': username,
 	  'nickname': nickname,

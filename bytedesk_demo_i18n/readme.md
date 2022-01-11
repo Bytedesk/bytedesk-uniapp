@@ -76,7 +76,7 @@
 
 bytedesk_demo和bytedesk_demo_i18n的区别仅仅在于后者支持国际化，其他功能没有区别
 
-- 第0步（可选）：支持国际化
+- 第0步：支持国际化
 
 ```js
 - 参照bytedesk_demo_i18n/main.js和官方国际化文档配置：官方文档 https://uniapp.dcloud.net.cn/collocation/i18n
