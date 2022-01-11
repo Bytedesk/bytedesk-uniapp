@@ -11,7 +11,7 @@ const messages = {
 }
 let i18nConfig = {
   // 其中：中文填写 'cn', 英文填写 'en'
-  locale: 'cn', // uni.getLocale(), // 获取已设置的语言
+  locale: 'en', // uni.getLocale(), // 获取已设置的语言
   messages
 }
 // 引入国际化设置插件

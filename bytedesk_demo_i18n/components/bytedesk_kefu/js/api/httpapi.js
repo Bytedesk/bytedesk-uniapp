@@ -34,6 +34,7 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 	}
 }
 
+// 自定义用户名登录
 export function login(username, password, subDomain, successcb, failedcb) {
 	console.log('login:', username, password, subDomain);
 	//
@@ -346,6 +347,7 @@ export function registerAnonymous(subDomain, successcb, failedcb) {
   })
 }
 
+// 自定义用户名 注册
 export function registerUser(username, nickname, password, subDomain, successcb, failedcb) {
   //
   uni.request({

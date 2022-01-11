@@ -269,8 +269,8 @@ export default {
 			RECORDER:uni.getRecorderManager(),
 			// #endif
 			isVoice:false,
-			voiceTis:'按住 说话',
-			recordTis:"手指上滑 取消发送",
+			voiceTis: this.$t('pressToSpeak'), //'按住 说话',
+			recordTis: this.$t('swipeToCancel'), // "手指上滑 取消发送",
 			recording:false,
 			willStop:false,
 			initPoint:{identifier:0,Y:0},
@@ -354,7 +354,7 @@ export default {
 			isInviteRate: false,
 			// 满意度评分
 			rateScore: 5,
-			rateValue: '非常满意',
+			rateValue: this.$t('verysatisfied'), //'非常满意',
 			// 满意度附言
 			rateContent: '',
 			//
@@ -474,7 +474,7 @@ export default {
 		　　title:this.option.title
 		})
 		if (this.option.agentclient === '1') {
-			console.log('客服端打开会话')
+			// console.log('客服端打开会话')
 			this.thread.tid = this.option.tid
 			this.thread.topic = this.option.topic
 			this.thread.type = this.option.type
@@ -670,9 +670,9 @@ export default {
 		},
 		formatStatus(status) {
 			if (status === 'read') {
-				return '已读'
+				return this.$t('read') //'已读'
 			} else if (status === 'received') {
-				return '送达'
+				return this.$t('received') //'送达'
 			} else {
 				return ''
 			}
@@ -841,7 +841,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				console.log('loadHistoryMessages: ', response)
+				// console.log('loadHistoryMessages: ', response)
 				//
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
@@ -870,7 +870,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessagesByTopic(topic, this.page, 10, function(response) {
-				console.log('loadHistoryMessagesByTopic: ', response)
+				// console.log('loadHistoryMessagesByTopic: ', response)
 				//
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
@@ -894,7 +894,7 @@ export default {
 				let app = this
 				let count = this.loadHistory ? 10 : 1
 				httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
-					console.log('loadLatestMessage: ', response)
+					// console.log('loadLatestMessage: ', response)
 					//
 					if (response.status_code === 200) {
 						for (let i = 0; i < response.data.content.length; i++) {
@@ -1025,7 +1025,7 @@ export default {
 				"thread": {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
-					"content": "[商品]",
+					"content": this.$t('[commodity]'), //"[商品]",
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
@@ -1056,11 +1056,13 @@ export default {
 		sendTextMessageSync(content) {
 			// this.sendMessageSync('text', content)
 			if (content.length === 0) {
-				alert('消息不能为空');
+				// alert('消息不能为空');
+				alert(this.$t('msgshouldnotempty'))
 				return;
 			}
 			if (content.length >= 500) {
-				alert('消息长度太长，请分多次发送');
+				// alert('消息长度太长，请分多次发送');
+				alert(this.$t('msgtoolong'))
 				return;
 			}
 			//
@@ -1117,7 +1119,7 @@ export default {
 				"thread": {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
-					"content": "[图片]",
+					"content": this.$t('[image]'), //"[图片]",
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
@@ -1150,7 +1152,7 @@ export default {
 				"thread": {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
-					"content": "[文件]",
+					"content": this.$t('[file]'), //"[文件]",
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
@@ -1185,7 +1187,7 @@ export default {
 				"thread": {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
-					"content": "[语音]",
+					"content": this.$t('[voice]'), //"[语音]",
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
@@ -1218,7 +1220,7 @@ export default {
 				"thread": {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
-					"content": "[视频]",
+					"content": this.$t('[video]'), //"[视频]",
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
@@ -1255,7 +1257,7 @@ export default {
 				"thread": {
 					"tid": this.thread.tid,
 					"type": this.thread.type,
-					"content": "[商品]",
+					"content": this.$t('[commodity]'), //"[商品]",
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
@@ -1547,7 +1549,7 @@ export default {
 			  }
 			} else if (messageObject.type === 'notification_form_request') {
                 // 收到客服端表单请求
-                messageObject.content = '表单请求'
+                messageObject.content = this.$t('requestForm') //'表单请求'
                 let formContent = messageObject.extra.content
                 console.log('form:' + formContent)
                 // let formContentObject = JSON.parse(formContent)
@@ -1570,7 +1572,7 @@ export default {
                 // app.switchForm()
             } else if (messageObject.type === 'notification_form_result') {
                 // 自己发送的表单结果
-                messageObject.content = '发送表单'
+                messageObject.content = this.$t('sendForm') //'发送表单'
             }
 			//
 			if (messageObject.type !== 'notification_preview'
@@ -1781,7 +1783,7 @@ export default {
 			} 
 			// 从服务器请求答案
 			httpApi.messageAnswer(this.option.wid, content, function(response) {
-				console.log('messageAnswer success', response)
+				// console.log('messageAnswer success', response)
 				if (response.status_code === 200 ||
 					response.status_code === 201)  {
 					//
@@ -1806,7 +1808,7 @@ export default {
 			//
 			let app = this
 			httpApi.rateAnswer(aid, mid, true, function(response) {
-				console.log('rateAnswerHelpful success：', response)
+				// console.log('rateAnswerHelpful success：', response)
 				if (response.status_code === 200) {
 					var message = response.data;
 					app.pushToMessageArray(message);
@@ -1823,7 +1825,7 @@ export default {
 			//
 			let app = this
 			httpApi.rateAnswer(aid, mid, false, function(response) {
-				console.log('rateAnswerHelpless success：', response)
+				// console.log('rateAnswerHelpless success：', response)
 				if (response.status_code === 200) {
 					var message = response.data;
 					app.pushToMessageArray(message);
@@ -1906,12 +1908,12 @@ export default {
 			}
 			this.initPoint.Y = e.touches[0].clientY;
 			this.initPoint.identifier = e.touches[0].identifier;
-			this.RECORDER.start({format:"mp3"});//录音开始,
+			this.RECORDER.start({format:"mp3"}); //录音开始,
 		},
 		//录音开始UI效果
 		recordBegin(e){
 			this.recording = true;
-			this.voiceTis='松开 结束';
+			this.voiceTis = this.$t('releaseToClose'); //'松开 结束';
 			this.recordLength = 0;
 			this.recordTimer = setInterval(()=>{
 				this.recordLength++;
@@ -1920,8 +1922,8 @@ export default {
 		// 录音被打断
 		voiceCancel(){
 			this.recording = false;
-			this.voiceTis='按住 说话';
-			this.recordTis = '手指上滑 取消发送'
+			this.voiceTis = this.$t('pressToSpeak'); //'按住 说话';
+			this.recordTis = this.$t('swipeToCancel'); //'手指上滑 取消发送'
 			this.willStop = true;//不发送录音
 			this.RECORDER.stop();//录音结束
 		},
@@ -1934,10 +1936,10 @@ export default {
 			//上滑一个导航栏的高度触发上滑取消发送
 			if(this.initPoint.Y - touche.clientY>=uni.upx2px(100)){
 				this.willStop = true;
-				this.recordTis = '松开手指 取消发送'
+				this.recordTis = this.$t('releaseToCancel') //'松开手指 取消发送'
 			}else{
 				this.willStop = false;
-				this.recordTis = '手指上滑 取消发送'
+				this.recordTis = this.$t('swipeToCancel') //'手指上滑 取消发送'
 			}
 		},
 		// 结束录音
@@ -1946,8 +1948,8 @@ export default {
 				return;
 			}
 			this.recording = false;
-			this.voiceTis='按住 说话';
-			this.recordTis = '手指上滑 取消发送'
+			this.voiceTis= this.$t('pressToSpeak') //'按住 说话';
+			this.recordTis = this.$t('swipeToCancel') //'手指上滑 取消发送'
 			this.RECORDER.stop();//录音结束
 		},
 		//录音结束(回调文件)
@@ -1974,8 +1976,8 @@ export default {
 				    }
 				});
 				
-			}else{
-				console.log('取消发送录音');
+			} else {
+				// console.log('取消发送录音');
 			}
 			this.willStop = false;
 		},
@@ -2011,8 +2013,8 @@ export default {
 			let app = this
 			if (this.can_recall(message)) {
 				uni.showActionSheet({
-					title:'选择操作',
-					itemList: ['复制', '撤回'],
+					title: this.$t('chooseAction'), //'选择操作',
+					itemList: [this.$t('copy'), this.$t('retract')],
 					success: (e) => {
 						console.log(e.tapIndex);
 						if (e.tapIndex === 0) {
@@ -2021,7 +2023,7 @@ export default {
 							  data: message.content,//要被复制的内容
 							  success:() => { //复制成功的回调函数
 							    uni.showToast({ //提示
-							      title:'复制成功'
+							      title: this.$t('copySuccess') //'复制成功'
 							    })
 							  }
 							});
@@ -2037,7 +2039,7 @@ export default {
 				  data: message.content,//要被复制的内容
 				  success:() => { //复制成功的回调函数
 				    uni.showToast({ //提示
-				      title:'复制成功'
+				      title: this.$t('copySuccess') //'复制成功'
 				    })
 				  }
 				});
