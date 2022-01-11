@@ -94,7 +94,7 @@
 			},
 			textareaPlaceholder:{
 				type:[String],
-				default: this.$t('saySomething') //"说点什么吧"
+				default: this.$t('saySomething'), //"说点什么吧"
 			},
 			submitShow:{ // 发布按钮
 				type:[String,Boolean],
@@ -102,7 +102,7 @@
 			},
 			submitText:{
 				type:String,
-				default: this.$t('submit') //"提交",
+				default: this.$t('submit'), //"提交",
 			},
 			infoReceive:{ // 获取值
 				type:Object,
@@ -125,7 +125,7 @@
 					rated: false
 				},
 				greaterThan3: true,
-				tip: this.$t('score5') //'非常满意，完美',
+				tip: this.$t('score5'), //'非常满意，完美',
 				// 满意，仍可改善
 				// 一般，还需改善
 				// 不满意，有点失望

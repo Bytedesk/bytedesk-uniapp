@@ -79,7 +79,6 @@ bytedesk_demo和bytedesk_demo_i18n的区别仅仅在于后者支持国际化，�
 - 第0步（可选）：支持国际化
 
 ```js
-- 将bytedesk_demo_i18n中文件夹i18n文件夹复制到自己项目中
 - 参照bytedesk_demo_i18n/main.js和官方国际化文档配置：官方文档 https://uniapp.dcloud.net.cn/collocation/i18n
 ```
 
