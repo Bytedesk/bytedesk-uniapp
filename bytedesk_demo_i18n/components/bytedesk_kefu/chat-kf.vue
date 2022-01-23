@@ -750,6 +750,7 @@ export default {
 			try {
 			    //
 			    this.uid = uni.getStorageSync(constants.uid)
+				// console.log('uid:', this.uid)
 			    this.username = uni.getStorageSync(constants.username)
 			    this.nickname = uni.getStorageSync(constants.nickname)
 			    this.avatar = uni.getStorageSync(constants.avatar)
@@ -1383,6 +1384,7 @@ export default {
 			// }, 100);
 		},
 		doSendMessage (json) {
+			// console.log(json)
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {

@@ -36,6 +36,7 @@
 				let app = this
 				httpApi.getWorkGroupStatus(this.workGroupWid, function(response) {
 					console.log('getWorkGroupStatus success:', response)
+					// online代表在线，否则为离线
 					app.workGroupOnlineStatus = response.data.status
 				}, function(error) {
 					console.log('getWorkGroupStatus error', error)
@@ -47,6 +48,7 @@
 				let app = this
 				httpApi.getAgentStatus(this.agentUid, function(response) {
 					console.log('getAgentStatus success:', response)
+					// online代表在线，否则为离线
 					app.agentOnlineStatus = response.data.status
 				}, function(error) {
 					console.log('getAgentStatus error', error)

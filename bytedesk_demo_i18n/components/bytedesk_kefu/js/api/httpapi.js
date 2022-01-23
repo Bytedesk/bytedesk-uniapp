@@ -183,29 +183,6 @@ export function wechatOauth(unionid, successcb, failedcb) {
   })
 }
 
-// export function register(mobile, password, successcb, failedcb) {
-//   // console.log('register:', mobile, password)
-//   uni.request({
-//     url: constants.API_BASE_URL + '/visitors/api/v1/register/mobile',
-//     data: {
-//       'mobile': mobile,
-//       'password': mobile,
-//       'admin': false, // 学校端时，修改为true
-//       'client': constants.client
-//     },
-//     method: 'POST',
-//     header: {
-//       'content-type': 'application/json' // 默认值
-//     },
-//     success (res) {
-//       successcb(res.data)
-//     },
-//     fail (res) {
-//       failedcb(res.data)
-//     }
-//   })
-// }
-
 // 注册接口
 export function emailRegister(email, password, successcb, failedcb) {
   // console.log('register:', email, password)
@@ -364,15 +341,18 @@ export function registerUser(username, nickname, password, subDomain, successcb,
       'content-type': 'application/json' // 默认值
     },
     success (res) {
-		try {
-		  uni.setStorageSync(constants.uid, res.data.data.uid);
-		  uni.setStorageSync(constants.username, res.data.data.username);
-		  uni.setStorageSync(constants.nickname, res.data.data.nickname);
-		  uni.setStorageSync(constants.avatar, res.data.data.avatar);
-		  uni.setStorageSync(constants.description, res.data.data.description);
-		  uni.setStorageSync(constants.subDomain, res.data.data.subDomain);
-		} catch (e) {
-		    // error
+		if (res.status_code === 200) {
+			try {
+			  uni.setStorageSync(constants.uid, res.data.data.uid);
+			  // console.log(res.data.data.uid)
+			  uni.setStorageSync(constants.username, res.data.data.username);
+			  uni.setStorageSync(constants.nickname, res.data.data.nickname);
+			  uni.setStorageSync(constants.avatar, res.data.data.avatar);
+			  uni.setStorageSync(constants.description, res.data.data.description);
+			  uni.setStorageSync(constants.subDomain, res.data.data.subDomain);
+			} catch (e) {
+				// error
+			}
 		}
 		successcb(res.data)
     },
