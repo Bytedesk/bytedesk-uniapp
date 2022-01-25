@@ -1,10 +1,10 @@
 # 萝卜丝智能客服-uniapp sdk
 
-- [官网](https://www.bytedesk.org/)
+- [官网](https://www.bytedesk.com/)
 - [价格](http://weikefu.net/pages/price.html)
-- [管理后台](https://www.bytedesk.org/antv/user/login)
-- [客服工作台](https://www.bytedesk.org/chaty)
-- [客服端下载](https://www.bytedesk.org/download)
+- [管理后台](https://www.bytedesk.com/antv/user/login)
+- [客服工作台](https://www.bytedesk.com/chaty)
+- [客服端下载](https://www.bytedesk.com/download)
 
 ## 部分功能
 
@@ -74,6 +74,14 @@
 
 ## 开发步骤说明（共三步）
 
+bytedesk_demo和bytedesk_demo_i18n的区别仅仅在于后者支持国际化，其他功能没有区别
+
+- 第0步：支持国际化
+
+```js
+- 参照bytedesk_demo_i18n/main.js和官方国际化文档配置：官方文档 https://uniapp.dcloud.net.cn/collocation/i18n
+```
+
 - 第一步：引入文件。在调用客服的vue页面，如：index.vue，引入
 
 ```js
@@ -129,10 +137,10 @@ startChat () {
 ## 微信小程序
 
 - 配置服务器域名：
-- request合法域名添加：https://stomp.bytedesk.org;https://www.bytedesk.org;
-- socket合法域名添加：wss://www.bytedesk.org;
-- uploadFile合法域名：https://stomp.bytedesk.org;https://www.bytedesk.org;
-- downloadFile合法域名：https://stomp.bytedesk.org;https://www.bytedesk.org;
+- request合法域名添加：https://stomp.bytedesk.com;https://www.bytedesk.com;
+- socket合法域名添加：wss://www.bytedesk.com;
+- uploadFile合法域名：https://stomp.bytedesk.com;https://www.bytedesk.com;
+- downloadFile合法域名：https://stomp.bytedesk.com;https://www.bytedesk.com;
 
 ## 减小体积
 
@@ -160,8 +168,15 @@ onUnload() {
 
 ## 消息推送
 
+客服消息会额外推送到此地址，开发者可据此实现消息存储和App离线推送等。
+以http或https开头，GET方式调用，参数名: json。注意: url中不能含有‘?’等字符。
+例如：您填写的url为：https://www.example.com/abc, 
+系统会自动在url末尾添加字符串 ‘?json=’，组成url：https://www.example.com/abc?json=消息内容。
+在您服务器，只需要解析json参数内容即可
+
 - 技能组：登录管理后台-》客服管理-》技能组-》编辑，滚动到最下方，填写webhook URL网址，客服消息会额外推送到此地址
 - 指定客服：登录管理后台-》客服管理-》客服账号-》编辑，滚动到最下方，填写webhook URL网址，客服消息会额外推送到此地址
+- 客服和访客发送的消息均会推送："extra": "{\"agent\":true}" // 其中：true 为客服发送消息，false 为访客发送消息
 - 推送消息体json格式及说明如下：
 
 ```js
