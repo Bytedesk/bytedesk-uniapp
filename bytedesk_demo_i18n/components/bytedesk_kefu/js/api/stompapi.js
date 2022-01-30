@@ -3,11 +3,18 @@ const Stomp = require('./stomp.min.js').Stomp;
 
 let stompClient;
 let stompReconnectTimes = 0;
+// 订阅主题topic
 let subscribedTopics = []
+// socket连接中
+let socketConnecting = false
 // socket是否连接
 let socketConnected = false;
+// socketTask实例
+let socketTask = false
 // 是否断线重连
 let reconnect = true;
+// 缓存消息
+let messagesCache = {}
 //
 let currentThread = {
 	tid: '',
@@ -31,9 +38,19 @@ var stompApi = {
 	  // printLog('sendSocketMessage:', msg)
       // 如果socket已连接则发送消息
       if (socketConnected) {
-        uni.sendSocketMessage({
-          data: msg
-        })
+        // uni.sendSocketMessage({
+        //   data: msg
+        // })
+		socketTask.send({
+			data: msg,
+			success(res) {
+				// console.log('socketTask send success:', res);
+			},
+			fail(err) {
+				// TODO: 发送失败 待处理
+				// console.log('socketTask send failed:', err);
+			}
+		})
       } else {
         stompApi.printLog('提示连接断开，无法发送消息')
 		// 重连
@@ -47,7 +64,10 @@ var stompApi = {
     function close() {
 	  stompApi.printLog('close')
       if (socketConnected) {
-        uni.closeSocket()
+        // uni.closeSocket()
+		if (socketTask && socketTask.close) {
+			socketTask.close()
+		}
         socketConnected = false;
 		// 为断开重连做准备
 		subscribedTopics = [];
@@ -80,71 +100,140 @@ var stompApi = {
 		  return
 	  }
 	  //
-	  uni.connectSocket({
-        url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessToken),
-		// #ifdef MP
-		header: {
-			'content-type': 'application/json'
-		},
-		// #endif
-		// #ifdef MP-WEIXIN
-		method: 'GET',
-		// #endif
-        // header: {
-        //   // access_token: app.globalData.token.access_token
-        // },
-        success() {
-          stompApi.printLog("socket连接成功")
-        },
-        fail() {
-          stompApi.printLog("socket连接失败")
-        },
-        complete() {
-          stompApi.printLog("socket连接完成");
-        }
-      })
+	 //  uni.connectSocket({
+  //       url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessToken),
+		// // #ifdef MP
+		// header: {
+		// 	'content-type': 'application/json'
+		// },
+		// // #endif
+		// // #ifdef MP-WEIXIN
+		// method: 'GET',
+		// // #endif
+  //       // header: {
+  //       //   // access_token: app.globalData.token.access_token
+  //       // },
+  //       success() {
+  //         stompApi.printLog("socket连接成功")
+  //       },
+  //       fail() {
+  //         stompApi.printLog("socket连接失败")
+  //       },
+  //       complete() {
+  //         stompApi.printLog("socket连接完成");
+  //       }
+  //     })
+	  socketTask = uni.connectSocket({
+	  	url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessToken),
+	  	// data() {
+	  	// 	return {
+	  	// 		msg: 'Hello'
+	  	// 	}
+	  	// },
+	  	// #ifdef MP
+	  	header: {
+	  		'content-type': 'application/json'
+	  	},
+	  	// #endif
+	  	// #ifdef MP-WEIXIN
+	  	method: 'GET',
+	  	// #endif
+	  	success(res) {
+	  		// 这里是接口调用成功的回调，不是连接成功的回调，请注意
+			stompApi.printLog("socketTask success")
+	  	},
+	  	fail(err) {
+	  		// 这里是接口调用失败的回调，不是连接失败的回调，请注意
+			stompApi.printLog("socketTask failed")
+	  	}
+	  })
+	  // console.log(socketTask);
+	  
+	  socketTask.onOpen((result) => {
+	  	stompApi.printLog("SocketOpen:" + result)
+		socketConnecting = false;
+	  	socketConnected = true;
+	  	webSocket.onopen();
+	  })
+	  
+	  socketTask.onMessage((result) => {
+	  	webSocket.onmessage(result);
+	  	// console.log('onMessage', result)
+	  })
+	  
+	  socketTask.onError((result) => {
+	  	stompApi.printLog("SocketError:" + result)
+		socketConnecting = false
+	  	if (!socketConnected) {
+	  	  // 为断开重连做准备
+	  	  subscribedTopics = [];
+	  	  // 断线重连
+	  	  if (reconnect) {
+	  	    setTimeout(function () {
+			  connectWebSocket();
+		    }, 5000)
+	  	  }
+	  	}
+	  	// this.connecting = false
+	  	// this.connected = false
+	  })
+	  
+	  socketTask.onClose((result) => {
+	  	stompApi.printLog("SocketClose:" + result)
+	  	socketConnected = false;
+		socketTask = false
+	  	// 为断开重连做准备
+	  	subscribedTopics = [];
+	  	// 断线重连
+	  	if (reconnect) {
+	  	  setTimeout(function () {
+	  	  	connectWebSocket();
+	  	  }, 5000)
+	  	}
+	  })
     }
-
-    // 监听 WebSocket 连接打开事件
-    uni.onSocketOpen(function (result) {
-      stompApi.printLog("SocketOpen:" + result)
-      socketConnected = true;
-      webSocket.onopen();
-    })
+	
+    // 监听 WebSocket 连接打开事件 
+    // uni.onSocketOpen(function (result) {
+    //   stompApi.printLog("SocketOpen:" + result)
+    //   socketConnected = true;
+    //   webSocket.onopen();
+    // })
 
     // 监听 WebSocket 接受到服务器的消息事件
-    uni.onSocketMessage(function (result) {
-      webSocket.onmessage(result);
-    })
+    // uni.onSocketMessage(function (result) {
+    //   webSocket.onmessage(result);
+    // })
 
     // 监听 WebSocket 错误事件
-    uni.onSocketError(function (result) {
-      stompApi.printLog("SocketError:" + result)
-      if (!socketConnected) {
-		// 为断开重连做准备
-		subscribedTopics = [];
-        // 断线重连
-        if (reconnect) {
-          setTimeout(function () {
-			  connectWebSocket();
-		  }, 5000)
-        }
-      }
-    })
-
+  //   uni.onSocketError(function (result) {
+  //     stompApi.printLog("SocketError:" + result)
+  //     if (!socketConnected) {
+		// // 为断开重连做准备
+		// subscribedTopics = [];
+  //       // 断线重连
+  //       if (reconnect) {
+  //         setTimeout(function () {
+		// 	  connectWebSocket();
+		//   }, 5000)
+  //       }
+  //     }
+  //   })
+	
     // 监听 WebSocket 连接关闭事件
-    uni.onSocketClose(function (result) {
-      stompApi.printLog("SocketClose:" + result)
-      socketConnected = false;
-	  // 为断开重连做准备
-	  subscribedTopics = [];
-      // 断线重连
-      if (reconnect) {
-        setTimeout(function () {
-        	connectWebSocket();
-        }, 5000)
-      }
-    })
+   //  uni.onSocketClose(function (result) {
+   //    stompApi.printLog("SocketClose:" + result)
+   //    socketConnected = false;
+	  // // 为断开重连做准备
+	  // subscribedTopics = [];
+   //    // 断线重连
+   //    if (reconnect) {
+   //      setTimeout(function () {
+   //      	connectWebSocket();
+   //      }, 5000)
+   //    }
+   //  })
+	// console.log('task', this.socketTask)
     //
     connectWebSocket();
     stompApi.stompConnect(webSocket, callback)
@@ -171,9 +260,10 @@ var stompApi = {
 
     stompClient = Stomp.over(webSocket);
     stompApi.printLog('stomp connecting...')
-    // let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTING
+	// 更新连接状态：连接中...
+    let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTING
     // commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
-    // bus.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+    uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
     // to disable logging, set it to an empty function:
     if (constants.IS_PRODUCTION) {
       stompClient.debug = function (value) {}
@@ -194,9 +284,9 @@ var stompApi = {
 		stompApi.subscribeTopic(tp)
 	  }
       // 更新连接状态：连接成功
-      // let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTED
+      let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTED
       // commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
-      // bus.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+      uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
 	  // 长连接成功回调
 	  callback()
     }, function (error) {
@@ -208,9 +298,9 @@ var stompApi = {
         // bus.$emit(constants.EVENT_BUS_LOGOUT, 'logout')
       }
       // 更新连接状态: 断开
-      // let connectionStatus = constants.STOMP_CONNECTION_STATUS_DISCONNECTED
+      let connectionStatus = constants.STOMP_CONNECTION_STATUS_DISCONNECTED
       // commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
-      // bus.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+      uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
       // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
       setTimeout(function () {
         stompApi.printLog('reconnecting...')
@@ -225,7 +315,6 @@ var stompApi = {
   // 发送消息
   sendMessage: function(topic, jsonString) {
     // console.log('sendMessage:', topic, jsonString)
-    //
     stompClient.send("/app/" + topic, {},
       jsonString
     );
@@ -247,11 +336,17 @@ var stompApi = {
 	if (stompClient === null || stompClient === undefined) {
 		return
 	}
-    //
+    // 初始化
+	messagesCache[topic] = []
+	// 订阅主题
     stompClient.subscribe("/topic/" + topic, function (message) {
       // console.log('message :', message, 'body:', message.body);
       var messageObject = JSON.parse(message.body);
 	  uni.$emit('message', messageObject);
+	  // TODO: 缓存消息
+	  let messageArray = messagesCache[topic]
+	  messageArray.push(messageObject)
+	  messagesCache[topic] = messageArray
     });
   },
 
@@ -274,10 +369,17 @@ var stompApi = {
     })
   },
   
+  // 判断stomp是否已连接
   isConnected: function () {
 	  return socketConnected;
   },
   
+  // 获取本地缓存聊天记录
+  getCacheMessages: function (topic) {
+	  return messagesCache[topic]
+  },
+  
+  // 打印log
   printLog: function(content) {
 	  if (!constants.IS_PRODUCTION) {
 		  console.log(content)
@@ -291,5 +393,6 @@ module.exports = {
   connect: stompApi.connect,
   subscribeTopic: stompApi.subscribeTopic,
   sendMessage: stompApi.sendMessage,
-  isConnected: stompApi.isConnected
+  isConnected: stompApi.isConnected,
+  getCacheMessages: stompApi.getCacheMessages
 }

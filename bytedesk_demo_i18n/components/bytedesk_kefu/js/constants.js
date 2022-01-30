@@ -4,7 +4,7 @@ module.exports = {
   // IS_PRODUCTION: false,
   // API_BASE_URL: 'http://127.0.0.1:8000',
   // WEBSOCKET_URL: 'ws://127.0.0.1:8000/stomp/mini?access_token=',
-  // 线上环境
+  // 线上环境，TODO: 替换掉此域名
   IS_PRODUCTION: true,
   API_BASE_URL: 'https://stomp.bytedesk.com',
   WEBSOCKET_URL: 'wss://www.bytedesk.com/stomp/mini?access_token=',
@@ -30,6 +30,14 @@ module.exports = {
   playAudio: 'bytedesk_playAudio',
   //
   EVENT_BUS_MESSAGE: 'BYTEDESK_EVENT_BUS_MESSAGE',
+  // stomp连接中
+  STOMP_CONNECTION_STATUS_CONNECTING: 'connecting',
+  // stomp连接成功
+  STOMP_CONNECTION_STATUS_CONNECTED: 'connected',
+  // stomp连接断开
+  STOMP_CONNECTION_STATUS_DISCONNECTED: 'disconnncted',
+  // 长连接状态
+  EVENT_BUS_STOMP_CONNECTION_STATUS: 'EVENT_BUS_STOMP_CONNECTION_STATUS',
   // 上传图片
   UPLOAD_IMAGE_URL: 'https://upload.bytedesk.com/visitor/api/upload/image',
   // 上传语音

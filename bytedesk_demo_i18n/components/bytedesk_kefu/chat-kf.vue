@@ -396,7 +396,8 @@ export default {
 			avatar: '',
 			// 本地存储access_token的key
 			token: 'bd_kfe_token',
-			isConnected: false,
+			// 网络连接状态
+			isNetworkConnected: true,
 			answers: [],
 			isRobot: false,
 			isThreadStarted: false,
@@ -463,10 +464,19 @@ export default {
 	},
 	onUnload() {
 	    // 移除监听事件  
-		uni.$off('message'); 
+		uni.$off('message');
+		//取消监听网络状态变化
+		uni.offNetworkStatusChange(function(res) {});
 	},
 	onShow(){
 		this.scrollTop = 9999999;
+		//监听网络状态变化
+		let app = this
+		uni.onNetworkStatusChange(function(res) {
+			app.isNetworkConnected = res.isConnected
+			// console.log('isNetworkConnected：', res.isConnected); //当前是否有网络连接
+			// console.log('networkType：', res.networkType); //网络类型
+		});
 	},
 	onReady () {
 		// 登录
@@ -761,9 +771,9 @@ export default {
 			//
 			let app = this
 			if (this.option.v2robot === undefined || this.option.v2robot === null || this.option.v2robot === false) {
+				//
 				httpApi.requestThread(this.option.wid, this.option.type, this.option.aid, function(response) {
 					// console.log('request thread success', app.option.wid, app.option.type, app.option.aid, response)
-					//
 					app.dealWithThread(response);
 				}, function(error) {
 					console.log('request thread error', error)
@@ -771,8 +781,7 @@ export default {
 			} else {
 				// v2robot = true
 				httpApi.requestWorkGroupThreadV2(this.option.wid, function(response) {
-					console.log('request thread v2 success', app.option.wid, response)
-					//
+					// console.log('request thread v2 success', app.option.wid, response)
 					app.dealWithThread(response);
 				}, function(error) {
 					console.log('request thread v2 error', error)
@@ -843,7 +852,6 @@ export default {
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
 				// console.log('loadHistoryMessages: ', response)
-				//
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
 						const element = response.data.content[i]
@@ -872,7 +880,6 @@ export default {
 			let app = this
 			httpApi.loadHistoryMessagesByTopic(topic, this.page, 10, function(response) {
 				// console.log('loadHistoryMessagesByTopic: ', response)
-				//
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {
 						const element = response.data.content[i]
@@ -916,9 +923,8 @@ export default {
 			// console.log('')
 			let message = response.data;
 			if (response.status_code === 200) {
-				//
 				// if (this.isManulRequestThread || this.loadHistory === '0') {
-					this.pushToMessageArray(message);
+				this.pushToMessageArray(message);
 				// }
 				// // 1. 保存thread
 				this.thread = message.thread;
@@ -931,7 +937,7 @@ export default {
 			} else if (response.status_code === 201) {
 				// message.content = '继续之前会话';
 				// if (this.isManulRequestThread || this.loadHistory === '0') {
-					this.pushToMessageArray(message);
+				this.pushToMessageArray(message);
 				// }
 				// // 1. 保存thread
 				this.thread = message.thread;
@@ -1036,6 +1042,7 @@ export default {
 			};
 			this.pushToMessageArray(json)
 		},
+		//
 		commodityInfo () {
 			//
 			let commodidy = {
@@ -1385,6 +1392,11 @@ export default {
 		},
 		doSendMessage (json) {
 			// console.log(json)
+			// 判断网络是否断开，如果断开，则提示并直接返回
+			if (!this.isNetworkConnected) {
+				uni.showToast({ title: '网络断开，请稍后重试', duration: 2000 });
+				return
+			}
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
@@ -1423,10 +1435,17 @@ export default {
 		},
 		// 建立长连接
 		byteDeskConnect () {
+			//
 			if (stompApi.isConnected()) {
 				// 订阅topic
-				let topic = this.thread.topic.replace(/\//g, ".");
+				let topic = this.thread.topic.replace(/\//g, ".")
 				stompApi.subscribeTopic(topic);
+				// 获取本地缓存聊天记录
+				let messagesCache = stompApi.getCacheMessages(topic)
+				for (var i = 0; i < messagesCache.length; i++) {
+					let messageObject = messagesCache[i]
+					this.onMessageReceived(messageObject)
+				}
 			} else {
 				stompApi.connect(this.thread, function() {
 					// 长连接成功回调

@@ -42,7 +42,7 @@ export function login(username, password, subDomain, successcb, failedcb) {
 		console.log('oauth:', result)
 		successcb(result.data)
 	}, function(error) {
-		failedcb(error.data)
+		failedcb(error)
 	})
 }
 

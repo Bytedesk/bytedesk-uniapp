@@ -48,6 +48,11 @@ export default {
 		} catch (error) {
 		    console.error('read vibrate/playAudio error', error)
 		}
+		
+		// 监听连接状态（可选）
+		uni.$on(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, function(connectionStatus) {
+			console.log('connectionStatus:', connectionStatus);
+		})
 	},
 	onReady () {
 		// 监听消息通知, 可选

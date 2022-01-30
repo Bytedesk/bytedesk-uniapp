@@ -396,7 +396,8 @@ export default {
 			avatar: '',
 			// 本地存储access_token的key
 			token: 'bd_kfe_token',
-			isConnected: false,
+			// 网络连接状态
+			isNetworkConnected: true,
 			answers: [],
 			isRobot: false,
 			isThreadStarted: false,
@@ -463,10 +464,19 @@ export default {
 	},
 	onUnload() {
 	    // 移除监听事件  
-		uni.$off('message'); 
+		uni.$off('message');
+		//取消监听网络状态变化
+		uni.offNetworkStatusChange(function(res) {});
 	},
 	onShow(){
 		this.scrollTop = 9999999;
+		//监听网络状态变化
+		let app = this
+		uni.onNetworkStatusChange(function(res) {
+			app.isNetworkConnected = res.isConnected
+			// console.log('isNetworkConnected：', res.isConnected); //当前是否有网络连接
+			// console.log('networkType：', res.networkType); //网络类型
+		});
 	},
 	onReady () {
 		// 登录
@@ -1381,6 +1391,11 @@ export default {
 			// }, 100);
 		},
 		doSendMessage (json) {
+			// 判断网络是否断开，如果断开，则提示并直接返回
+			if (!this.isNetworkConnected) {
+				uni.showToast({ title: '网络断开，请稍后重试', duration: 2000 });
+				return
+			}
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
@@ -1423,6 +1438,12 @@ export default {
 				// 订阅topic
 				let topic = this.thread.topic.replace(/\//g, ".");
 				stompApi.subscribeTopic(topic);
+				// 获取本地缓存聊天记录
+				let messagesCache = stompApi.getCacheMessages(topic)
+				for (var i = 0; i < messagesCache.length; i++) {
+					let messageObject = messagesCache[i]
+					this.onMessageReceived(messageObject)
+				}
 			} else {
 				stompApi.connect(this.thread, function() {
 					// 长连接成功回调
