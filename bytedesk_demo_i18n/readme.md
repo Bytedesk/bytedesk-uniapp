@@ -1,10 +1,10 @@
 # 萝卜丝智能客服-uniapp sdk
 
-- [官网](https://www.bytedesk.com/)
+- [官网](https://weikefu.net/)
 - [价格](http://weikefu.net/pages/price.html)
-- [管理后台](https://www.bytedesk.com/antv/user/login)
-- [客服工作台](https://www.bytedesk.com/chaty)
-- [客服端下载](https://www.bytedesk.com/download)
+- [管理后台](https://weikefu.net/admin)
+- [客服工作台](https://weikefu.netchaty)
+- [客服端下载](https://cdn.bytedesk.com/download)
 
 ## 部分功能
 
@@ -76,12 +76,6 @@
 
 bytedesk_demo和bytedesk_demo_i18n的区别仅仅在于后者支持国际化，其他功能没有区别
 
-- 第0步：支持国际化
-
-```js
-- 参照bytedesk_demo_i18n/main.js和官方国际化文档配置：官方文档 https://uniapp.dcloud.net.cn/collocation/i18n
-```
-
 - 第一步：引入文件。在调用客服的vue页面，如：index.vue，引入
 
 ```js
@@ -134,13 +128,51 @@ startChat () {
 | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/index.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/robot.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/h5.jpg?raw=true" width="250"> |
 | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/rate.png?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/setting.jpg?raw=true" width="250"> |
 
+
+## 国际化
+
+- [官方国际化文档配置](https://uniapp.dcloud.net.cn/collocation/i18n)
+- 参照bytedesk_demo_i18n/main.js
+
+```js
+// 引入头文件及其他
+// .....
+
+// 官方文档 https://uniapp.dcloud.net.cn/collocation/i18n
+// 国际化 json 文件，文件内容详见下面的示例
+import en from './components/bytedesk_kefu/i18n/en.json'
+import cn from './components/bytedesk_kefu/i18n/cn.json'
+const messages = {
+    en,
+    cn
+}
+let i18nConfig = {
+  // 其中：中文填写 'cn', 英文填写 'en'
+  locale: 'cn', // uni.getLocale(), // 获取已设置的语言
+  messages
+}
+// 引入国际化设置插件
+import VueI18n from 'vue-i18n'
+Vue.use(VueI18n)
+const i18n = new VueI18n(i18nConfig)
+
+// 其他
+// .....
+
+const app = new Vue({
+	i18n, // 国际化配置
+    ...App
+})
+app.$mount()
+```
+
 ## 微信小程序
 
 - 配置服务器域名：
-- request合法域名添加：https://stomp.bytedesk.com;https://www.bytedesk.com;
-- socket合法域名添加：wss://www.bytedesk.com;
-- uploadFile合法域名：https://stomp.bytedesk.com;https://www.bytedesk.com;
-- downloadFile合法域名：https://stomp.bytedesk.com;https://www.bytedesk.com;
+- request合法域名添加：https://stomp.bytedesk.com;https://api.bytedesk.com;
+- socket合法域名添加：wss://api.bytedesk.com;
+- uploadFile合法域名：https://upload.bytedesk.com;
+- downloadFile合法域名：https://api.bytedesk.com;
 
 ## 减小体积
 

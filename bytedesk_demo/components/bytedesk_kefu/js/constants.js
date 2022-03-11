@@ -7,7 +7,7 @@ module.exports = {
   // 线上环境
   IS_PRODUCTION: true,
   API_BASE_URL: 'https://stomp.bytedesk.com',
-  WEBSOCKET_URL: 'wss://www.bytedesk.com/stomp/mini?access_token=',
+  WEBSOCKET_URL: 'wss://api.bytedesk.com/stomp/mini?access_token=',
   //
   uid: 'bytedesk_uid',
   username: 'bytedesk_username',
