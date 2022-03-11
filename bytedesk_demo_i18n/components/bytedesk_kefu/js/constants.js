@@ -6,8 +6,8 @@ module.exports = {
   // WEBSOCKET_URL: 'ws://127.0.0.1:8000/stomp/mini?access_token=',
   // 线上环境，TODO: 替换掉此域名
   IS_PRODUCTION: true,
-  API_BASE_URL: 'https://stomp.bytedesk.com',
-  WEBSOCKET_URL: 'wss://api.bytedesk.com/stomp/mini?access_token=',
+  API_BASE_URL: 'https://api.bytedesk.com',
+  WEBSOCKET_URL: 'wss://stomp.bytedesk.com/stomp/mini?access_token=',
   //
   uid: 'bytedesk_uid',
   username: 'bytedesk_username',
