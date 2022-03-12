@@ -169,7 +169,7 @@ app.$mount()
 ## 微信小程序
 
 - 配置服务器域名：
-- request合法域名添加：https://uniapp.bytedesk.com;https://uniapp.bytedesk.com;
+- request合法域名添加：https://uniapp.bytedesk.com;
 - socket合法域名添加：wss://uniapp.bytedesk.com;
 - uploadFile合法域名：https://uniapp.bytedesk.com;
 - downloadFile合法域名：https://uniapp.bytedesk.com;

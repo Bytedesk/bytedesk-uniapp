@@ -1,10 +1,10 @@
 # 萝卜丝智能客服-uniapp sdk
 
-- [官网](https://www.bytedesk.com/)
+- [官网](https://weikefu.net/)
 - [价格](http://weikefu.net/pages/price.html)
-- [管理后台](https://www.bytedesk.com/antv/user/login)
-- [客服工作台](https://www.bytedesk.com/chaty)
-- [客服端下载](https://www.bytedesk.com/download)
+- [管理后台](https://weikefu.net/admin)
+- [客服工作台](https://weikefu.netchaty)
+- [客服端下载](https://cdn.bytedesk.com/download)
 
 ## 部分功能
 
@@ -169,10 +169,10 @@ app.$mount()
 ## 微信小程序
 
 - 配置服务器域名：
-- request合法域名添加：https://stomp.bytedesk.com;https://www.bytedesk.com;
-- socket合法域名添加：wss://www.bytedesk.com;
-- uploadFile合法域名：https://stomp.bytedesk.com;https://www.bytedesk.com;
-- downloadFile合法域名：https://stomp.bytedesk.com;https://www.bytedesk.com;
+- request合法域名添加：https://uniapp.bytedesk.com;
+- socket合法域名添加：wss://uniapp.bytedesk.com;
+- uploadFile合法域名：https://uniapp.bytedesk.com;
+- downloadFile合法域名：https://uniapp.bytedesk.com;
 
 ## 减小体积
 
