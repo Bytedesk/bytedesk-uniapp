@@ -184,7 +184,7 @@ export default {
 		startH5Chat () {
 			// 如果不想集成SDK，也可以直接集成H5页面即可，其余操作均可忽略，只需一步集成H5链接即可 
 			// 登录管理后台：https://www.bytedesk.com/antv/user/login，客服管理-》技能组-》获取组客服代码
-			let url = "https://www.bytedesk.com/chat?sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&hidenav=1&aid=&ph=ph";
+			let url = "https://h1.kefux.cn/chat/h5/index.html?sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&hidenav=1&aid=&ph=ph";
 			uni.navigateTo({
 				url:"../../components/bytedesk_kefu/webview?url=" + encodeURIComponent(url)
 			})
