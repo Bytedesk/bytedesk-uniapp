@@ -4,7 +4,7 @@ module.exports = {
   // IS_PRODUCTION: false,
   // API_BASE_URL: 'http://127.0.0.1:8000',
   // WEBSOCKET_URL: 'ws://127.0.0.1:8000/stomp/mini?access_token=',
-  // 线上环境，TODO: 替换掉此域名
+  // 线上环境
   IS_PRODUCTION: true,
   API_BASE_URL: 'https://uniapp.bytedesk.com',
   WEBSOCKET_URL: 'wss://uniapp.bytedesk.com/stomp/mini?access_token=',

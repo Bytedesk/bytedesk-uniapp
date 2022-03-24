@@ -1,5 +1,9 @@
 <template>
 	<view class="bytedesk">
+		<uni-section title="未读消息数目" type="line"></uni-section>
+		<uni-list :border="true">
+			<uni-list-item title="未读消息数目" :note="unreadMessageCount"/>
+		</uni-list>
 		<uni-section title="技能组客服(可按规则分配多个客服)" type="line"></uni-section>
 		<uni-list :border="true">
 			<!-- 技能组客服会话-支持多个客服 -->
@@ -34,9 +38,14 @@
 </template>
 
 <script>
+// 引入js文件
+import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
+
 export default {
 	data() {
 		return {
+			// 未读消息数目
+			unreadMessageCount: "0",
 			// [管理后台](https://www.bytedesk.com/antv/user/login)
 			// 第二步：到 客服管理->技能组-有一列 ‘唯一ID（wId）’
 			// 说明：一个技能组可以分配多个客服，访客会按照一定的规则分配给组内的各个客服账号
@@ -53,6 +62,8 @@ export default {
 		uni.$on('commodity',function(content) {
 			console.log('点击商品回调:', content);
 		})
+		// 加载未读消息数目
+		this.getUnreadCountVisitor()
 	},
 	onUnload() {
 	    // 移除点击商品回调监听
@@ -207,6 +218,19 @@ export default {
 				url: '../../components/bytedesk_kefu/chat-scan?scan=a15'
 			});
 		},
+		// 访客端-查询访客所有未读消息数目
+		getUnreadCountVisitor () {
+			httpApi.getUnreadCountVisitor(response => {
+				console.log('getUnreadCountVisitor: ', response.data)
+				let unreadCount = response.data
+				if (unreadCount > 0) {
+					uni.showToast({ title: '未读消息数目：' + unreadCount, duration: 2000 });
+					this.unreadMessageCount = unreadCount + ''
+				}
+			}, error => {
+				console.log(error)
+			})
+		}
 	}
 }
 </script>

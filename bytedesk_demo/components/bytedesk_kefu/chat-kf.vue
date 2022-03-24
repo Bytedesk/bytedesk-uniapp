@@ -851,7 +851,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				console.log('loadHistoryMessages: ', response)
+				// console.log('loadHistoryMessages: ', response)
 				//
 				if (response.status_code === 200) {
 					for (let i = 0; i < response.data.content.length; i++) {

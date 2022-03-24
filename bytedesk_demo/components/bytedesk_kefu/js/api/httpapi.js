@@ -922,6 +922,116 @@ export function loadHistoryMessagesById(id, page, size, successcb, failedcb) {
   })
 }
 
+// 访客端-根据技能组wid或指定客服uid, 统一为wid-分页拉取聊天记录。注意：仅用于访客端
+export function loadHistoryMessagesByWid(wid, page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/user/wid',
+    data: {
+	  wid: wid,
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  // console.log('loadHistoryMessages:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 查询当前用户-某技能组wid或指定客服未读消息数目
+// 注意：技能组wid或指定客服唯一id
+// 适用于 访客 和 客服
+export function getUnreadCount(wid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/unreadCount',
+    data: {
+	  wid: wid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  // console.log('getUnreadCount:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 访客端-查询访客所有未读消息数目
+export function getUnreadCountVisitor(successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/unreadCount/visitor',
+    data: {
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  // console.log('getUnreadCount:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 客服端-查询客服所有未读消息数目
+export function getUnreadCountAgent(successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('not login')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/unreadCount/agent',
+    data: {
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+	  // console.log('getUnreadCount:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 加载从某条消息记录之后的消息
 export function loadMessagesFrom(uid, id, successcb, failedcb) {
   //
