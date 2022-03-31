@@ -788,33 +788,33 @@ export default {
 			this.loadHistoryMessagesByTopic(this.thread.topic)
 		},
 		// 加载更多聊天记录
-		loadHistoryMessages (uid) {
-			if (this.isManulRequestThread || this.loadHistory === '0') {
-				return;
-			}
-			if(this.isHistoryLoading){
-				return ;
-			}
-			// TODO: 加载历史聊天记录
-			this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
-			this.scrollAnimation = false;//关闭滑动动画
-			let app = this
-			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				console.log('loadHistoryMessages: ', response)
-				if (response.status_code === 200) {
-					for (let i = 0; i < response.data.content.length; i++) {
-						const element = response.data.content[i]
-						// console.log('element:', element);
-						app.messages.unshift(element)
-					}
-				}
-				app.scrollToBottom()
-				app.page += 1
-				app.isHistoryLoading = false;
-			}, function(error) {
-				console.log('load history messages error', error)
-			})
-		},
+		// loadHistoryMessages (uid) {
+		// 	if (this.isManulRequestThread || this.loadHistory === '0') {
+		// 		return;
+		// 	}
+		// 	if(this.isHistoryLoading){
+		// 		return ;
+		// 	}
+		// 	// TODO: 加载历史聊天记录
+		// 	this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
+		// 	this.scrollAnimation = false;//关闭滑动动画
+		// 	let app = this
+		// 	httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
+		// 		console.log('loadHistoryMessages: ', response)
+		// 		if (response.status_code === 200) {
+		// 			for (let i = 0; i < response.data.content.length; i++) {
+		// 				const element = response.data.content[i]
+		// 				// console.log('element:', element);
+		// 				app.messages.unshift(element)
+		// 			}
+		// 		}
+		// 		app.scrollToBottom()
+		// 		app.page += 1
+		// 		app.isHistoryLoading = false;
+		// 	}, function(error) {
+		// 		console.log('load history messages error', error)
+		// 	})
+		// },
 		loadHistoryMessagesByTopic (topic) {
 			//
 			if (this.isManulRequestThread || this.loadHistory === '0') {
@@ -831,10 +831,29 @@ export default {
 				console.log('loadHistoryMessagesByTopic: ', response)
 				//
 				if (response.status_code === 200) {
-					for (let i = 0; i < response.data.content.length; i++) {
-						const element = response.data.content[i]
-						// console.log('element:', element);
-						app.messages.unshift(element)
+					// for (let i = 0; i < response.data.content.length; i++) {
+					// 	const element = response.data.content[i]
+					// 	app.messages.unshift(element)
+					// }
+					var length = response.data.content.length
+					for (var i = 0; i < length; i++) {
+						var message = response.data.content[i];
+						if (message.type === 'notification_form_request' ||
+						  message.type === 'notification_form_result') {
+						  // 暂时忽略表单消息
+						} if (message.type === 'notification_thread_reentry') {
+						  // 连续的 ‘继续会话’ 消息，只显示最后一条
+						  if (i + 1 < length) {
+							var nextmsg = response.data.content[i + 1];
+							if (nextmsg.type === 'notification_thread_reentry') {
+							  continue
+							} else {
+							  	app.messages.unshift(message);
+							}
+						  }
+						} else {
+						  	app.messages.unshift(message);
+						}
 					}
 				}
 				app.scrollToBottom()
@@ -856,11 +875,29 @@ export default {
 					console.log('loadHistoryMessagesByTopic: ', response)
 					//
 					if (response.status_code === 200) {
-						for (let i = 0; i < response.data.content.length; i++) {
-							const element = response.data.content[i]
-							// console.log('element:', element);
-							// app.messages.unshift(element)
-							app.pushToMessageArray(element)
+						// for (let i = 0; i < response.data.content.length; i++) {
+						// 	const element = response.data.content[i]
+						// 	app.pushToMessageArray(element)
+						// }
+						var length = response.data.content.length
+						for (var i = 0; i < length; i++) {
+							var message = response.data.content[i];
+							if (message.type === 'notification_form_request' ||
+							  message.type === 'notification_form_result') {
+							  // 暂时忽略表单消息
+							} if (message.type === 'notification_thread_reentry') {
+							  // 连续的 ‘继续会话’ 消息，只显示最后一条
+							  if (i + 1 < length) {
+								var nextmsg = response.data.content[i + 1];
+								if (nextmsg.type === 'notification_thread_reentry') {
+								  continue
+								} else {
+								  	app.pushToMessageArray(message);
+								}
+							  }
+							} else {
+							  	app.pushToMessageArray(message);
+							}
 						}
 					}
 					// app.scrollToBottom()
