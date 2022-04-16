@@ -36,12 +36,14 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 
 // 自定义用户名登录
 export function login(username, password, subDomain, successcb, failedcb) {
-	console.log('login:', username, password, subDomain);
+	// console.log('login:', username, password, subDomain);
 	//
 	oauth(username, password, subDomain, function (result) {
-		console.log('oauth:', result)
+		// console.log('oauth:', result)
+		console.log('login success')
 		successcb(result.data)
 	}, function(error) {
+		console.log('login error')
 		failedcb(error.data)
 	})
 }
@@ -230,7 +232,7 @@ export function emailRegisterWithNickname(email, password, nickname, successcb, 
   })
 }
 
-// 
+// 手机号注册
 export function mobileRegister(mobile, nickname, successcb, failedcb) {
   // console.log('register:', mobile, password)
   uni.request({
@@ -471,7 +473,6 @@ export function requestWorkGroupThreadV2(wid, successcb, failedcb) {
     }
   })
 }
-
 
 // 客服端：当前进行中会话
 export function getThreads(page, size, successcb, failedcb) {

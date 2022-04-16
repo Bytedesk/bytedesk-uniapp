@@ -402,7 +402,7 @@ export default {
 			isRobot: false,
 			isThreadStarted: false,
 			isThreadClosed: false,
-			isManulRequestThread: false,
+			// isManulRequestThread: false,
 			// focusStatus: true,
 			leaveMessageTip: '',
 			loadHistory: '1',
@@ -867,8 +867,8 @@ export default {
 		// 	})
 		// },
 		loadHistoryMessagesByTopic (topic) {
-			//
-			if (this.isManulRequestThread || this.loadHistory === '0') {
+			// this.isManulRequestThread || 
+			if (this.loadHistory === '0') {
 				return;
 			}
 			if(this.isHistoryLoading) {
@@ -1044,6 +1044,7 @@ export default {
 				url: '../../components/bytedesk_kefu/leavemsg?wid=' + this.option.wid + '&type=' + this.option.type + '&aid=' + this.option.aid + '&tip=' + this.leaveMessageTip
 			});
 		},
+		// 本地显示商品信息
 		appendCommodityInfo () {
 			let goods = this.option.goods
 			if (goods !== "1") {
@@ -1079,7 +1080,7 @@ export default {
 			};
 			this.pushToMessageArray(json)
 		},
-		//
+		// 商品信息格式化
 		commodityInfo () {
 			//
 			let commodidy = {
@@ -1098,6 +1099,7 @@ export default {
 		onInputChange (event) {
 			console.log('onInputChange:', event.detail.value)
 		},
+		// 发送文本消息
 		sendTextMessageSync(content) {
 			// this.sendMessageSync('text', content)
 			if (content.length === 0) {
@@ -1141,6 +1143,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送图片消息
 		sendImageMessageSync(imageUrl) {
 			// console.log('sendImageMessageSync:', imageUrl);
 			//
@@ -1174,6 +1177,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送文件消息
 		sendFileMessageSync(fileUrl) {
 			// console.log('sendFileMessageSync:', fileUrl);
 			//
@@ -1207,6 +1211,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送录音消息
 		sendVoiceMessageSync(voiceUrl, length, format) {
 			// console.log('sendVoiceMessageSync:', voiceUrl);
 			//
@@ -1242,6 +1247,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送视频消息
 		sendVideoMessageSync(videoUrl) {
 			// console.log('sendVideoMessageSync:', videoUrl);
 			//
@@ -1275,6 +1281,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送商品消息
 		sendCommodityMessageSync() {
 			let goods = this.option.goods
 			if (goods !== "1") {
@@ -1312,6 +1319,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送预知消息
 		sendPreviewMessage() {
 			//
 			var json = {
@@ -1345,6 +1353,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送回执消息
 		sendReceiptMessage (mid, status) {
 			var json = {
 				"mid": this.guid(),
@@ -1377,6 +1386,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送消息撤回消息
 		sendRecallMessage (mid) {
 			var json = {
 				"mid": this.guid(),
@@ -1408,6 +1418,7 @@ export default {
 			};
 			this.doSendMessage(json);
 		},
+		// 发送文本消息-封装
 		sendTextMessage () {
 			//
 			if (this.inputContent.trim().length === 0) {
@@ -1427,6 +1438,7 @@ export default {
 			// 	$("input")[1].focus()
 			// }, 100);
 		},
+		// 实际发送消息
 		doSendMessage (json) {
 			// console.log(json)
 			// 判断网络是否断开，如果断开，则提示并直接返回
@@ -1446,6 +1458,7 @@ export default {
 			// 先插入本地
 			this.onMessageReceived(json)
 		},
+		// 本地消息存储
 		pushToMessageArray(message) {
 			// 判断是否已经存在
 			let contains = false
@@ -1500,7 +1513,10 @@ export default {
 				this.sendCommodityMessageSync()
 				this.isCommoditySend = true
 			}
+			// 加载更多聊天记录
+			this.loadMoreMessages()
 		},
+		// 监听接收消息
 		onMessageReceived (messageObject) {
 			// console.log('onMessageReceived:', messageObject)
 			//

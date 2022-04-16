@@ -36,10 +36,11 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 
 // 自定义用户名登录
 export function login(username, password, subDomain, successcb, failedcb) {
-	console.log('login:', username, password, subDomain);
+	// console.log('login:', username, password, subDomain);
 	//
 	oauth(username, password, subDomain, function (result) {
-		console.log('oauth:', result)
+		// console.log('oauth:', result)
+		console.log('login success')
 		successcb(result.data)
 	}, function(error) {
 		failedcb(error)

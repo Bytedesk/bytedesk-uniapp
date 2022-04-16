@@ -389,7 +389,6 @@ var stompApi = {
 }
 
 module.exports = {
-  // stompClient: stompClient,
   connect: stompApi.connect,
   subscribeTopic: stompApi.subscribeTopic,
   sendMessage: stompApi.sendMessage,
