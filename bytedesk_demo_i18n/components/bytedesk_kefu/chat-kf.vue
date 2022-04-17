@@ -835,6 +835,8 @@ export default {
 			// } else {
 				// this.loadHistoryMessages(this.uid)
 			// }
+			// 主动下拉，开启拉取聊天记录
+			this.loadHistory = '1'
 			this.loadHistoryMessagesByTopic(this.thread.topic)
 		},
 		// 加载更多聊天记录
@@ -1514,7 +1516,7 @@ export default {
 				this.isCommoditySend = true
 			}
 			// 加载更多聊天记录
-			this.loadMoreMessages()
+			this.loadHistoryMessagesByTopic(this.thread.topic)
 		},
 		// 监听接收消息
 		onMessageReceived (messageObject) {

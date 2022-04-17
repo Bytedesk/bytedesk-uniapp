@@ -34,6 +34,34 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 	}
 }
 
+// 自定义用户名 + 昵称 + 头像初始化登录
+export function userLogin(username, nickname, avatar, subDomain, appKey, successcb, failedcb) {
+	// console.log('userLogin: ' + subDomain);
+	try {
+	    const usernameLocal = uni.getStorageSync(constants.username);
+		const passwordLocal = uni.getStorageSync(constants.password);
+	    if (usernameLocal != null && usernameLocal.length > 0) {
+	        // console.log(username);
+			let password = username
+			// 登录
+			login(usernameLocal, password, subDomain, successcb, failedcb);
+	    } else {
+			// 注册
+			let password = username
+			registerUser(username, nickname, password, avatar, subDomain, function(result) {
+				//
+				let username = result.data.username;
+				login(username, password, subDomain, successcb, failedcb);
+			}, function(error) {
+				console.log('userLogin:', error)
+			})
+		}
+	} catch (e) {
+	    // error
+		console.log('anonymous storage error:' + e);
+	}
+}
+
 // 自定义用户名登录
 export function login(username, password, subDomain, successcb, failedcb) {
 	// console.log('login:', username, password, subDomain);
@@ -326,7 +354,7 @@ export function registerAnonymous(subDomain, successcb, failedcb) {
 }
 
 // 自定义用户名 注册
-export function registerUser(username, nickname, password, subDomain, successcb, failedcb) {
+export function registerUser(username, nickname, password, avatar, subDomain, successcb, failedcb) {
   //
   uni.request({
     url: constants.API_BASE_URL + '/visitor/api/register/user',
@@ -334,6 +362,7 @@ export function registerUser(username, nickname, password, subDomain, successcb,
 	  'username': username,
 	  'nickname': nickname,
 	  'password': password,
+	  'avatar': avatar,
       'subDomain': subDomain,
       'client': constants.client
     },
@@ -342,7 +371,7 @@ export function registerUser(username, nickname, password, subDomain, successcb,
       'content-type': 'application/json' // 默认值
     },
     success (res) {
-		if (res.status_code === 200) {
+		if (res.data.status_code === 200) {
 			try {
 			  uni.setStorageSync(constants.uid, res.data.data.uid);
 			  // console.log(res.data.data.uid)
@@ -354,8 +383,10 @@ export function registerUser(username, nickname, password, subDomain, successcb,
 			} catch (e) {
 				// error
 			}
+			successcb(res.data)
+		} else {
+			failedcb(res.data)
 		}
-		successcb(res.data)
     },
     fail (res) {
       failedcb(res.data)

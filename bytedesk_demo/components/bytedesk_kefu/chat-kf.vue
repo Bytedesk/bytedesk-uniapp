@@ -763,7 +763,7 @@ export default {
 			    this.username = uni.getStorageSync(constants.username)
 			    this.nickname = uni.getStorageSync(constants.nickname)
 			    this.avatar = uni.getStorageSync(constants.avatar)
-				// console.log('uid 1:', this.uid)
+				console.log('uid 1:', this.uid)
 			} catch (error) {
 			    console.error('read uid/username error', error)
 			}
@@ -835,6 +835,8 @@ export default {
 			// } else {
 				// this.loadHistoryMessages(this.uid)
 			// }
+			// 主动下拉，开启拉取聊天记录
+			this.loadHistory = '1'
 			this.loadHistoryMessagesByTopic(this.thread.topic)
 		},
 		// 加载更多聊天记录
@@ -882,7 +884,7 @@ export default {
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
 			httpApi.loadHistoryMessagesByTopic(topic, this.page, 10, function(response) {
-				console.log('loadHistoryMessagesByTopic: ', response)
+				// console.log('loadHistoryMessagesByTopic: ', response)
 				//
 				if (response.status_code === 200) {
 					// for (let i = 0; i < response.data.content.length; i++) {
@@ -925,7 +927,7 @@ export default {
 				let app = this
 				let count = this.loadHistory ? 10 : 1
 				httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
-					console.log('loadLatestMessage: ', response)
+					// console.log('loadLatestMessage: ', response)
 					//
 					if (response.status_code === 200) {
 						// for (let i = 0; i < response.data.content.length; i++) {
@@ -1516,7 +1518,7 @@ export default {
 				this.isCommoditySend = true
 			}
 			// 加载更多聊天记录
-			this.loadMoreMessages()
+			this.loadHistoryMessagesByTopic(this.thread.topic)
 		},
 		// 监听接收消息
 		onMessageReceived (messageObject) {

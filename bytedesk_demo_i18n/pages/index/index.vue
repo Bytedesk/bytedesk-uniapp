@@ -31,6 +31,11 @@ export default {
 		// 登录后台->渠道管理-》uniapp中创建应用获取appkey
 		let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
 		bytedesk.init(subDomain, appKey);
+		// 注：如果需要多平台统一用户（用于同步聊天记录等），可使用:
+		// bytedesk.initWithUsernameAndNicknameAndAvatar('myuniappusername', '我是美女', 'https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/girl.png', subDomain, appKey);
+		// bytedesk.initWithUsername('myuniappusername',subDomain, appKey); // 其中：username为自定义用户名，可与开发者所在用户系统对接
+		// 如果还需要自定义昵称/头像，可以使用 initWithUsernameAndNickname或initWithUsernameAndNicknameAndAvatar，
+		// 具体参数可以参考 @/components/bytedesk_kefu/js/api/bytedesk.js 文件中接口
 		
 		// (可选)
 		try {
