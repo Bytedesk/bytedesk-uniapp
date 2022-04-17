@@ -904,11 +904,13 @@ export default {
 							if (nextmsg.type === 'notification_thread_reentry') {
 							  continue
 							} else {
-							  	app.messages.unshift(message);
+							  	// app.messages.unshift(message);
+								app.pushToMessageArray(message);
 							}
 						  }
 						} else {
-						  	app.messages.unshift(message);
+						  	// app.messages.unshift(message);
+							app.pushToMessageArray(message);
 						}
 					}
 				}
