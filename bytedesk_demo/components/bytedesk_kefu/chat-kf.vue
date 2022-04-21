@@ -688,17 +688,9 @@ export default {
 			}
 		},
 		my_uid () {
-			// 客服端
-			// if (this.option.agentclient === '1') {
-			// 	return this.userInfo.uid;
-			// }
 			return this.uid
 		},
 		my_nickname () {
-			// 客服端
-			// if (this.option.agentclient === '1') {
-			// 	return this.userInfo.nickname;
-			// }
 			// 访客端
 			if (this.option.nickname) {
 				return this.option.nickname
@@ -763,7 +755,7 @@ export default {
 			    this.username = uni.getStorageSync(constants.username)
 			    this.nickname = uni.getStorageSync(constants.nickname)
 			    this.avatar = uni.getStorageSync(constants.avatar)
-				console.log('uid 1:', this.uid)
+				// console.log('uid 1:', this.uid)
 			} catch (error) {
 			    console.error('read uid/username error', error)
 			}
@@ -1448,6 +1440,11 @@ export default {
 		},
 		// 实际发送消息
 		doSendMessage (json) {
+			// console.log('doSendMessage:', json)
+			if (this.my_uid() === '') {
+				uni.showToast({ title: 'uid不能为空', duration: 2000 });
+				return
+			}
 			// 判断网络是否断开，如果断开，则提示并直接返回
 			if (!this.isNetworkConnected) {
 				uni.showToast({ title: '网络断开，请稍后重试', duration: 2000 });
@@ -1727,7 +1724,9 @@ export default {
 					.toString(16)
 					.substring(1)
 			}
-			return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+			let timestamp = moment(new Date(), "YYYYMMDDHHmmss");
+			return timestamp + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()
+			// return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 		},
 		//
 		appendQueryMessage (content) {

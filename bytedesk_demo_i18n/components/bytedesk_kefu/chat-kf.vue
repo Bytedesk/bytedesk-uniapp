@@ -1444,7 +1444,11 @@ export default {
 		},
 		// 实际发送消息
 		doSendMessage (json) {
-			// console.log(json)
+			// console.log('doSendMessage:', json)
+			if (this.my_uid() === '') {
+				uni.showToast({ title: 'uid不能为空', duration: 2000 });
+				return
+			}
 			// 判断网络是否断开，如果断开，则提示并直接返回
 			if (!this.isNetworkConnected) {
 				uni.showToast({ title: '网络断开，请稍后重试', duration: 2000 });
@@ -1725,7 +1729,9 @@ export default {
 					.toString(16)
 					.substring(1)
 			}
-			return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+			let timestamp = moment(new Date(), "YYYYMMDDHHmmss");
+			return timestamp + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()
+			// return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 		},
 		//
 		appendQueryMessage (content) {

@@ -1875,7 +1875,9 @@ export default {
 					.toString(16)
 					.substring(1)
 			}
-			return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+			let timestamp = moment(new Date(), "YYYYMMDDHHmmss");
+			return timestamp + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()
+			// return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 		},
 		queryAnswer (answer) {
 			console.log('answer:', answer);
