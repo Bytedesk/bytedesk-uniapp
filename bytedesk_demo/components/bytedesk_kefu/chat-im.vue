@@ -443,7 +443,7 @@ export default {
 			} else if (cuw.type === 'video') {
 				app.sendVideoMessageSync(cuw.content)
 			} else {
-				uni.showToast({ title: '暂不支持消息类型', duration: 2000 });
+				uni.showToast({ title: '暂不支持消息类型', icon:'none', duration: 2000 });
 			}
 		})
 	},
@@ -654,14 +654,17 @@ export default {
 			}
 			return this.uid
 		},
+		my_username () {
+			// 客服端
+			if (this.option.agentclient === '1') {
+				return this.userInfo.username;
+			}
+			return this.username
+		},
 		my_nickname () {
 			// 客服端
 			if (this.option.agentclient === '1') {
 				return this.userInfo.nickname;
-			}
-			// 访客端
-			if (this.option.nickname) {
-				return this.option.nickname
 			}
 			return this.nickname.trim().length > 0 ? this.nickname : this.thread.visitor.nickname
 		},
@@ -1042,6 +1045,7 @@ export default {
 				"type": 'commodity',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1103,6 +1107,7 @@ export default {
 				"type": 'text',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1136,6 +1141,7 @@ export default {
 				"type": 'image',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1169,6 +1175,7 @@ export default {
 				"type": 'file',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1202,6 +1209,7 @@ export default {
 				"type": 'voice',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1237,6 +1245,7 @@ export default {
 				"type": 'video',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1274,6 +1283,7 @@ export default {
 				"type": 'commodity',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1306,6 +1316,7 @@ export default {
 				"type": "notification_preview",
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1338,6 +1349,7 @@ export default {
 				"type": "notification_receipt",
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1370,6 +1382,7 @@ export default {
 				"type": "notification_recall",
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.my_username(),
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1608,13 +1621,13 @@ export default {
 				if (response.status_code === 200) {
 					uni.showToast({ title: '拉黑成功', duration: 2000 });
 				} else {
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 				// 关闭窗口
 				done()
 			}, function(error) {
 				console.log('add block error:', error)
-				uni.showToast({ title: '拉黑失败', duration: 2000 });
+				uni.showToast({ title: '拉黑失败', icon:'none', duration: 2000 });
 			})
 		},
 		// 设置会话免打扰
@@ -1625,7 +1638,7 @@ export default {
 				uni.showToast({ title: '设置免打扰成功', duration: 2000 });
 			}, error => {
 				console.log('mark nodisturb error:', error);
-				uni.showToast({ title: '设置免打扰失败', duration: 2000 });
+				uni.showToast({ title: '设置免打扰失败', icon:'none', duration: 2000 });
 			})
 		},
 		// 取消会话免打扰
@@ -1636,7 +1649,7 @@ export default {
 				uni.showToast({ title: '取消免打扰成功', duration: 2000 });
 			}, error => {
 				console.log('unmark nodisturb error:', error)
-				uni.showToast({ title: '取消免打扰失败', duration: 2000 });
+				uni.showToast({ title: '取消免打扰失败', icon:'none', duration: 2000 });
 			})
 		},
 		// 加载当前在线客服
@@ -1663,7 +1676,7 @@ export default {
 						}
 					})
 				} else {
-					uni.showToast({ title: '无其他客服在线', duration: 2000 });
+					uni.showToast({ title: '无其他客服在线', icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('getOnlineAgents error', error)
@@ -1816,7 +1829,7 @@ export default {
 					uni.showToast({ title: '关闭会话成功', duration: 2000 });
 					uni.navigateBack()
 				} else {
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('agentCloseThread error', error)
@@ -1897,7 +1910,7 @@ export default {
 					app.scrollToMessage(replyMessage)
 				} else {
 					// app.$message.warning(response.message)
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('queryAnswer error', error)
@@ -1925,7 +1938,7 @@ export default {
 					app.scrollToMessage(replyMessage)
 				} else {
 					// app.$message.warning(response.data.message)
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('messageAnswer error', error)

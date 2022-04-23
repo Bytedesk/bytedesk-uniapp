@@ -763,7 +763,7 @@ export default {
 			let app = this
 			if (this.option.v2robot === undefined || this.option.v2robot === null || this.option.v2robot === false) {
 				httpApi.requestThread(this.option.wid, this.option.type, this.option.aid, function(response) {
-					// console.log('request thread success', app.option.wid, app.option.type, app.option.aid, response)
+					console.log('request thread success', app.option.wid, app.option.type, app.option.aid, response)
 					//
 					app.dealWithThread(response);
 				}, function(error) {
@@ -1032,8 +1032,10 @@ export default {
 			} else if (response.status_code === -2) {
 				// sid 或 wid 错误
 				// this.$message.error('siteId或者工作组id错误');
+				uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 			} else if (response.status_code === -3) {
 				// alert('您已经被禁言')
+				uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 			}
 			this.scrollToBottom();
 			// // 建立长连接
@@ -1061,6 +1063,7 @@ export default {
 				"type": 'commodity',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1121,6 +1124,7 @@ export default {
 				"type": 'text',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1155,6 +1159,7 @@ export default {
 				"type": 'image',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1189,6 +1194,7 @@ export default {
 				"type": 'file',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1223,6 +1229,7 @@ export default {
 				"type": 'voice',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1259,6 +1266,7 @@ export default {
 				"type": 'video',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1297,6 +1305,7 @@ export default {
 				"type": 'commodity',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1330,6 +1339,7 @@ export default {
 				"type": "notification_preview",
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1363,6 +1373,7 @@ export default {
 				"type": "notification_receipt",
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1396,6 +1407,7 @@ export default {
 				"type": "notification_recall",
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1442,12 +1454,12 @@ export default {
 		doSendMessage (json) {
 			// console.log('doSendMessage:', json)
 			if (this.my_uid() === '') {
-				uni.showToast({ title: 'uid不能为空', duration: 2000 });
+				uni.showToast({ title: 'uid不能为空', icon:'none', duration: 2000 });
 				return
 			}
 			// 判断网络是否断开，如果断开，则提示并直接返回
 			if (!this.isNetworkConnected) {
-				uni.showToast({ title: '网络断开，请稍后重试', duration: 2000 });
+				uni.showToast({ title: '网络断开，请稍后重试', icon:'none', duration: 2000 });
 				return
 			}
 			if (stompApi.isConnected()) {
@@ -1739,6 +1751,7 @@ export default {
 				"type": 'robot',
 				"user": {
 					"uid": this.my_uid(),
+					"username": this.username,
 					"nickname": this.my_nickname(),
 					"avatar": this.my_avatar(),
 					"extra": {
@@ -1821,7 +1834,7 @@ export default {
 					// app.scrollToMessage(replyMessage)
 				} else {
 					// app.$message.warning(response.message)
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('queryAnswer error', error)
@@ -1843,7 +1856,7 @@ export default {
 					app.pushToMessageArray(replyMessage);
 					app.scrollToBottom()
 				} else {
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('queryCategoryAnswers error', error)
@@ -1876,7 +1889,7 @@ export default {
 					// 滚动界面到此消息
 					app.scrollToMessage(replyMessage)
 				} else {
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('messageAnswer error', error)
@@ -1893,7 +1906,7 @@ export default {
 					app.pushToMessageArray(message);
 					app.scrollToMessage(message);
 				} else {
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('rateAnswerHelpful error', error)
@@ -1910,7 +1923,7 @@ export default {
 					app.pushToMessageArray(message);
 					app.scrollToMessage(message);
 				} else {
-					uni.showToast({ title: response.message, duration: 2000 });
+					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
 				}
 			}, function(error) {
 				console.log('rateAnswerUseless error', error)

@@ -371,6 +371,7 @@ export function registerUser(username, nickname, password, avatar, subDomain, su
       'content-type': 'application/json' // 默认值
     },
     success (res) {
+		// console.log('registerUser success:' + res)
 		if (res.data.status_code === 200) {
 			try {
 			  uni.setStorageSync(constants.uid, res.data.data.uid);
@@ -383,10 +384,19 @@ export function registerUser(username, nickname, password, avatar, subDomain, su
 			} catch (e) {
 				// error
 			}
-			successcb(res.data)
 		} else {
-			failedcb(res.data)
+			try {
+			  uni.setStorageSync(constants.uid, res.data.data);
+			  uni.setStorageSync(constants.username, username);
+			  uni.setStorageSync(constants.nickname, nickname);
+			  uni.setStorageSync(constants.avatar, avatar);
+			  uni.setStorageSync(constants.description, '');
+			  uni.setStorageSync(constants.subDomain, subDomain);
+			} catch (e) {
+				// error
+			}
 		}
+		successcb(res.data)
     },
     fail (res) {
       failedcb(res.data)
