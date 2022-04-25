@@ -226,6 +226,7 @@ onUnload() {
     "type": "text",
     "user": {
         "uid": "201808221551193",
+		"username": "username",
         "nickname": "客服001",
         "avatar": "https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png",
         "extra": "{\"agent\":true}" // 说明：true 为客服发送消息，false 为访客发送消息
