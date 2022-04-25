@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import * as constants from '../constants.js'
+import { username } from '../constants.js';
 
 /**
  * 匿名登录，首先检测本地是否以及存在用户，如果没有，则注册，否则直接登录
@@ -41,17 +42,17 @@ export function userLogin(username, nickname, avatar, subDomain, appKey, success
 	    const usernameLocal = uni.getStorageSync(constants.username);
 		const passwordLocal = uni.getStorageSync(constants.password);
 	    if (usernameLocal != null && usernameLocal.length > 0) {
-	        // console.log(username);
-			let password = username
+	        // console.log(usernameLocal, passwordLocal);
 			// 登录
-			login(usernameLocal, password, subDomain, successcb, failedcb);
+			login(usernameLocal, passwordLocal, subDomain, successcb, failedcb);
 	    } else {
 			// 注册
 			let password = username
 			registerUser(username, nickname, password, avatar, subDomain, function(result) {
 				//
-				let username = result.data.username;
-				login(username, password, subDomain, successcb, failedcb);
+				let usernameCompose = username + '@' + subDomain; //result.data.username;
+				// console.log(usernameCompose, password);
+				login(usernameCompose, password, subDomain, successcb, failedcb);
 			}, function(error) {
 				console.log('userLogin:', error)
 			})
@@ -372,12 +373,13 @@ export function registerUser(username, nickname, password, avatar, subDomain, su
       'content-type': 'application/json' // 默认值
     },
     success (res) {
-		// console.log('registerUser success:' + res)
+		console.log('registerUser success:', res.data.data)
 		if (res.data.status_code === 200) {
 			try {
 			  uni.setStorageSync(constants.uid, res.data.data.uid);
 			  // console.log(res.data.data.uid)
 			  uni.setStorageSync(constants.username, res.data.data.username);
+			  uni.setStorageSync(constants.password, password);
 			  uni.setStorageSync(constants.nickname, res.data.data.nickname);
 			  uni.setStorageSync(constants.avatar, res.data.data.avatar);
 			  uni.setStorageSync(constants.description, res.data.data.description);
@@ -388,7 +390,8 @@ export function registerUser(username, nickname, password, avatar, subDomain, su
 		} else {
 			try {
 			  uni.setStorageSync(constants.uid, res.data.data);
-			  uni.setStorageSync(constants.username, username);
+			  uni.setStorageSync(constants.username, username + '@' + subDomain);
+			  uni.setStorageSync(constants.password, password);
 			  uni.setStorageSync(constants.nickname, nickname);
 			  uni.setStorageSync(constants.avatar, avatar);
 			  uni.setStorageSync(constants.description, '');

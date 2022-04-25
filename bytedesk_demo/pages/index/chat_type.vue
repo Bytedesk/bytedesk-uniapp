@@ -221,7 +221,7 @@ export default {
 		// 访客端-查询访客所有未读消息数目
 		getUnreadCountVisitor () {
 			httpApi.getUnreadCountVisitor(response => {
-				console.log('getUnreadCountVisitor: ', response.data)
+				// console.log('getUnreadCountVisitor: ', response.data)
 				let unreadCount = response.data
 				if (unreadCount > 0) {
 					uni.showToast({ title: '未读消息数目：' + unreadCount, duration: 2000 });
