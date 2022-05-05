@@ -401,7 +401,8 @@ export default {
 			//
 			isAgentClient: false,
 			visitorUid: '',
-			timer: ''
+			loadHistoryTimer: '',
+			sendMessageTimer: ''
 		};
 	},
 	onLoad(option) {
@@ -640,11 +641,18 @@ export default {
 		},
 		formatStatus(status) {
 			if (status === 'read') {
-				return '已读'
+				return '已读' // 对方已读
 			} else if (status === 'received') {
-				return '送达'
+				return '送达' // 已经发送到对方客户端
+			} else if (status === 'stored') {
+				return '' // 发送到服务器，发送成功
+			} else if (status === 'error') {
+				return '失败' // 发送失败
+			} else if (status === 'sending') {
+				return '发送中..' // 发送中
 			} else {
-				return ''
+				// return ''
+				return status
 			}
 		},
 		my_uid () {
@@ -1043,6 +1051,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'commodity',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1105,6 +1114,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'text',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1139,6 +1149,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'image',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1173,6 +1184,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'file',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1207,6 +1219,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'voice',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1243,6 +1256,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'video',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1281,6 +1295,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'commodity',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1314,6 +1329,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": "notification_preview",
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1347,6 +1363,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": "notification_receipt",
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1380,6 +1397,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": "notification_recall",
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.my_username(),
@@ -1443,6 +1461,8 @@ export default {
 				let msg = this.messages[i]
 				if (msg.mid === message.mid) {
 					contains = true
+					// 更新消息状态
+					Vue.set(this.messages[i], 'status', message.status)
 				}
 			}
 			// 如果不存在，则保存
@@ -1691,6 +1711,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'notification_transfer',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
@@ -1726,6 +1747,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'notification_transfer_accept',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
@@ -1761,6 +1783,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'notification_transfer_reject',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
@@ -1796,6 +1819,7 @@ export default {
 				"client": this.client,
 				"version": "1",
 				"type": 'notification_invite_rate',
+				"status": "sending",
 				"user": {
 					"uid": this.my_uid(),
 					"nickname": this.my_nickname(),
@@ -1888,7 +1912,7 @@ export default {
 					.toString(16)
 					.substring(1)
 			}
-			let timestamp = moment(new Date(), "YYYYMMDDHHmmss");
+			let timestamp = moment(new Date()).format('YYYYMMDDHHmmss'); 
 			return timestamp + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()
 			// return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 		},
@@ -2147,54 +2171,32 @@ export default {
 				// #endif
 			}
 		},
-		/**
-		 * 1. 首先判断是否已经注册过
-		 * 2. 如果已经注册过，则直接调用登录接口
-		 * 3. 如果没有注册过，则从服务器请求用户名
-		 */
-		requestUsername () {
-			// this.username = localStorage.bd_kfe_username;
-			// this.password = this.username;
-			if (this.username) {
-				// this.login();
-			} else {
-				//
-				// $.ajax({
-				// 	url: this.HTTP_HOST + '/visitor/api/username',
-				// 	contentType: "application/json; charset=utf-8",
-				// 	type: "get",
-				// 	data: {
-				// 		nickname: this.nickname,
-				// 		subDomain: this.subDomain,
-				// 		client: this.client
-				// 	},
-				// 	success: function (response) {
-				// 		console.log('user:', response.data);
-				// 		// 登录
-				// 		app.uid = response.data.uid;
-				// 		app.username = response.data.username;
-				// 		app.password = app.username;
-				// 		app.nickname = response.data.nickname;
-				// 		// 本地存储
-				// 		localStorage.bd_kfe_uid = app.uid;
-				// 		localStorage.bd_kfe_username = app.username;
-				// 		// 登录
-				// 		app.login();
-				// 	},
-				// 	error: function (error) {
-				// 		//Do Something to handle error
-				// 		console.log(error);
-				// 	}
-				// });
+		checkTimeoutMessage() {
+		  // 检测-消息是否超时发送失败
+		  for (let i = 0; i < this.messages.length; i++) {
+			const message = this.messages[i];
+			if (this.is_self(message) && this.is_sending(message)) {
+			  let timestamp = moment(message.createdAt);
+			  let now = moment(new Date());
+			  let diff = now.diff(timestamp, "seconds");
+			  console.log('diff:', diff)
+			  if (diff > 60) {
+				// 超时60秒，设置为消息状态为error
+				// this.messages[i].status = 'error'
+				Vue.set(this.messages[i], 'status', 'error')
+			  }
 			}
-		},
+		  }
+		}
 	},
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
-	  this.timer = setInterval(this.loadLatestMessage, 1000 * 10);
+	  this.loadHistoryTimer = setInterval(this.loadLatestMessage, 1000 * 10);
+	  this.sendMessageTimer = setInterval(this.checkTimeoutMessage, 1000);
 	},
 	beforeDestroy() {
-	  clearInterval(this.timer);
+	  clearInterval(this.loadHistoryTimer);
+	  clearInterval(this.sendMessageTimer);
 	}
 }
 </script>
