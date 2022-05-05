@@ -342,6 +342,9 @@ var stompApi = {
     stompClient.subscribe("/topic/" + topic, function (message) {
       // console.log('message :', message, 'body:', message.body);
       var messageObject = JSON.parse(message.body);
+	  if (messageObject.status === 'sending') {
+		 messageObject.status = 'stored' 
+	  }
 	  uni.$emit('message', messageObject);
 	  // TODO: 缓存消息
 	  let messageArray = messagesCache[topic]

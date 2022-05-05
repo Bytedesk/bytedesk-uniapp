@@ -1,4 +1,5 @@
 <template>
+	<!-- TODO: 修改为标签 可自定义，支持后台可配置 -->
 	<view class='issue'>
 		<view class="issue-head">
 			<slot name="headPic"></slot>
