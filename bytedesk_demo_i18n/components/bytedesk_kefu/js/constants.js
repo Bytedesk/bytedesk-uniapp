@@ -23,6 +23,16 @@ module.exports = {
   client: 'uniapp',
   appKey: 'bytedesk_appkey',
   //
+  MESSAGE_STATUS_SENDING: 'sending',
+  // 送达
+  MESSAGE_STATUS_RECEIVED: 'received',
+  // 已读
+  MESSAGE_STATUS_READ: 'read',
+  // 发送到服务器，成功存储数据库中
+  MESSAGE_STATUS_STORED: 'stored',
+  // 发送错误
+  MESSAGE_STATUS_ERROR: 'error',
+  //
   CHAT_TYPE_WORKGROUP: 'workGroup',
   CHAT_TYPE_APPOINTED: 'appointed',
   //

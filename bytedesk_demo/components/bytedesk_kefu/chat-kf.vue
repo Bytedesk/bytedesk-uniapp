@@ -368,7 +368,7 @@ export default {
 			workGroupWid: '',
 			subDomain: '',
 			// TODO: 区分安卓、ios、小程序等
-			client: 'uniapp',
+			// client: 'uniapp',
 			thread: {
 				id: 0,
 				tid: '',
@@ -553,7 +553,9 @@ export default {
 	methods:{
 		//
 		is_self (message) {
-			// return message.user.uid === this.uid;
+			if (message.user == null) {
+				return false
+			}
 			return message.user.uid === this.my_uid();
 		},
 		// 发送状态
@@ -781,7 +783,7 @@ export default {
 			} else {
 				// v2robot = true
 				httpApi.requestWorkGroupThreadV2(this.option.wid, function(response) {
-					console.log('request thread v2 success', app.option.wid, response)
+					// console.log('request thread v2 success', app.option.wid, response)
 					//
 					app.dealWithThread(response);
 				}, function(error) {
@@ -799,7 +801,7 @@ export default {
 			//
 			let app = this
 			httpApi.requestAgent(this.option.wid, this.option.type, this.option.aid, function(response) {
-				console.log('request agent success', app.option.wid, app.option.type, app.option.aid, response)
+				// console.log('request agent success', app.option.wid, app.option.type, app.option.aid, response)
 				//
 				app.dealWithThread(response);
 			}, function(error) {
@@ -823,7 +825,7 @@ export default {
 			//
 			let app = this
 			httpApi.requestThreadScan(this.option.scan, function(response) {
-				console.log('request thread scan success', app.option.id, response)
+				// console.log('request thread scan success', app.option.id, response)
 				//
 				app.dealWithThread(response);
 			}, function(error) {
@@ -898,7 +900,7 @@ export default {
 						if (message.type === 'notification_form_request' ||
 						  message.type === 'notification_form_result') {
 						  // 暂时忽略表单消息
-						} if (message.type === 'notification_thread_reentry') {
+						} else if (message.type === 'notification_thread_reentry') {
 						  // 连续的 ‘继续会话’ 消息，只显示最后一条
 						  if (i + 1 < length) {
 							var nextmsg = response.data.content[i + 1];
@@ -1067,10 +1069,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'commodity',
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1088,6 +1090,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1129,10 +1132,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'text',
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1152,6 +1155,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1166,10 +1170,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'image',
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1189,6 +1193,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1202,10 +1207,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'file',
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1225,6 +1230,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1238,10 +1244,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'voice',
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1263,6 +1269,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1276,10 +1283,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'video',
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1299,6 +1306,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1316,10 +1324,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'commodity',
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1339,6 +1347,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1351,10 +1360,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": "notification_preview",
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1375,6 +1384,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1386,10 +1396,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": "notification_receipt",
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1410,6 +1420,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1421,10 +1432,10 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": "notification_recall",
-				"status": "sending",
+				"status": constants.MESSAGE_STATUS_SENDING,
 				"user": {
 					"uid": this.my_uid(),
 					"username": this.username,
@@ -1444,6 +1455,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1591,7 +1603,7 @@ export default {
 			  let mid = messageObject.mid;
 			  // this.thread.topic = messageObject.thread.topic;
 			  // 非自己发送的消息，发送消息回执: 消息已读
-			  if (messageObject.user.uid !== this.uid) {
+			  if (messageObject.user.uid !== this.uid && messageObject.type != 'robot' && messageObject.type !== "robot_result") {
 				  // console.log('do send receipt');
 				  this.sendReceiptMessage(mid, "read");
 			  }
@@ -1768,7 +1780,7 @@ export default {
 			var json = {
 				"mid": this.guid(),
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'robot',
 				"user": {
@@ -1790,6 +1802,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1803,7 +1816,7 @@ export default {
 			var json = {
 				"mid": mid,
 				"timestamp": this.currentTimestamp(),
-				"client": this.client,
+				"client": constants.client,
 				"version": "1",
 				"type": 'robot_result',
 				"user": {
@@ -1827,6 +1840,7 @@ export default {
 					"nickname": this.thread_nickname(),
 					"avatar": this.thread.visitor.avatar,
 					"topic": this.threadTopic,
+					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
 					"unreadCount": 0
 				}
@@ -1842,6 +1856,7 @@ export default {
 			//
 			let mid = this.guid();
 			this.appendReplyMessage(answer.aid, mid, answer.answer)
+			//
 			let app = this
 			httpApi.queryAnswer(this.thread.tid, answer.aid, mid, function(response) {
 				console.log('queryAnswer success', response)

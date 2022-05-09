@@ -524,7 +524,9 @@ export default {
 	methods:{
 		//
 		is_self (message) {
-			// return message.user.uid === this.uid;
+			if (message.user == null) {
+				return false
+			}
 			return message.user.uid === this.my_uid();
 		},
 		// 发送状态
@@ -852,7 +854,7 @@ export default {
 						if (message.type === 'notification_form_request' ||
 						  message.type === 'notification_form_result') {
 						  // 暂时忽略表单消息
-						} if (message.type === 'notification_thread_reentry') {
+						} else if (message.type === 'notification_thread_reentry') {
 						  // 连续的 ‘继续会话’ 消息，只显示最后一条
 						  if (i + 1 < length) {
 							var nextmsg = response.data.content[i + 1];
@@ -1445,8 +1447,13 @@ export default {
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
+				let app = this
 				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
 					// console.log('sendMessageRest success:', json)
+					var messageObject = JSON.parse(json);
+					messageObject.status = 'stored'
+					// uni.$emit('message', messageObject);
+					app.onMessageReceived(messageObject)
 				}, function(error) {
 					console.log('send message rest error:', error)
 				})

@@ -373,7 +373,7 @@ export function registerUser(username, nickname, password, avatar, subDomain, su
       'content-type': 'application/json' // 默认值
     },
     success (res) {
-		console.log('registerUser success:', res.data.data)
+		// console.log('registerUser success:', res.data.data)
 		if (res.data.status_code === 200) {
 			try {
 			  uni.setStorageSync(constants.uid, res.data.data.uid);
