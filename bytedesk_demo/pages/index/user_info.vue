@@ -76,6 +76,21 @@
 					console.log('updateAvatar error', error)
 					uni.showToast({ title: error, duration: 2000 });
 				})
+			},
+			setProfile () {
+				let mynickname = '自定义APP昵称uniapp'
+				let myavatarurl = 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/visitor_default_avatar.png'; // 头像网址url
+				let mydescription = '自定义APP用户备注信息uniapp'
+				let app = this
+				httpApi.updateProfile(mynickname, myavatarurl, mydescription, response => {
+					console.log('updateProfile success:', response)
+					app.nickname = mynickname
+					app.avatar = myavatarurl
+					app.description = mydescription
+				}, error => {
+					console.log('updateAvatar error', error)
+					uni.showToast({ title: error, duration: 2000 });
+				}) 
 			}
 		}
 	}

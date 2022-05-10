@@ -1356,6 +1356,38 @@ export function updateAvatar(avatar, successcb, failedcb) {
   })
 }
 
+// 访客端-设置个人资料，一次性调用同时设置：昵称、头像、备注
+export function updateProfile(nickname, avatar, description, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('not login')
+	  return
+	}
+  uni.request({
+    url: constants.API_BASE_URL + '/api/user/update/visitor/profile',
+    data: {
+	  'nickname': nickname,
+      'avatar': avatar,
+	  'description': description,
+      'client': constants.client
+    },
+	header: header,
+    method: 'POST',
+    success (res) {
+		try {
+			uni.setStorageSync(constants.avatar, avatar);
+		} catch (e) {
+		    // error
+		}
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 在长连接断开的情况下，发送消息
 export function sendMessageRest(json, successcb, failedcb) {
   // console.log('sendMessageRest:' + json)

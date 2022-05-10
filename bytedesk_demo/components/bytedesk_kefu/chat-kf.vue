@@ -716,10 +716,13 @@ export default {
 			return this.nickname.trim().length > 0 ? this.nickname : this.thread.visitor.nickname
 		},
 		my_avatar () {
-			// 客服端
-			// if (this.option.agentclient === '1') {
-			// 	return this.userInfo.avatar;
-			// }
+			// 访客端
+			if (this.option.avatar) {
+				return this.option.avatar
+			}
+			return this.avatar.trim().length > 0 ? this.avatar : this.thread.visitor.avatar
+		},
+		thread_avatar () {
 			// 访客端
 			if (this.option.avatar) {
 				return this.option.avatar
@@ -1088,7 +1091,7 @@ export default {
 					"type": this.thread.type,
 					"content": "[商品]",
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1153,7 +1156,7 @@ export default {
 					"type": this.thread.type,
 					"content": content,
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1191,7 +1194,7 @@ export default {
 					"type": this.thread.type,
 					"content": "[图片]",
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1228,7 +1231,7 @@ export default {
 					"type": this.thread.type,
 					"content": "[文件]",
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1267,7 +1270,7 @@ export default {
 					"type": this.thread.type,
 					"content": "[语音]",
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1304,7 +1307,7 @@ export default {
 					"type": this.thread.type,
 					"content": "[视频]",
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1345,7 +1348,7 @@ export default {
 					"type": this.thread.type,
 					"content": "[商品]",
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1382,7 +1385,7 @@ export default {
 					// TODO: 根据内容类型设置不同, 如: [图片]
 					"content": this.localPreviewContent,
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1418,7 +1421,7 @@ export default {
 					"type": this.thread.type,
 					// "content": content,
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1453,7 +1456,7 @@ export default {
 					"type": this.thread.type,
 					// "content": content,
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1800,7 +1803,7 @@ export default {
 					"type": this.thread.type,
 					"content": content,
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
@@ -1838,7 +1841,7 @@ export default {
 					"type": this.thread.type,
 					"content": content,
 					"nickname": this.thread_nickname(),
-					"avatar": this.thread.visitor.avatar,
+					"avatar": this.thread_avatar(),
 					"topic": this.threadTopic,
 					"client": constants.client,
 					"timestamp": this.currentTimestamp(),
