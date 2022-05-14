@@ -1585,7 +1585,7 @@ export function bindMiniOpenid(openid, successcb, failedcb) {
 
 // 提交留言
 export function saveLeaveMessage(workGroupWid, agentUid, type, mobile, email, content, successcb, failedcb) {
-  console.log('saveLeaveMessage:' + content)
+  // console.log('saveLeaveMessage:' + content)
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
@@ -1597,7 +1597,7 @@ export function saveLeaveMessage(workGroupWid, agentUid, type, mobile, email, co
     url: constants.API_BASE_URL + '/api/leavemsg/save',
     data: {
       'wid': workGroupWid,
-	  'uid': agentUid,
+	  'aid': agentUid,
 	  'type': type,
 	  'mobile': mobile,
 	  'email': email,

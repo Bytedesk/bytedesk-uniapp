@@ -46,11 +46,10 @@ export default {
 		subMit () {
 			//
 			uni.showLoading({title: this.$t('leaveMessing'), mask:true});
-			console.log('leavemsg:', this.workGroupWid, this.agentUid, 
-				this.type, this.mobile, this.email, this.content);
+			// console.log('leavemsg:', this.workGroupWid, this.agentUid, 
+			// 	this.type, this.mobile, this.email, this.content);
 			httpApi.saveLeaveMessage(this.workGroupWid, this.agentUid, 
-				this.type, this.mobile, this.email, this.content, 
-			function(response) {
+				this.type, this.mobile, this.email, this.content, function(response) {
 				console.log('saveLeaveMessage success:', response)
 				if (response.status_code === 200) {
 					uni.showToast({ title: this.$t('leaveMessageSuccess'), duration: 2000 });

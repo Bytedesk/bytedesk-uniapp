@@ -172,7 +172,7 @@ const app = new Vue({
 app.$mount()
 ```
 
-## 微信小程序
+## 微信小程序(百度等小程序，同理参考)
 
 - 配置服务器域名：
 - request合法域名添加：https://uniapp.bytedesk.com;

@@ -46,11 +46,10 @@ export default {
 		subMit () {
 			//
 			uni.showLoading({title: '提交留言中', mask:true});
-			console.log('leavemsg:', this.workGroupWid, this.agentUid, 
-				this.type, this.mobile, this.email, this.content);
+			// console.log('leavemsg:', this.workGroupWid, this.agentUid, 
+			// 	this.type, this.mobile, this.email, this.content);
 			httpApi.saveLeaveMessage(this.workGroupWid, this.agentUid, 
-				this.type, this.mobile, this.email, this.content, 
-			function(response) {
+				this.type, this.mobile, this.email, this.content, function(response) {
 				console.log('saveLeaveMessage success:', response)
 				if (response.status_code === 200) {
 					uni.showToast({ title: '留言成功', duration: 2000 });
