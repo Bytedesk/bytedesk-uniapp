@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import * as constants from '../constants.js'
-import { username } from '../constants.js';
+// import { username } from '../constants.js';
 
 /**
  * 匿名登录，首先检测本地是否以及存在用户，如果没有，则注册，否则直接登录
@@ -413,7 +413,7 @@ export function requestThread(wid, type, aid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -442,7 +442,7 @@ export function requestAgent(wid, type, aid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -470,7 +470,7 @@ export function requestThreadScan(id, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -497,7 +497,7 @@ export function requestWorkGroupThreadV2(wid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -523,7 +523,7 @@ export function getThreads(page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -550,7 +550,7 @@ export function getHistoryThreads(uid, page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -578,7 +578,7 @@ export function getThreadHistoryRecords(page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -605,7 +605,7 @@ export function getVisitorThreads(page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -632,7 +632,7 @@ export function getQueues(page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -663,7 +663,7 @@ export function acceptQueue(qid, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -692,7 +692,7 @@ export function ignoreQueue(qid, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -721,7 +721,7 @@ export function setAcceptStatus(status, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -750,7 +750,7 @@ export function updateAutoReply(autoReply, content, imageUrl, successcb, failedc
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -781,7 +781,7 @@ export function agentCloseThread(tid, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -806,7 +806,7 @@ export function getWorkGroupStatus(workGroupWid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -832,7 +832,7 @@ export function getAgentStatus(agentUid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -858,7 +858,7 @@ export function getOnlineAgents(successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -884,7 +884,7 @@ export function loadHistoryMessages(uid, page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -914,7 +914,7 @@ export function loadHistoryMessagesByTopic(topic, page, size, successcb, failedc
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -943,7 +943,7 @@ export function loadHistoryMessagesById(id, page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -972,7 +972,7 @@ export function loadHistoryMessagesByWid(wid, page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1003,7 +1003,7 @@ export function getUnreadCount(wid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1030,7 +1030,7 @@ export function getUnreadCountVisitor(successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1056,7 +1056,7 @@ export function getUnreadCountAgent(successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1082,7 +1082,7 @@ export function loadMessagesFrom(uid, id, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1110,7 +1110,7 @@ export function getProfile (successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1135,7 +1135,7 @@ export function queryAnswer (tid, aid, mid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1163,7 +1163,7 @@ export function queryCategoryAnswers (tid, cid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1190,7 +1190,7 @@ export function messageAnswer (wid, content, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1218,7 +1218,7 @@ export function rateAnswer(aid, mid, rate, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1246,7 +1246,7 @@ export function getCuws (successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1271,7 +1271,7 @@ export function updateNickname(nickname, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -1301,7 +1301,7 @@ export function updateDescription(description, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -1331,7 +1331,7 @@ export function updateAvatar(avatar, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -1361,7 +1361,7 @@ export function updateProfile(nickname, avatar, description, successcb, failedcb
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
   uni.request({
@@ -1395,7 +1395,7 @@ export function sendMessageRest(json, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1424,7 +1424,7 @@ export function rate(tid, score, note, invite, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1454,7 +1454,7 @@ export function rateDetail(tid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1480,7 +1480,7 @@ export function getBlocks (page, size, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1508,7 +1508,7 @@ export function addBlock(uid, note, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1536,7 +1536,7 @@ export function removeBlock(bid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1563,7 +1563,7 @@ export function bindMiniOpenid(openid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1590,7 +1590,7 @@ export function saveLeaveMessage(workGroupWid, agentUid, type, mobile, email, co
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1627,7 +1627,7 @@ export function markNodisturb(uid, tid, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
 	//
@@ -1660,7 +1660,7 @@ export function unmarkNodisturb(uid, tid, successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
 	//
@@ -1687,7 +1687,7 @@ export function getQuickButtons (workGroupWid, successcb, failedcb) {
   //
   let header = visitorApiHeader()
   if (header['Authorization'] === undefined) {
-    failedcb('not login')
+    failedcb('未登录，请务必确保提前调用init接口')
     return
   }
   //
@@ -1736,7 +1736,7 @@ export function logout(successcb, failedcb) {
 	//
 	let header = visitorApiHeader()
 	if (header['Authorization'] === undefined) {
-	  failedcb('not login')
+	  failedcb('未登录，请务必确保提前调用init接口')
 	  return
 	}
 	uni.request({
