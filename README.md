@@ -28,7 +28,7 @@
 ## 配置步骤说明（共两步）
 
 - 首先：将 bytedesk_kefu 文件夹拷贝到 components 文件夹，
-- 然后：在pages.json中添加此三个页面，具体可参考demo中pages.json文件
+- 然后：在pages.json中添加以下几个页面，具体可参考demo中pages.json文件
 
 ```js
 {
@@ -87,6 +87,7 @@ import * as bytedesk from '@/components/bytedesk_kefu/js/api/bytedesk.js'
 
 ```js
 // 萝卜丝第二步：初始化
+// 注意：init的接口要提前调用，最好在打开App的时候就调用。不要跟打开客服页面接口放在一起同时调用，否则会因未初始化完毕报错 'not login'
 // 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
 let subDomain = 'vip'
 // 登录后台->渠道管理-》uniapp中创建应用获取
@@ -172,7 +173,7 @@ const app = new Vue({
 app.$mount()
 ```
 
-## 微信小程序
+## 微信小程序(百度等小程序，同理参考)
 
 - 配置服务器域名：
 - request合法域名添加：https://uniapp.bytedesk.com;
