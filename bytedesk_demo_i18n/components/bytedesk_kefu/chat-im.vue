@@ -1660,7 +1660,9 @@ export default {
 		blockDialogInputConfirm(done, val) {
 			console.log(val);
 			//
-			httpApi.addBlock(this.visitorUid, val, function(response) {
+			let type = this.thread.type
+			let uuid = this.thread.topic.split('/')[0]
+			httpApi.addBlock2(this.visitorUid, val, type, uuid, function(response) {
 				console.log('add block success:', response)
 				if (response.status_code === 200) {
 					uni.showToast({ title: '拉黑成功', duration: 2000 });

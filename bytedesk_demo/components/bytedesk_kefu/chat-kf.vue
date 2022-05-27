@@ -936,12 +936,7 @@ export default {
 				let count = this.loadHistory ? 10 : 1
 				httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
 					// console.log('loadLatestMessage: ', response)
-					//
 					if (response.status_code === 200) {
-						// for (let i = 0; i < response.data.content.length; i++) {
-						// 	const element = response.data.content[i]
-						// 	app.pushToMessageArray(element)
-						// }
 						var length = response.data.content.length
 						for (var i = 0; i < length; i++) {
 							var message = response.data.content[i];
@@ -2210,7 +2205,7 @@ export default {
 			  let now = moment(new Date());
 			  let diff = now.diff(timestamp, "seconds");
 			  console.log('diff:', diff)
-			  if (diff > 60) {
+			  if (diff > 20) {
 				// 超时60秒，设置为消息状态为error
 				// this.messages[i].status = 'error'
 				Vue.set(this.messages[i], 'status', 'error')
@@ -2222,7 +2217,7 @@ export default {
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
 	  this.loadHistoryTimer = setInterval(this.loadLatestMessage, 1000 * 10);
-	  this.sendMessageTimer = setInterval(this.checkTimeoutMessage, 1000);
+	  this.sendMessageTimer = setInterval(this.checkTimeoutMessage, 1000 * 2);
 	},
 	beforeDestroy() {
 	  clearInterval(this.loadHistoryTimer);

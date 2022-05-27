@@ -1529,6 +1529,36 @@ export function addBlock(uid, note, successcb, failedcb) {
   })
 }
 
+// 客服端-拉黑访客2
+export function addBlock2(uid, note, type, uuid, successcb, failedcb) {
+  // console.log('add block:', uid, note);
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('未登录，请务必确保提前调用init接口')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/block/add',
+    data: {
+      'uid': uid,
+	  'note': note,
+	  'type': type,
+	  'uuid': uuid,
+      'client': constants.client
+    },
+  	header: header,
+    method: 'POST',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 客服端-取消拉黑访客
 export function removeBlock(bid, successcb, failedcb) {
   // console.log('add block:', uid, note);
