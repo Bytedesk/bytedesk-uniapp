@@ -72,7 +72,7 @@ export function login(username, password, subDomain, successcb, failedcb) {
 		console.log('login success')
 		successcb(result.data)
 	}, function(error) {
-		console.log('login error')
+		console.log('登录失败')
 		failedcb(error.data)
 	})
 }

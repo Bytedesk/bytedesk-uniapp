@@ -1,6 +1,13 @@
+import moment from './moment.min.js'
 const constants = require('../constants.js')
 const Stomp = require('./stomp.min.js').Stomp;
 
+//
+let uid;
+let username;
+let nickname;
+let avatar;
+//
 let stompClient;
 let stompReconnectTimes = 0;
 // 订阅主题topic
@@ -96,40 +103,17 @@ var stompApi = {
     // 创建一个 WebSocket 连接
     function connectWebSocket() {
 	  //
+	  uid = uni.getStorageSync(constants.uid)
+	  username = uni.getStorageSync(constants.username)
+	  nickname = uni.getStorageSync(constants.nickname)
+	  avatar = uni.getStorageSync(constants.avatar)
+	  //
 	  if (socketConnected) {
-		  return
+		return
 	  }
 	  //
-	 //  uni.connectSocket({
-  //       url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessToken),
-		// // #ifdef MP
-		// header: {
-		// 	'content-type': 'application/json'
-		// },
-		// // #endif
-		// // #ifdef MP-WEIXIN
-		// method: 'GET',
-		// // #endif
-  //       // header: {
-  //       //   // access_token: app.globalData.token.access_token
-  //       // },
-  //       success() {
-  //         stompApi.printLog("socket连接成功")
-  //       },
-  //       fail() {
-  //         stompApi.printLog("socket连接失败")
-  //       },
-  //       complete() {
-  //         stompApi.printLog("socket连接完成");
-  //       }
-  //     })
 	  socketTask = uni.connectSocket({
 	  	url: constants.WEBSOCKET_URL + uni.getStorageSync(constants.accessToken),
-	  	// data() {
-	  	// 	return {
-	  	// 		msg: 'Hello'
-	  	// 	}
-	  	// },
 	  	// #ifdef MP
 	  	header: {
 	  		'content-type': 'application/json'
@@ -192,48 +176,6 @@ var stompApi = {
 	  	}
 	  })
     }
-	
-    // 监听 WebSocket 连接打开事件 
-    // uni.onSocketOpen(function (result) {
-    //   stompApi.printLog("SocketOpen:" + result)
-    //   socketConnected = true;
-    //   webSocket.onopen();
-    // })
-
-    // 监听 WebSocket 接受到服务器的消息事件
-    // uni.onSocketMessage(function (result) {
-    //   webSocket.onmessage(result);
-    // })
-
-    // 监听 WebSocket 错误事件
-  //   uni.onSocketError(function (result) {
-  //     stompApi.printLog("SocketError:" + result)
-  //     if (!socketConnected) {
-		// // 为断开重连做准备
-		// subscribedTopics = [];
-  //       // 断线重连
-  //       if (reconnect) {
-  //         setTimeout(function () {
-		// 	  connectWebSocket();
-		//   }, 5000)
-  //       }
-  //     }
-  //   })
-	
-    // 监听 WebSocket 连接关闭事件
-   //  uni.onSocketClose(function (result) {
-   //    stompApi.printLog("SocketClose:" + result)
-   //    socketConnected = false;
-	  // // 为断开重连做准备
-	  // subscribedTopics = [];
-   //    // 断线重连
-   //    if (reconnect) {
-   //      setTimeout(function () {
-   //      	connectWebSocket();
-   //      }, 5000)
-   //    }
-   //  })
-	// console.log('task', this.socketTask)
     //
     connectWebSocket();
     stompApi.stompConnect(webSocket, callback)
@@ -343,13 +285,15 @@ var stompApi = {
       // console.log('message :', message, 'body:', message.body);
       var messageObject = JSON.parse(message.body);
 	  if (messageObject.status === 'sending') {
-	  	messageObject.status = 'stored' 
+		 messageObject.status = 'stored' 
 	  }
 	  uni.$emit('message', messageObject);
 	  // TODO: 缓存消息
 	  let messageArray = messagesCache[topic]
 	  messageArray.push(messageObject)
 	  messagesCache[topic] = messageArray
+	  // TODO: 发送送达回执
+	  stompApi.sendReceiptMessage(messageObject)
     });
   },
 
@@ -382,6 +326,69 @@ var stompApi = {
 	  return messagesCache[topic]
   },
   
+  guid: function() {
+	  function s4 () {
+	  	return Math.floor((1 + Math.random()) * 0x10000)
+	  		.toString(16)
+	  		.substring(1)
+	  }
+	  let timestamp = moment(new Date()).format('YYYYMMDDHHmmss'); 
+	  return timestamp + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()
+  },
+  currentTimestamp: function() {
+  	return moment().format('YYYY-MM-DD HH:mm:ss')
+  },
+  
+  //
+  sendReceiptMessage: function(messageObject) {
+	  if (messageObject.user.uid !== this.uid 
+		&& messageObject.type !== 'robot' 
+		&& messageObject.type !== "robot_result"
+		&& messageObject.type !== 'notification_preview'
+		&& messageObject.type !== 'notification_receipt'
+		&& messageObject.type !== 'notification_recall'
+		&& messageObject.type !== 'notification_form_request'
+		&& messageObject.type !== 'notification_form_result'
+		&& messageObject.type !== 'notification_connect'
+		&& messageObject.type !== 'notification_disconnect') {
+		//
+		let topic = messageObject.thread.topic.replace(/\//g, ".");
+		var json = {
+			"mid": stompApi.guid(),
+			"timestamp": stompApi.currentTimestamp(),
+			"client": constants.client,
+			"version": "1",
+			"type": "notification_receipt",
+			"status": constants.MESSAGE_STATUS_SENDING,
+			"user": {
+				"uid": uid,
+				"username": username,
+				"nickname": nickname,
+				"avatar": avatar,
+				"extra": {
+					"agent": false
+				}
+			},
+			"receipt": {
+				"mid": messageObject.mid,
+				"status": constants.MESSAGE_STATUS_RECEIVED
+			},
+			"thread": {
+				"tid": messageObject.thread.tid,
+				"type": messageObject.thread.type,
+				// "content": content,
+				"nickname": nickname,
+				"avatar": avatar,
+				"topic": topic,
+				"client": constants.client,
+				"timestamp": stompApi.currentTimestamp(),
+				"unreadCount": 0
+			}
+		};
+		stompApi.sendMessage(topic, JSON.stringify(json));
+	  }
+  },
+  
   // 打印log
   printLog: function(content) {
 	  if (!constants.IS_PRODUCTION) {
@@ -392,7 +399,6 @@ var stompApi = {
 }
 
 module.exports = {
-  // stompClient: stompClient,
   connect: stompApi.connect,
   subscribeTopic: stompApi.subscribeTopic,
   sendMessage: stompApi.sendMessage,

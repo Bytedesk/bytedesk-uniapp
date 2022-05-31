@@ -1608,7 +1608,7 @@ export default {
 			  // 非自己发送的消息，发送消息回执: 消息已读
 			  if (messageObject.user.uid !== this.uid && messageObject.type != 'robot' && messageObject.type !== "robot_result") {
 				  // console.log('do send receipt');
-				  this.sendReceiptMessage(mid, "read");
+				  this.sendReceiptMessage(mid, constants.MESSAGE_STATUS_READ);
 			  }
 			}
 			else if (messageObject.type === 'notification_browse_invite') {
