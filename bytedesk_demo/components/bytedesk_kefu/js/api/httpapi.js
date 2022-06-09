@@ -1042,7 +1042,6 @@ export function getUnreadCountVisitor(successcb, failedcb) {
     header: header,
     method: 'GET',
     success (res) {
-	  // console.log('getUnreadCount:', res)
       successcb(res.data)
     },
     fail (res) {
@@ -1068,7 +1067,118 @@ export function getUnreadCountAgent(successcb, failedcb) {
     header: header,
     method: 'GET',
     success (res) {
-	  // console.log('getUnreadCount:', res)
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 查询当前用户-某技能组wid或指定客服未读消息数目
+// 注意：技能组wid或指定客服唯一id
+// 适用于 访客 和 客服
+export function getUnreadMessage(wid, page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('未登录，请务必确保提前调用init接口')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/unread/message',
+    data: {
+	  wid: wid,
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 访客端-查询访客所有未读消息
+export function getUreadMessagesVisitor(page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('未登录，请务必确保提前调用init接口')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/unread/message/visitor',
+    data: {
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 访客端-查询访客所有未读消息
+// 访客端定期循环拉取
+export function getUreadMessagesVisitorSchedule(page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('未登录，请务必确保提前调用init接口')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/unread/message/visitor/schedule',
+    data: {
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
+// 客服端-查询客服所有未读消息
+export function getUreadMessagesAgent(page, size, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('未登录，请务必确保提前调用init接口')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/messages/unread/message/agent',
+    data: {
+	  page: page,
+	  size: size,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
       successcb(res.data)
     },
     fail (res) {

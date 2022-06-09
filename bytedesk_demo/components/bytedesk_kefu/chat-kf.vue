@@ -934,7 +934,8 @@ export default {
 				//
 				let app = this
 				let count = this.loadHistory ? 10 : 1
-				httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
+				// httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
+				httpApi.getUreadMessagesVisitorSchedule(0, count, function(response) {
 					// console.log('loadLatestMessage: ', response)
 					if (response.status_code === 200) {
 						var length = response.data.content.length
