@@ -699,3 +699,35 @@ page{
 	border-top: 1px solid #d0d0d5;
 	margin-top: 5px;
 }
+
+#byteDesk-quick-question {
+  position: absolute;
+  right: 0;
+  bottom: 60px;
+  left: 0;
+  width: 100%;
+}
+
+#byteDesk-quick-question-arrow {
+  font-size: 12px;
+  margin-left: 5px;
+  background: white;
+  padding: 6px 6px 6px 6px;
+  border-radius: 15px;
+  border: solid;
+  border-color: #bbbbbb;
+  border-width: thin;
+  cursor: pointer;
+}
+
+.byteDesk-quick-question-item {
+  font-size: 12px;
+  margin-left: 5px;
+  background: white;
+  padding: 6px 6px 6px 6px;
+  border-radius: 15px;
+  border: solid;
+  border-color: #bbbbbb;
+  border-width: thin;
+  cursor: pointer;
+}

@@ -204,6 +204,12 @@
 				<button class="mini-btn" size="mini">123</button>
 			</view>
 		</view> -->
+		<div v-if="showQuickButton" id="byteDesk-quick-question">
+			<span id="byteDesk-quick-question-arrow" @click="switchQuickButtonItems()">{{ quickButtonArrow }}</span>
+			<span v-if="showQuickButtonItem" class="byteDesk-quick-question-item" 
+				v-for="item in quickButtons" :key="item.qid" 
+				@click="quickButtonItemClicked(item)">{{ item.title }}</span>
+		</div>
 		<!-- 底部输入栏 -->
 		<view class="input-box" :class="popupLayerClass" @touchmove.stop.prevent="discard">
 			<!-- H5下不能录音，输入栏布局改动一下 -->
@@ -428,6 +434,11 @@ export default {
 			showForm: false,
 			// app: this,
 			visitorUid: '',
+			// 快捷按钮
+			quickButtonArrow: '↓',
+			showQuickButton: false,
+			showQuickButtonItem: true,
+			quickButtons: [],
 			//
 			loadHistoryTimer: '',
 			sendMessageTimer: ''
@@ -536,11 +547,12 @@ export default {
 		} else {
 			// 正常打开
 			this.requestThread()
-			// 加载快捷按钮
-			// this.getQuickButtons()
-			// 获取技能组设置，如：置顶语
+			// 
 			if (this.option.type === 'workGroup') {
+				// 获取技能组设置，如：置顶语
 				this.getPrechatSettings()
+				// 加载快捷按钮
+				this.getQuickButtons()
 			}
 		}
 	},
@@ -1487,6 +1499,174 @@ export default {
 			// 	$("input")[1].focus()
 			// }, 100);
 		},
+		sendMessageJsonRest (mid, type, content) {
+			//
+			var json;
+			if (type === constants.MESSAGE_TYPE_TEXT) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"text": {
+						"content": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": content,
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_IMAGE) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"image": {
+						"imageUrl": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[图片]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_FILE) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"file": {
+						"fileUrl": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[文件]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_VOICE) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"voice": {
+						"voiceUrl": content,
+						"length": '0', // TODO:替换为真实值
+						"format": 'wav',
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[语音]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_VIDEO) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"video": {
+						"videoOrShortUrl": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[视频]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			}
+			this.doSendMessage(json);
+		},
 		// 实际发送消息
 		doSendMessage (json) {
 			// console.log('doSendMessage:', json)
@@ -2184,11 +2364,65 @@ export default {
 			// console.log('closeTopTip');
 			this.showTopTip = false
 		},
+		// 切换
+		switchQuickButtonItems() {
+			this.showQuickButtonItem = !this.showQuickButtonItem
+			if (this.showQuickButtonItem) {
+				this.quickButtonArrow = '↓'
+			} else {
+				this.quickButtonArrow = '↑'
+			}
+		},
+		quickButtonItemClicked(item) {
+			// console.log(item)
+			if (item.type === 'url') {
+				window.open(item.content)
+			} else {
+				var localId = this.guid();
+				var message = {
+					mid: localId,
+					type: 'text',
+					content: item.title,
+					createdAt: this.currentTimestamp(),
+					localId: localId,
+					status: 'stored',
+					user: {
+						uid: this.my_uid(),
+						username: this.username,
+						nickname: this.my_nickname(),
+						avatar: this.my_avatar()
+					}
+				};
+				this.pushToMessageArray(message);
+				//
+				var localId2 = this.guid();
+				var message2 = {
+					mid: localId2,
+					type: 'text',
+					content: item.content,
+					createdAt: this.currentTimestamp(),
+					localId: localId,
+					status: 'stored',
+					user: {
+						uid: '',
+						username: '',
+						nickname: '系统',
+						avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png'
+					}
+				};
+				this.pushToMessageArray(message2);
+				this.scrollToBottom()
+			}
+		},
 		getQuickButtons () {
+			//
 			let app = this
 			httpApi.getQuickButtons(this.option.wid, function(response) {
 				console.log('getQuickButtons success:', app.option.wid, response)
-				
+				if (response.data.length > 0) {
+					app.showQuickButton = true
+				}
+				app.quickButtons = response.data
 			}, function(error) {
 				console.log('getQuickButtons error', error)
 			})
@@ -2211,11 +2445,26 @@ export default {
 			  let timestamp = moment(message.createdAt);
 			  let now = moment(new Date());
 			  let diff = now.diff(timestamp, "seconds");
-			  // console.log('diff:', diff)
-			  if (diff > 60) {
-				// 超时60秒，设置为消息状态为error
+			  console.log('diff:', diff)
+			  if (diff > 15) {
+				// 超时15秒，设置为消息状态为error
 				// this.messages[i].status = 'error'
 				Vue.set(this.messages[i], 'status', 'error')
+			  } else if (diff > 5) {
+				// 5秒没有发送成功，则尝试使用http rest接口发送
+				let content = ''
+				if (message.type === constants.MESSAGE_TYPE_TEXT) {
+					content = message.content
+				} else if (message.type === constants.MESSAGE_TYPE_IMAGE) {
+					content = message.imageUrl
+				} else if (message.type === constants.MESSAGE_TYPE_FILE) {
+					content = message.fileUrl
+				} else if (message.type === constants.MESSAGE_TYPE_VOICE) {
+					content = message.voiceUrl
+				} else if (message.type === constants.MESSAGE_TYPE_VIDEO) {
+					content = message.videoOrShortUrl
+				}
+				this.sendMessageJsonRest(message.mid, message.type, content)
 			  }
 			}
 		  }

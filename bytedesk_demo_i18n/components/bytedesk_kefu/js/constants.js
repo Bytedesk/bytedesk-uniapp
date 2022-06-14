@@ -23,6 +23,31 @@ module.exports = {
   client: 'uniapp',
   appKey: 'bytedesk_appkey',
   //
+  // 文本消息类型
+  MESSAGE_TYPE_TEXT: 'text',
+  // 图片消息类型
+  MESSAGE_TYPE_IMAGE: 'image',
+  // 文件消息类型
+  MESSAGE_TYPE_FILE: 'file',
+  // 语音消息类型
+  MESSAGE_TYPE_VOICE: 'voice',
+  // 视频消息类型
+  MESSAGE_TYPE_VIDEO: 'video',
+  // 商品
+  MESSAGE_TYPE_COMMODITY: 'commodity',
+  // 短视频消息类型
+  MESSAGE_TYPE_SHORT_VIDEO: 'shortvideo',
+  // 位置消息类型
+  MESSAGE_TYPE_LOCATION: 'location',
+  // 链接消息类型
+  MESSAGE_TYPE_LINK: 'link',
+  // 事件消息类型
+  MESSAGE_TYPE_EVENT: 'event',
+  // 机器人 自动回复
+  MESSAGE_TYPE_ROBOT: 'robot',
+  MESSAGE_TYPE_ROBOTV2: 'robotv2',
+  //
+  //
   MESSAGE_STATUS_SENDING: 'sending',
   // 送达
   MESSAGE_STATUS_RECEIVED: 'received',
