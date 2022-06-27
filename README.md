@@ -256,6 +256,7 @@ onUnload() {
 
 ## 其他
 
+- [Flutter SDK](https://gitee.com/270580156/bytedesk-flutter)
 - [UniApp SDK](https://github.com/bytedesk/bytedesk-uniapp)
 - [iOS SDK](https://github.com/bytedesk/bytedesk-ios)
 - [Android SDK](https://github.com/bytedesk/bytedesk-android)
