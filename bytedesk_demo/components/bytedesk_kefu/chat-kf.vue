@@ -2465,6 +2465,7 @@ export default {
 	},
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
+	  // TODO: 智能调节时长，如果长时间没有未读消息，则拉取时间间隔逐渐加长
 	  this.loadHistoryTimer = setInterval(this.loadLatestMessage, 1000 * 10);
 	  this.sendMessageTimer = setInterval(this.checkTimeoutMessage, 1000 * 2);
 	},
