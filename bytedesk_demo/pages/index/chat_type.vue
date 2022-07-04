@@ -172,7 +172,7 @@ export default {
 				+ '&goods_id=123' 
 				+ '&goods_imageUrl=https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/123.webp' 
 				+ '&goods_price=1000' 
-				+ '&goods_title=商品标题哈哈哈哈哈哈哈哈哈哈或或或或或或或或或' 
+				+ '&goods_title=商品标题' 
 				+ '&goods_url=' + goodsUrl 
 				+ '&history=0' 
 				+ '&lang=cn'

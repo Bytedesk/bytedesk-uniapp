@@ -2190,8 +2190,9 @@ export default {
 						console.log(e.tapIndex);
 						if (e.tapIndex === 0) {
 							// #ifndef H5
+							let content = message.content.replaceAll('amp;', '')
 							uni.setClipboardData({
-							  data: message.content,//要被复制的内容
+							  data: content,//要被复制的内容
 							  success:() => { //复制成功的回调函数
 							    uni.showToast({ //提示
 							      title:'复制成功'
@@ -2206,8 +2207,9 @@ export default {
 				})
 			} else {
 				// #ifndef H5
+				let content = message.content.replaceAll('amp;', '')
 				uni.setClipboardData({
-				  data: message.content,//要被复制的内容
+				  data: content,//要被复制的内容
 				  success:() => { //复制成功的回调函数
 				    uni.showToast({ //提示
 				      title:'复制成功'
