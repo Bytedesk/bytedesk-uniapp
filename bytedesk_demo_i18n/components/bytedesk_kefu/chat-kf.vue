@@ -1664,6 +1664,38 @@ export default {
 						"unreadCount": 0
 					}
 				};
+			} else if (type === constants.MESSAGE_TYPE_COMMODITY) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"text": {
+						"content": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[商品]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
 			}
 			this.doSendMessage(json);
 		},
@@ -2465,6 +2497,8 @@ export default {
 					content = message.voiceUrl
 				} else if (message.type === constants.MESSAGE_TYPE_VIDEO) {
 					content = message.videoOrShortUrl
+				} else if (message.type === constants.MESSAGE_TYPE_COMMODITY) {
+					content = this.commodityInfo();
 				}
 				this.sendMessageJsonRest(message.mid, message.type, content)
 			  }
