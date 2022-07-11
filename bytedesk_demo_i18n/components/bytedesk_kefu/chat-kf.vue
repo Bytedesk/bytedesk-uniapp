@@ -406,6 +406,7 @@ export default {
 			isNetworkConnected: true,
 			answers: [],
 			isRobot: false,
+			isQueuing: false,
 			isThreadStarted: false,
 			isThreadClosed: false,
 			// isManulRequestThread: false,
@@ -1020,7 +1021,8 @@ export default {
 				this.pushToMessageArray(message);
 				// // 1. 保存thread
 				this.thread = message.thread;
-				//
+				// 是否正在排队
+				this.isQueuing = true
 			} else if (response.status_code === 203) {
 				// 当前非工作时间，请自助查询或留言
 				this.pushToMessageArray(message);
@@ -1488,6 +1490,9 @@ export default {
 			// console.log('robot:', this.isRobot)
 			if (this.isRobot) {
 				this.messageAnswer(this.inputContent);
+			} else if (this.isQueuing) {
+				uni.showToast({ title: '排队中,请稍后', icon:'none', duration: 2000 });
+				return
 			} else {
 				// 发送/广播会话消息
 				this.sendTextMessageSync(this.inputContent)
@@ -1697,7 +1702,8 @@ export default {
 					}
 				};
 			}
-			this.doSendMessage(json);
+			// this.doSendMessage(json);
+			this.doSendMessageRest(json)
 		},
 		// 实际发送消息
 		doSendMessage (json) {
@@ -1714,14 +1720,31 @@ export default {
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
-				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
-					// console.log('sendMessageRest success:', json)
-				}, function(error) {
-					console.log('send message rest error:', error)
-				})
+				this.doSendMessageRest(json)
 			}
 			// 先插入本地
 			this.onMessageReceived(json)
+		},
+		doSendMessageRest(json) {
+			let app = this
+			httpApi.sendMessageRest(JSON.stringify(json), function(response) {
+				// console.log('sendMessageRest success:', response)
+				let message = JSON.parse(json)
+				for (let i = app.messages.length - 1; i >= 0; i--) {
+					const msg = app.messages[i]
+					// console.log('mid:', msg.mid, message.mid)
+					if (msg.mid === message.mid) {
+						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						if (app.messages[i].status === 'read' ||
+							app.messages[i].status === 'received') {
+							return
+						}
+						Vue.set(app.messages[i], 'status', 'stored')
+					}
+				}
+			}, function(error) {
+				console.log('send message rest error:', error)
+			})
 		},
 		// 本地消息存储
 		pushToMessageArray(message) {
@@ -1822,6 +1845,18 @@ export default {
 			  if (messageObject.user.uid !== this.uid && messageObject.type != 'robot' && messageObject.type !== "robot_result") {
 				  // console.log('do send receipt');
 				  this.sendReceiptMessage(mid, constants.MESSAGE_STATUS_READ);
+			  } else {
+				// 自己发送的消息，更新消息发送状态
+				for (let i = this.messages.length - 1; i >= 0; i--) {
+					const msg = this.messages[i]
+					if (msg.mid === mid) {
+						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						if (this.messages[i].status === 'sending') {
+							Vue.set(this.messages[i], 'status', 'stored')
+						}
+						break
+					}
+				}
 			  }
 			}
 			else if (messageObject.type === 'notification_browse_invite') {
@@ -1829,6 +1864,8 @@ export default {
 			} else if (messageObject.type === 'notification_queue') {
 			    // 排队
 				this.isThreadClosed = false;
+				// 是否正在排队
+				this.isQueuing = true
 			} else if (messageObject.type === 'notification_queue_accept') {
 				// 接入访客
 				messageObject.createdAt = messageObject.timestamp;
@@ -1838,6 +1875,8 @@ export default {
 			   // 2. 订阅会话消息
 			   // this.subscribeTopic(this.threadTopic);
 			   this.isThreadClosed = false;
+			   // 是否正在排队
+			   this.isQueuing = false
 			} else if (messageObject.type === 'notification_invite_rate') {
 			   // 邀请评价
 			   messageObject.createdAt = messageObject.timestamp;
