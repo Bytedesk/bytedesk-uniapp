@@ -1,0 +1,9 @@
+# Ignore everything then include selectively
+*
+
+!bundles/**/*
+!esm6/**/*
+!index.d.ts
+!package.json
+!README.md
+!src/**/*

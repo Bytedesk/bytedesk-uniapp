@@ -1,0 +1,58 @@
+{
+  "name": "@stomp/stompjs",
+  "version": "6.1.2",
+  "description": "STOMP client for Javascript and Typescript",
+  "scripts": {
+    "clean": "rm -rf bundles esm6",
+    "build-webpack": "webpack && webpack --mode=production --output-filename=stomp.umd.min.js",
+    "build": "npm run clean && npx tsc && npm run build-webpack",
+    "test": "jasmine",
+    "karma": "karma start --single-run",
+    "lint": "tslint 'src/**/*.ts'",
+    "prettier": "prettier --write .",
+    "prepublishOnly": "npm run lint && npm run build && npm run karma && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stomp-js/stompjs.git"
+  },
+  "keywords": [
+    "STOMP",
+    "RabbitMQ",
+    "ActiveMQ",
+    "Websocket",
+    "messaging",
+    "queue",
+    "SockJS"
+  ],
+  "author": "deepak@kreatio.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/stomp-js/stompjs/issues"
+  },
+  "homepage": "https://github.com/stomp-js/stompjs#readme",
+  "devDependencies": {
+    "@chiragrupani/karma-chromium-edge-launcher": "^2.0.0",
+    "awesome-typescript-loader": "^5.2.0",
+    "jasmine": "^3.1.0",
+    "karma": "^5.0.3",
+    "karma-chrome-launcher": "^3.0.0",
+    "karma-firefox-launcher": "^2.0.0",
+    "karma-jasmine": "^4.0.0",
+    "karma-safari-launcher": "git://github.com/RLovelett/karma-safari-launcher.git#safari-webdriver",
+    "karma-summary-reporter": "^2.0.2",
+    "prettier": "^2.1.2",
+    "text-encoding": "^0.7.0",
+    "tslint": "^6.0.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "=3.6.4",
+    "webpack": "^4.33.0",
+    "webpack-cli": "^3.3.2",
+    "ws": "^8.2.0"
+  },
+  "module": "./esm6/index.js",
+  "main": "bundles/stomp.umd.js",
+  "typings": "index.d.ts",
+  "sideEffects": false,
+  "dependencies": {}
+}
