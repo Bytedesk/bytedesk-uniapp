@@ -198,12 +198,6 @@
 				</view>
 			</view>
 		</view>
-		<!-- 底部快捷按钮 -->
-<!-- 		<view class="quick-button">
-			<view>
-				<button class="mini-btn" size="mini">123</button>
-			</view>
-		</view> -->
 		<div v-if="showQuickButton" id="byteDesk-quick-question">
 			<span id="byteDesk-quick-question-arrow" @click="switchQuickButtonItems()">{{ quickButtonArrow }}</span>
 			<span v-if="showQuickButtonItem" class="byteDesk-quick-question-item" 
@@ -747,14 +741,6 @@ export default {
 				let lastMessage = this.messages[this.messages.length - 1]
 				this.scrollToMessage(lastMessage)
 			}
-			// 聊天记录滚动到最底部, FIXME: 不起作用？
-			// this.$nextTick(function() {
-			// 	//进入页面滚动到底部
-			// 	this.scrollTop = 9999;
-			// 	this.$nextTick(function() {
-			// 		this.scrollAnimation = true;
-			// 	});
-			// });
 		},
 		scrollToMessage (message) {
 			// console.log('scroll to ', message.mid);
@@ -853,36 +839,6 @@ export default {
 			this.loadHistory = '1'
 			this.loadHistoryMessagesByTopic(this.thread.topic)
 		},
-		// 加载更多聊天记录
-		// loadHistoryMessages (uid) {
-		// 	//
-		// 	if (this.isManulRequestThread || this.loadHistory === '0') {
-		// 		return;
-		// 	}
-		// 	if(this.isHistoryLoading){
-		// 		return ;
-		// 	}
-		// 	// TODO: 加载历史聊天记录
-		// 	this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
-		// 	this.scrollAnimation = false;//关闭滑动动画
-		// 	let app = this
-		// 	httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-		// 		// console.log('loadHistoryMessages: ', response)
-		// 		//
-		// 		if (response.status_code === 200) {
-		// 			for (let i = 0; i < response.data.content.length; i++) {
-		// 				const element = response.data.content[i]
-		// 				// console.log('element:', element);
-		// 				app.messages.unshift(element)
-		// 			}
-		// 		}
-		// 		app.scrollToBottom()
-		// 		app.page += 1
-		// 		app.isHistoryLoading = false;
-		// 	}, function(error) {
-		// 		console.log('load history messages error', error)
-		// 	})
-		// },
 		loadHistoryMessagesByTopic (topic) {
 			// this.isManulRequestThread || 
 			if (this.loadHistory === '0') {
@@ -1535,7 +1491,7 @@ export default {
 					"timestamp": this.currentTimestamp(),
 					"client": constants.client,
 					"version": "1",
-					"type": type,
+					"type": 'image',
 					"status": constants.MESSAGE_STATUS_SENDING,
 					"user": {
 						"uid": this.my_uid(),
@@ -1693,7 +1649,7 @@ export default {
 				};
 			}
 			// 
-			// this.doSendMessage(json);
+			// 长连接断开，则调用rest接口发送消息
 			this.doSendMessageRest(json)
 		},
 		// 实际发送消息
@@ -1708,29 +1664,38 @@ export default {
 				uni.showToast({ title: '网络断开，请稍后重试', icon:'none', duration: 2000 });
 				return
 			}
+			// 发送消息
 			if (stompApi.isConnected()) {
+				// 通过长连接，发送消息
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
+				// 如果长连接断开，则调用rest接口发送消息
 				this.doSendMessageRest(json)
 			}
 			// 先插入本地
 			this.onMessageReceived(json)
 		},
+		// 第一次长连接消息未发送成功，则会调用此rest接口尝试多次发送消息，如果发送成功，会更新本地消息发送状态
 		doSendMessageRest(json) {
+			// console.log('doSendMessageRest:', JSON.stringify(json))
 			let app = this
 			httpApi.sendMessageRest(JSON.stringify(json), function(response) {
 				// console.log('sendMessageRest success:', response)
 				let message = JSON.parse(json)
+				// 遍历本地消息数组，查找当前消息，并更新数组中当前消息发送状态为发送成功，也即：'stored'
 				for (let i = app.messages.length - 1; i >= 0; i--) {
 					const msg = app.messages[i]
 					// console.log('mid:', msg.mid, message.mid)
+					// 根据mid判断消息
 					if (msg.mid === message.mid) {
+						// 已读 > 送达 > 发送成功 > 发送中
 						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
 						if (app.messages[i].status === 'read' ||
 							app.messages[i].status === 'received') {
 							return
 						}
-						Vue.set(app.messages[i], 'status', 'stored')
+						// 重要：更新本地消息发送状态。如果消息发送‘失败’，请重点跟踪此语句是否被执行
+						Vue.set(app.messages[i], 'status', 'stored') // 更新数组中当前消息发送状态为发送成功，也即：'stored'
 					}
 				}
 			}, function(error) {
@@ -1798,7 +1763,7 @@ export default {
 		},
 		// 监听接收消息
 		onMessageReceived (messageObject) {
-			console.log('onMessageReceived:', JSON.stringify(messageObject))
+			// console.log('onMessageReceived:', JSON.stringify(messageObject))
 			//
 			if ((messageObject.type === 'text'
 			  || messageObject.type === 'robot'
@@ -1835,7 +1800,7 @@ export default {
 			  // this.thread.topic = messageObject.thread.topic;
 			  // 非自己发送的消息，发送消息回执: 消息已读
 			  if (messageObject.user.uid !== this.uid && messageObject.type !== 'robot' && messageObject.type !== "robot_result") {
-				  // console.log('do send receipt');
+				  // 发送已读回执
 				  this.sendReceiptMessage(mid, constants.MESSAGE_STATUS_READ);
 			  } else {
 				// 自己发送的消息，更新消息发送状态

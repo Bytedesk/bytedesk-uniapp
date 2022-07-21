@@ -1545,7 +1545,7 @@ export default {
 					"timestamp": this.currentTimestamp(),
 					"client": constants.client,
 					"version": "1",
-					"type": type,
+					"type": 'image',
 					"status": constants.MESSAGE_STATUS_SENDING,
 					"user": {
 						"uid": this.my_uid(),

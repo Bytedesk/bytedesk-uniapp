@@ -1195,7 +1195,7 @@ export function messageAnswer (wid, content, successcb, failedcb) {
   }
   //
   uni.request({
-    url: constants.API_BASE_URL + '/api/v2/answer/message',
+    url: constants.API_BASE_URL + '/api/elastic/robot/message', // '/api/v2/answer/message',
     data: {
 	  wid: wid,
 	  content: content,
