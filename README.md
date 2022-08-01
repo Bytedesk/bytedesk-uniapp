@@ -1,9 +1,9 @@
 # 萝卜丝智能客服-uniapp sdk
 
 - [官网](https://www.bytedesk.com/)
-- [价格](http://weikefu.net/pages/price.html)
-- [管理后台](https://weikefu.net/admin)
-- [客服工作台](https://weikefu.net/chaty)
+- [价格](https://www.weikefu.net/pages/price.html)
+- [管理后台](https://www.weikefu.net/admin)
+- [客服工作台](https://www.weikefu.net/chaty)
 - [客服端下载](https://cdn.bytedesk.com/download)
 
 ## 部分功能
