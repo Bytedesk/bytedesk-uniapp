@@ -981,7 +981,7 @@ export default {
 							}
 						}
 					}
-					// app.scrollToBottom()
+					app.scrollToBottom()
 				}, function(error) {
 					console.log('load history messages error', error)
 				})
