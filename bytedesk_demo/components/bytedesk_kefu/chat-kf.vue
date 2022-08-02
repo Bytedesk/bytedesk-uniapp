@@ -1086,11 +1086,17 @@ export default {
 		sendTextMessageSync(content) {
 			// this.sendMessageSync('text', content)
 			if (content.length === 0) {
-				alert('消息不能为空');
+				// alert('消息不能为空');
+				uni.showToast({ title: '消息不能为空', icon:'none', duration: 2000 });
 				return;
 			}
 			if (content.length >= 500) {
-				alert('消息长度太长，请分多次发送');
+				// alert('消息长度太长，请分多次发送');
+				uni.showToast({ title: '消息长度太长，请分多次发送', icon:'none', duration: 2000 });
+				return;
+			}
+			if (this.thread.tid === '') {
+				uni.showToast({ title: '请求会话中, 请稍后', icon:'none', duration: 2000 });
 				return;
 			}
 			//
@@ -1694,6 +1700,7 @@ export default {
 							app.messages[i].status === 'received') {
 							return
 						}
+						console.log('update status')
 						// 重要：更新本地消息发送状态。如果消息发送‘失败’，请重点跟踪此语句是否被执行
 						Vue.set(app.messages[i], 'status', 'stored') // 更新数组中当前消息发送状态为发送成功，也即：'stored'
 					}

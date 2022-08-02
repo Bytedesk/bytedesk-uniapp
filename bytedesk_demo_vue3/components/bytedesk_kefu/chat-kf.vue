@@ -1130,11 +1130,17 @@ export default {
 		sendTextMessageSync(content) {
 			// this.sendMessageSync('text', content)
 			if (content.length === 0) {
-				alert('消息不能为空');
+				// alert('消息不能为空');
+				uni.showToast({ title: '消息不能为空', icon:'none', duration: 2000 });
 				return;
 			}
 			if (content.length >= 500) {
-				alert('消息长度太长，请分多次发送');
+				// alert('消息长度太长，请分多次发送');
+				uni.showToast({ title: '消息长度太长，请分多次发送', icon:'none', duration: 2000 });
+				return;
+			}
+			if (this.thread.tid === '') {
+				uni.showToast({ title: '请求会话中, 请稍后', icon:'none', duration: 2000 });
 				return;
 			}
 			//

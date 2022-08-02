@@ -34,6 +34,7 @@ export default {
 		let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
 		bytedesk.init(subDomain, appKey);
 		// 注：如果需要多平台统一用户（用于同步聊天记录等），可使用:
+		// 其中：username用户名只能包含字母和数字，不能使用汉字
 		// bytedesk.initWithUsernameAndNicknameAndAvatar('myuniappusername', '我是美女', 'https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/girl.png', subDomain, appKey);
 		// bytedesk.initWithUsername('myuniappusername',subDomain, appKey); // 其中：username为自定义用户名，可与开发者所在用户系统对接
 		// 如果还需要自定义昵称/头像，可以使用 initWithUsernameAndNickname或initWithUsernameAndNicknameAndAvatar，

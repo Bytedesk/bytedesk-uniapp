@@ -1140,12 +1140,17 @@ export default {
 			// this.sendMessageSync('text', content)
 			if (content.length === 0) {
 				// alert('消息不能为空');
-				alert(this.$t('msgshouldnotempty'))
+				uni.showToast({ title: this.$t('msgshouldnotempty'), icon:'none', duration: 2000 });
 				return;
 			}
 			if (content.length >= 500) {
 				// alert('消息长度太长，请分多次发送');
-				alert(this.$t('msgtoolong'))
+				// alert(this.$t('msgtoolong'))
+				uni.showToast({ title: this.$t('msgtoolong'), icon:'none', duration: 2000 });
+				return;
+			}
+			if (this.thread.tid === '') {
+				uni.showToast({ title: this.$t('pleaseWait'), icon:'none', duration: 2000 });
 				return;
 			}
 			//

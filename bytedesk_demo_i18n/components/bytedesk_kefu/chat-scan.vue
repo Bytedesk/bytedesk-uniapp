@@ -995,11 +995,18 @@ export default {
 		sendTextMessageSync(content) {
 			// this.sendMessageSync('text', content)
 			if (content.length === 0) {
-				alert('消息不能为空');
+				// alert('消息不能为空');
+				uni.showToast({ title: this.$t('msgshouldnotempty'), icon:'none', duration: 2000 });
 				return;
 			}
 			if (content.length >= 500) {
-				alert('消息长度太长，请分多次发送');
+				// alert('消息长度太长，请分多次发送');
+				// alert(this.$t('msgtoolong'))
+				uni.showToast({ title: this.$t('msgtoolong'), icon:'none', duration: 2000 });
+				return;
+			}
+			if (this.thread.tid === '') {
+				uni.showToast({ title: this.$t('pleaseWait'), icon:'none', duration: 2000 });
 				return;
 			}
 			//
@@ -1035,7 +1042,7 @@ export default {
 			this.doSendMessage(json);
 		},
 		sendImageMessageSync(imageUrl) {
-			console.log('sendImageMessageSync:', imageUrl);
+			// console.log('sendImageMessageSync:', imageUrl);
 			//
 			let localId = this.guid();
 			var json = {
