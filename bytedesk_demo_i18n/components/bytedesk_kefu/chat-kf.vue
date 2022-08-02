@@ -1722,6 +1722,11 @@ export default {
 				uni.showToast({ title: '网络断开，请稍后重试', icon:'none', duration: 2000 });
 				return
 			}
+			// 会话请求成功之后，才能够发送消息
+			if (this.thread.tid === '') {
+				uni.showToast({ title: '请求会话中, 请稍后', icon:'none', duration: 2000 });
+				return;
+			}
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
