@@ -1700,7 +1700,7 @@ export default {
 			}
 			// 
 			// this.doSendMessage(json);
-			this.doSendMessageRest(json)
+			this.doSendMessageRest2(mid, json)
 		},
 		// 实际发送消息
 		doSendMessage (json) {
@@ -1722,11 +1722,7 @@ export default {
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
-				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
-					// console.log('sendMessageRest success:', json)
-				}, function(error) {
-					console.log('send message rest error:', error)
-				})
+				this.doSendMessageRest(json)
 			}
 			// 先插入本地
 			this.onMessageReceived(json)
@@ -1746,7 +1742,34 @@ export default {
 							app.messages[i].status === 'received') {
 							return
 						}
-						Vue.set(app.messages[i], 'status', 'stored')
+						// Vue.set(app.messages[i], 'status', 'stored')
+						app.messages[i].status = 'stored'
+					}
+				}
+			}, function(error) {
+				console.log('send message rest error:', error)
+			})
+		},
+		// 第一次长连接消息未发送成功，则会调用此rest接口尝试多次发送消息，如果发送成功，会更新本地消息发送状态
+		doSendMessageRest2(mid, json) {
+			// console.log('doSendMessageRest2:', JSON.stringify(json))
+			let app = this
+			httpApi.sendMessageRest(JSON.stringify(json), function(response) {
+				// console.log('sendMessageRest2 success:', response)
+				// 遍历本地消息数组，查找当前消息，并更新数组中当前消息发送状态为发送成功，也即：'stored'
+				for (let i = app.messages.length - 1; i >= 0; i--) {
+					const msg = app.messages[i]
+					// 根据mid判断消息
+					if (msg.mid === mid) {
+						// 已读 > 送达 > 发送成功 > 发送中
+						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						if (app.messages[i].status === 'read' ||
+							app.messages[i].status === 'received') {
+							return
+						}
+						// 重要：更新本地消息发送状态。如果消息发送‘失败’，请重点跟踪此语句是否被执行
+						// Vue.set(app.messages[i], 'status', 'stored') // 更新数组中当前消息发送状态为发送成功，也即：'stored'
+						app.messages[i].status = 'stored'
 					}
 				}
 			}, function(error) {
@@ -1861,7 +1884,8 @@ export default {
 					if (msg.mid === mid) {
 						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
 						if (this.messages[i].status === 'sending') {
-							Vue.set(this.messages[i], 'status', 'stored')
+							// Vue.set(this.messages[i], 'status', 'stored')
+							this.messages[i].status = 'stored'
 						}
 						break
 					}
