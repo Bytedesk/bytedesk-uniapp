@@ -1334,6 +1334,9 @@ export default {
 			if (goods !== "1") {
 				return
 			}
+			if (this.my_uid() === '') {
+				return
+			}
 			let jsonContent = this.commodityInfo();
 			// 发送商品信息
 			var json = {
