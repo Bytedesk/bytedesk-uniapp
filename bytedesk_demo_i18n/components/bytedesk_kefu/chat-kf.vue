@@ -1742,7 +1742,7 @@ export default {
 			let app = this
 			httpApi.sendMessageRest(JSON.stringify(json), function(response) {
 				// console.log('sendMessageRest success:', response)
-				let message = JSON.parse(json)
+				let message = JSON.parse(response.data)
 				for (let i = app.messages.length - 1; i >= 0; i--) {
 					const msg = app.messages[i]
 					// console.log('mid:', msg.mid, message.mid)

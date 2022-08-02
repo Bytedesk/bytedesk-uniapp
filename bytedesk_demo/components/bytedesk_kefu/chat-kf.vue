@@ -895,7 +895,6 @@ export default {
 		loadLatestMessage () {
 			// 长连接断开的情况拉取。机器人对话不需要拉取
 			if (!stompApi.isConnected() && !this.isRobot) {
-				//
 				let app = this
 				let count = this.loadHistory ? 10 : 1
 				// httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
@@ -1694,21 +1693,23 @@ export default {
 			// console.log('doSendMessageRest:', JSON.stringify(json))
 			let app = this
 			httpApi.sendMessageRest(JSON.stringify(json), function(response) {
-				// console.log('sendMessageRest success:', response)
-				let message = JSON.parse(json)
+				console.log('sendMessageRest success:', response)
+				let message = JSON.parse(response.data)
+				console.log('after parse json:', message.mid)
 				// 遍历本地消息数组，查找当前消息，并更新数组中当前消息发送状态为发送成功，也即：'stored'
 				for (let i = app.messages.length - 1; i >= 0; i--) {
 					const msg = app.messages[i]
-					// console.log('mid:', msg.mid, message.mid)
+					console.log('mid:', msg.mid, message.mid)
 					// 根据mid判断消息
 					if (msg.mid === message.mid) {
 						// 已读 > 送达 > 发送成功 > 发送中
 						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						console.log('before update status:', msg.mid)
 						if (app.messages[i].status === 'read' ||
 							app.messages[i].status === 'received') {
 							return
 						}
-						console.log('update status')
+						console.log('update status:', msg.mid)
 						// 重要：更新本地消息发送状态。如果消息发送‘失败’，请重点跟踪此语句是否被执行
 						Vue.set(app.messages[i], 'status', 'stored') // 更新数组中当前消息发送状态为发送成功，也即：'stored'
 					}
@@ -2518,7 +2519,7 @@ export default {
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
 	  // TODO: 智能调节时长，如果长时间没有未读消息，则拉取时间间隔逐渐加长
-	  this.loadHistoryTimer = setInterval(this.loadLatestMessage, 1000 * 10);
+	  this.loadHistoryTimer = setInterval(this.loadLatestMessage, 1000 * 5);
 	  this.sendMessageTimer = setInterval(this.checkTimeoutMessage, 1000 * 2);
 	},
 	beforeDestroy() {

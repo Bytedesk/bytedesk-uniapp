@@ -1519,12 +1519,12 @@ export function sendMessageRest(json, successcb, failedcb) {
   	header: header,
     method: 'POST',
     success (res) {
-      // successcb(res.data)
-	  successcb(json)
+      successcb(res.data)
+	  // successcb(json)
     },
     fail (res) {
-      // failedcb(res.data)
-	  failedcb(json)
+      failedcb(res.data)
+	  // failedcb(json)
     }
   })
 }
