@@ -1753,6 +1753,7 @@ export default {
 							return
 						}
 						Vue.set(app.messages[i], 'status', 'stored')
+						return
 					}
 				}
 			}, function(error) {
@@ -1778,6 +1779,7 @@ export default {
 						}
 						// 重要：更新本地消息发送状态。如果消息发送‘失败’，请重点跟踪此语句是否被执行
 						Vue.set(app.messages[i], 'status', 'stored') // 更新数组中当前消息发送状态为发送成功，也即：'stored'
+						return
 					}
 				}
 			}, function(error) {
