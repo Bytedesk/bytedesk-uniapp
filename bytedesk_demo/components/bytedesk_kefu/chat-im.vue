@@ -1634,24 +1634,325 @@ export default {
 			// 	$("input")[1].focus()
 			// }, 100);
 		},
+		sendMessageJsonRest (mid, type, content) {
+			//
+			var json;
+			if (type === constants.MESSAGE_TYPE_TEXT) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"text": {
+						"content": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": content,
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_IMAGE) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": 'image',
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"image": {
+						"imageUrl": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[图片]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_FILE) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"file": {
+						"fileUrl": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[文件]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_VOICE) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"voice": {
+						"voiceUrl": content,
+						"length": '0', // TODO:替换为真实值
+						"format": 'wav',
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[语音]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_VIDEO) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"video": {
+						"videoOrShortUrl": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[视频]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			} else if (type === constants.MESSAGE_TYPE_COMMODITY) {
+				json = {
+					"mid": mid,
+					"timestamp": this.currentTimestamp(),
+					"client": constants.client,
+					"version": "1",
+					"type": type,
+					"status": constants.MESSAGE_STATUS_SENDING,
+					"user": {
+						"uid": this.my_uid(),
+						"username": this.username,
+						"nickname": this.my_nickname(),
+						"avatar": this.my_avatar(),
+						"extra": {
+							"agent": false
+						}
+					},
+					"text": {
+						"content": content
+					},
+					"thread": {
+						"tid": this.thread.tid,
+						"type": this.thread.type,
+						"content": "[商品]",
+						"nickname": this.thread_nickname(),
+						"avatar": this.thread_avatar(),
+						"topic": this.threadTopic,
+						"client": constants.client,
+						"timestamp": this.currentTimestamp(),
+						"unreadCount": 0
+					}
+				};
+			}
+			// 
+			// 长连接断开，则调用rest接口发送消息
+			this.doSendMessageRest2(mid, json)
+		},
+		// 实际发送消息
 		doSendMessage (json) {
+			// console.log('doSendMessage:', json)
+			if (this.my_uid() === '') {
+				uni.showToast({ title: 'uid不能为空', icon:'none', duration: 2000 });
+				return
+			}
+			// 判断网络是否断开，如果断开，则提示并直接返回
+			if (!this.isNetworkConnected) {
+				uni.showToast({ title: '网络断开，请稍后重试', icon:'none', duration: 2000 });
+				return
+			}
+			// 发送消息
 			if (stompApi.isConnected()) {
+				// 通过长连接，发送消息
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {
-				let app = this
-				httpApi.sendMessageRest(JSON.stringify(json), function(json) {
-					// console.log('sendMessageRest success:', json)
-					var messageObject = JSON.parse(json);
-					messageObject.status = 'stored'
-					// uni.$emit('message', messageObject);
-					app.onMessageReceived(messageObject)
-				}, function(error) {
-					console.log('send message rest error:', error)
-				})
+				// 如果长连接断开，则调用rest接口发送消息
+				this.doSendMessageRest(json)
 			}
 			// 先插入本地
 			this.onMessageReceived(json)
 		},
+		// 第一次长连接消息未发送成功，则会调用此rest接口尝试多次发送消息，如果发送成功，会更新本地消息发送状态
+		doSendMessageRest(json) {
+			// console.log('doSendMessageRest:', JSON.stringify(json))
+			let app = this
+			httpApi.sendMessageRest(JSON.stringify(json), function(response) {
+				console.log('sendMessageRest success:', response)
+				let message = JSON.parse(response.data)
+				console.log('after parse json:', message.mid)
+				// 遍历本地消息数组，查找当前消息，并更新数组中当前消息发送状态为发送成功，也即：'stored'
+				for (let i = app.messages.length - 1; i >= 0; i--) {
+					const msg = app.messages[i]
+					console.log('mid:', msg.mid, message.mid)
+					// 根据mid判断消息
+					if (msg.mid === message.mid) {
+						// 已读 > 送达 > 发送成功 > 发送中
+						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						console.log('before update status:', msg.mid)
+						if (app.messages[i].status === 'read' ||
+							app.messages[i].status === 'received') {
+							return
+						}
+						console.log('update status:', msg.mid)
+						// 重要：更新本地消息发送状态。如果消息发送‘失败’，请重点跟踪此语句是否被执行
+						Vue.set(app.messages[i], 'status', 'stored') // 更新数组中当前消息发送状态为发送成功，也即：'stored'
+						return
+					}
+				}
+			}, function(error) {
+				console.log('send message rest error:', error)
+			})
+		},
+		// 第一次长连接消息未发送成功，则会调用此rest接口尝试多次发送消息，如果发送成功，会更新本地消息发送状态
+		doSendMessageRest2(mid, json) {
+			// console.log('doSendMessageRest2:', JSON.stringify(json))
+			let app = this
+			httpApi.sendMessageRest(JSON.stringify(json), function(response) {
+				// console.log('sendMessageRest2 success:', response)
+				// 遍历本地消息数组，查找当前消息，并更新数组中当前消息发送状态为发送成功，也即：'stored'
+				for (let i = app.messages.length - 1; i >= 0; i--) {
+					const msg = app.messages[i]
+					// 根据mid判断消息
+					if (msg.mid === mid) {
+						// 已读 > 送达 > 发送成功 > 发送中
+						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						if (app.messages[i].status === 'read' ||
+							app.messages[i].status === 'received') {
+							return
+						}
+						// 重要：更新本地消息发送状态。如果消息发送‘失败’，请重点跟踪此语句是否被执行
+						Vue.set(app.messages[i], 'status', 'stored') // 更新数组中当前消息发送状态为发送成功，也即：'stored'
+						return
+					}
+				}
+			}, function(error) {
+				console.log('send message rest error:', error)
+			})
+		},
+		// 重新发送
+		resendButtonClicked(message) {
+			// 5秒没有发送成功，则尝试使用http rest接口发送
+			let content = ''
+			if (message.type === constants.MESSAGE_TYPE_TEXT) {
+				content = message.content
+			} else if (message.type === constants.MESSAGE_TYPE_IMAGE) {
+				content = message.imageUrl
+			} else if (message.type === constants.MESSAGE_TYPE_FILE) {
+				content = message.fileUrl
+			} else if (message.type === constants.MESSAGE_TYPE_VOICE) {
+				content = message.voiceUrl
+			} else if (message.type === constants.MESSAGE_TYPE_VIDEO) {
+				content = message.videoOrShortUrl
+			} else if (message.type === constants.MESSAGE_TYPE_COMMODITY) {
+				content = this.commodityInfo();
+			}
+			this.sendMessageJsonRest(message.mid, message.type, content)
+		},
+		// doSendMessage (json) {
+		// 	if (stompApi.isConnected()) {
+		// 		stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
+		// 	} else {
+		// 		let app = this
+		// 		httpApi.sendMessageRest(JSON.stringify(json), function(json) {
+		// 			// console.log('sendMessageRest success:', json)
+		// 			var messageObject = JSON.parse(json);
+		// 			messageObject.status = 'stored'
+		// 			// uni.$emit('message', messageObject);
+		// 			app.onMessageReceived(messageObject)
+		// 		}, function(error) {
+		// 			console.log('send message rest error:', error)
+		// 		})
+		// 	}
+		// 	// 先插入本地
+		// 	this.onMessageReceived(json)
+		// },
 		pushToMessageArray(message) {
 			// 判断是否已经存在
 			let contains = false
@@ -2382,11 +2683,18 @@ export default {
 			  let now = moment(new Date());
 			  let diff = now.diff(timestamp, "seconds");
 			  console.log('diff:', diff)
-			  if (diff > 60) {
-				// 超时60秒，设置为消息状态为error
-				// this.messages[i].status = 'error'
+			 //  if (diff > 60) {
+				// // 超时60秒，设置为消息状态为error
+				// // this.messages[i].status = 'error'
+				// Vue.set(this.messages[i], 'status', 'error')
+			 //  }
+			 if (diff > 15) {
+				// 超时15秒，设置为消息状态为error
 				Vue.set(this.messages[i], 'status', 'error')
-			  }
+			 } else if (diff > 5) {
+				// 5秒没有发送成功，则尝试使用http rest接口发送
+				this.resendButtonClicked(message)
+			 }
 			}
 		  }
 		}

@@ -54,11 +54,16 @@
 					<block v-if="!is_type_notification(message) && !is_type_commodity(message)">
 						<!-- 自己发出的消息 -->
 						<view class="my" v-if="is_self(message)">
-							<!-- 左-消息 -->
+							<!-- 右侧-消息 -->
 							<view class="left">
 								<!-- 发送状态 -->
 								<view class="status">
-									<view>{{ formatStatus(message.status) }}</view>
+									<!-- <view>{{ formatStatus(message.status) }}</view> -->
+									<view v-if="is_sending(message)" class="fa fa-spinner fa-spin" style="font-size:12px">发送中</view>
+									<view v-else-if="is_stored(message)" class="fa fa-times-circle" style="font-size:10px"></view>
+									<view v-else-if="is_received(message)" style="font-size:10px; margin-right: 5px;">送达</view>
+									<view v-else-if="is_read(message)" style="font-size:10px; margin-right: 5px;">已读</view>
+									<view v-else-if="is_error(message)" class="fa fa-times-circle" style="font-size:12px" @click="resendButtonClicked(message)">失败</view>
 								</view>
 								<!-- 文字消息 -->
 								<view v-if="is_type_text(message)" class="bubble"  @longtap="longtap(message)">
@@ -816,7 +821,6 @@ export default {
 			} else if (status === 'sending') {
 				return '发送中..' // 发送中
 			} else {
-				// return ''
 				return status
 			}
 		},
@@ -1612,6 +1616,7 @@ export default {
 			// 	$("input")[1].focus()
 			// }, 100);
 		},
+		// 
 		sendMessageJsonRest (mid, type, content) {
 			//
 			var json;
@@ -1898,6 +1903,25 @@ export default {
 			}, function(error) {
 				console.log('send message rest error:', error)
 			})
+		},
+		// 重新发送
+		resendButtonClicked(message) {
+			// 5秒没有发送成功，则尝试使用http rest接口发送
+			let content = ''
+			if (message.type === constants.MESSAGE_TYPE_TEXT) {
+				content = message.content
+			} else if (message.type === constants.MESSAGE_TYPE_IMAGE) {
+				content = message.imageUrl
+			} else if (message.type === constants.MESSAGE_TYPE_FILE) {
+				content = message.fileUrl
+			} else if (message.type === constants.MESSAGE_TYPE_VOICE) {
+				content = message.voiceUrl
+			} else if (message.type === constants.MESSAGE_TYPE_VIDEO) {
+				content = message.videoOrShortUrl
+			} else if (message.type === constants.MESSAGE_TYPE_COMMODITY) {
+				content = this.commodityInfo();
+			}
+			this.sendMessageJsonRest(message.mid, message.type, content)
 		},
 		// 本地消息存储
 		pushToMessageArray(message) {
@@ -2677,21 +2701,22 @@ export default {
 				Vue.set(this.messages[i], 'status', 'error')
 			  } else if (diff > 5) {
 				// 5秒没有发送成功，则尝试使用http rest接口发送
-				let content = ''
-				if (message.type === constants.MESSAGE_TYPE_TEXT) {
-					content = message.content
-				} else if (message.type === constants.MESSAGE_TYPE_IMAGE) {
-					content = message.imageUrl
-				} else if (message.type === constants.MESSAGE_TYPE_FILE) {
-					content = message.fileUrl
-				} else if (message.type === constants.MESSAGE_TYPE_VOICE) {
-					content = message.voiceUrl
-				} else if (message.type === constants.MESSAGE_TYPE_VIDEO) {
-					content = message.videoOrShortUrl
-				} else if (message.type === constants.MESSAGE_TYPE_COMMODITY) {
-					content = this.commodityInfo();
-				}
-				this.sendMessageJsonRest(message.mid, message.type, content)
+				this.resendButtonClicked(message)
+				// let content = ''
+				// if (message.type === constants.MESSAGE_TYPE_TEXT) {
+				// 	content = message.content
+				// } else if (message.type === constants.MESSAGE_TYPE_IMAGE) {
+				// 	content = message.imageUrl
+				// } else if (message.type === constants.MESSAGE_TYPE_FILE) {
+				// 	content = message.fileUrl
+				// } else if (message.type === constants.MESSAGE_TYPE_VOICE) {
+				// 	content = message.voiceUrl
+				// } else if (message.type === constants.MESSAGE_TYPE_VIDEO) {
+				// 	content = message.videoOrShortUrl
+				// } else if (message.type === constants.MESSAGE_TYPE_COMMODITY) {
+				// 	content = this.commodityInfo();
+				// }
+				// this.sendMessageJsonRest(message.mid, message.type, content)
 			  }
 			}
 		  }
