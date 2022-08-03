@@ -92,7 +92,7 @@
 								</view>
 								<!-- 文字消息 -->
 								<view v-if="is_type_text(message)" class="bubble" @longtap="longtap(message)">
-									<rich-text :nodes="message.content"></rich-text>
+									<rich-text :nodes="replaceFace(message.content)"></rich-text>
 								</view>
 								<!-- 事件消息 -->
 								<view v-if="is_type_event(message)" class="bubble">
@@ -631,6 +631,40 @@ export default {
 		jsonObject (content) {
 			// console.log('parse json:', content);
 			return JSON.parse(content);
+		},
+		// 识别链接, FIXME: 对于不带http(s)前缀的url，会被识别为子链接，点击链接无法跳出
+		replaceUrl(content) {
+			if (!content) {
+				return content;
+			}
+			const urlPattern = /(https?:\/\/|www\.)[a-zA-Z_0-9\-@]+(\.\w[a-zA-Z_0-9\-:]+)+(\/[()~#&\-=?+%/.\w]+)?/g;
+			return content.replace(urlPattern, (url) => {
+				// console.log('url:', url)
+				return `<a href="${url}" target="_blank">${url}</a>`;
+			})
+		},
+		//  在发送信息之后，将输入的内容中属于表情的部分替换成emoji图片标签
+		//  再经过v-html 渲染成真正的图片
+		replaceFace(content) {
+			if (content === null || content === undefined) {
+				return ''
+			}
+			// 识别链接
+			let replaceUrl = this.replaceUrl(content)
+			//
+			var emotionMap = this.emotionMap;
+			var reg = /\[[\u4E00-\u9FA5NoOK]+\]/g
+			var matchresult = replaceUrl.match(reg)
+			var result = replaceUrl
+			if (matchresult) {
+				for (var i = 0; i < matchresult.length; i++) {
+					result = result.replace(matchresult[i], '<img height=\'25px\' width=\'25px\' style=\'margin-bottom:4px;\' src=\'' + this.emotionBaseUrl + emotionMap[matchresult[i]] + '\'>')
+				}
+			}
+			return result
+		},
+		escapeHTML(content) {
+			return content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 		},
 		scrollToBottom () {
 			if (this.messages.length > 0) {
