@@ -1964,6 +1964,14 @@ export default {
 					return 0
 				});
 			}
+			// 消息持久化到 localstorage, 当前消息条数大于100时，清空数据
+			if (this.messages.length > 100) {
+				uni.setStorage(topic , "");
+			} else {
+				let topic = this.thread.topic.replace(/\//g, ".");
+				let localMessages = JSON.stringify(this.messages);
+				uni.setStorage(topic , localMessages);
+			}
 		},
 		// 建立长连接
 		byteDeskConnect () {
@@ -1994,6 +2002,20 @@ export default {
 			if (!this.isCommoditySend) {
 				this.sendCommodityMessageSync()
 				this.isCommoditySend = true
+			}
+			// 获取本地缓存聊天记录
+			let topic = this.thread.topic.replace(/\//g, ".");
+			if (topic.length > 0) {
+				// 从localstorage里面加载消息
+				var localMessages = uni.getStorageSync(topic);
+				// console.log('localMessages:', localMessages)
+				if (localMessages != null && localMessages.length > 0) {
+					var localMessageObjects = JSON.parse(localMessages)
+					for (var i = 0; i < localMessageObjects.length; i++) {
+						let messageObject = localMessageObjects[i]
+						this.onMessageReceived(messageObject)
+					}
+				}
 			}
 			// 加载更多聊天记录
 			this.loadHistoryMessagesByTopic(this.thread.topic)
