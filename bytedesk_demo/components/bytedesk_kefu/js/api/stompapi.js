@@ -288,12 +288,13 @@ var stompApi = {
 		 messageObject.status = 'stored' 
 	  }
 	  uni.$emit('message', messageObject);
+	  // 发送送达回执
+	  stompApi.sendReceiptMessage(messageObject)
 	  // 缓存消息
 	  let messageArray = messagesCache[topic]
 	  messageArray.push(messageObject)
 	  messagesCache[topic] = messageArray
-	  // 发送送达回执
-	  stompApi.sendReceiptMessage(messageObject)
+	  // 
     });
   },
 

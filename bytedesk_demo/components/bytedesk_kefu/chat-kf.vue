@@ -1015,10 +1015,6 @@ export default {
 				// console.log('loadHistoryMessagesByTopic: ', response)
 				//
 				if (response.status_code === 200) {
-					// for (let i = 0; i < response.data.content.length; i++) {
-					// 	const element = response.data.content[i]
-					// 	app.messages.unshift(element)
-					// }
 					var length = response.data.content.length
 					for (var i = 0; i < length; i++) {
 						var message = response.data.content[i];
@@ -1032,12 +1028,10 @@ export default {
 							if (nextmsg.type === 'notification_thread_reentry') {
 							  continue
 							} else {
-							  	// app.messages.unshift(message);
 								app.pushToMessageArray(message);
 							}
 						  }
 						} else {
-						  	// app.messages.unshift(message);
 							app.pushToMessageArray(message);
 						}
 					}
@@ -1852,23 +1846,23 @@ export default {
 			// console.log('doSendMessageRest:', JSON.stringify(json))
 			let app = this
 			httpApi.sendMessageRest(JSON.stringify(json), function(response) {
-				console.log('sendMessageRest success:', response)
+				// console.log('sendMessageRest success:', response)
 				let message = JSON.parse(response.data)
-				console.log('after parse json:', message.mid)
+				// console.log('after parse json:', message.mid)
 				// 遍历本地消息数组，查找当前消息，并更新数组中当前消息发送状态为发送成功，也即：'stored'
 				for (let i = app.messages.length - 1; i >= 0; i--) {
 					const msg = app.messages[i]
-					console.log('mid:', msg.mid, message.mid)
+					// console.log('mid:', msg.mid, message.mid)
 					// 根据mid判断消息
 					if (msg.mid === message.mid) {
 						// 已读 > 送达 > 发送成功 > 发送中
 						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
-						console.log('before update status:', msg.mid)
+						// console.log('before update status:', msg.mid)
 						if (app.messages[i].status === 'read' ||
 							app.messages[i].status === 'received') {
 							return
 						}
-						console.log('update status:', msg.mid)
+						// console.log('update status:', msg.mid)
 						// 重要：更新本地消息发送状态。如果消息发送‘失败’，请重点跟踪此语句是否被执行
 						Vue.set(app.messages[i], 'status', 'stored') // 更新数组中当前消息发送状态为发送成功，也即：'stored'
 						return
@@ -1935,6 +1929,16 @@ export default {
 					Vue.set(this.messages[i], 'status', message.status)
 				}
 			}
+			// 当数组中最后一条消息未‘继续会话’，直接覆盖最后一条
+			if (message.type === 'notification_thread_reentry') {
+				let length = this.messages.length
+				if (length > 0) {
+					let premsg = this.messages[length - 1]
+					if (premsg.type === 'notification_thread_reentry') {
+						this.messages[length - 1] = message
+					}
+				}
+			}
 			// 如果不存在，则保存
 			if (!contains) {
 				this.messages.push(message);
@@ -1948,6 +1952,14 @@ export default {
 					}
 					return 0
 				});
+			}
+			// 消息持久化到 localstorage, 当前消息条数大于100时，清空数据
+			if (this.messages.length > 100) {
+				uni.setStorage(topic , "");
+			} else {
+				let topic = this.thread.topic.replace(/\//g, ".");
+				let localMessages = JSON.stringify(this.messages);
+				uni.setStorage(topic , localMessages);
 			}
 		},
 		// 建立长连接
@@ -1978,6 +1990,20 @@ export default {
 			if (!this.isCommoditySend) {
 				this.sendCommodityMessageSync()
 				this.isCommoditySend = true
+			}
+			// 获取本地缓存聊天记录
+			let topic = this.thread.topic.replace(/\//g, ".");
+			if (topic.length > 0) {
+				// 从localstorage里面加载消息
+				var localMessages = uni.getStorageSync(topic);
+				console.log('localMessages:', localMessages)
+				if (localMessages != null && localMessages.length > 0) {
+					var localMessageObjects = JSON.parse(localMessages)
+					for (var i = 0; i < localMessageObjects.length; i++) {
+						let messageObject = localMessageObjects[i]
+						this.onMessageReceived(messageObject)
+					}
+				}
 			}
 			// 加载更多聊天记录
 			this.loadHistoryMessagesByTopic(this.thread.topic)
@@ -2146,7 +2172,7 @@ export default {
 			    // TODO: 监听客服端输入状态
 			}
 		},
-		//
+		// 获取格式化当前时间戳
 		currentTimestamp () {
 			return moment().format('YYYY-MM-DD HH:mm:ss')
 		},
@@ -2192,11 +2218,13 @@ export default {
 			    }
 			});
 		},
+		// 预览大图
 		previewImageMessage (message) {
 			uni.previewImage({
 				urls: [message.imageUrl]
 			});
 		},
+		// 生成uuid
 		guid() {
 			function s4 () {
 				return Math.floor((1 + Math.random()) * 0x10000)
@@ -2207,7 +2235,7 @@ export default {
 			return timestamp + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()
 			// return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 		},
-		//
+		// 本地插入机器人问题消息
 		appendQueryMessage (content) {
 			//
 			var json = {
@@ -2244,6 +2272,7 @@ export default {
 			this.onMessageReceived(json)
 			// this.scrollToMessage(json)
 		},
+		// 本地插入机器人回答消息
 		appendReplyMessage (aid, mid, content) {
 			//
 			var json = {
@@ -2292,7 +2321,7 @@ export default {
 			//
 			let app = this
 			httpApi.queryAnswer(this.thread.tid, answer.aid, mid, function(response) {
-				console.log('queryAnswer success', response)
+				// console.log('queryAnswer success', response)
 				//
 				if (response.status_code === 200)  {
 					// let queryMessage = response.data.query;
@@ -2317,7 +2346,7 @@ export default {
 			//
 			let app = this
 			httpApi.queryCategoryAnswers(this.thread.tid, category.cid, function(response) {
-				console.log('queryCategoryAnswers success', response)
+				// console.log('queryCategoryAnswers success', response)
 				//
 				if (response.status_code === 200)  {
 					// 
@@ -2345,7 +2374,7 @@ export default {
 			} 
 			// 从服务器请求答案
 			httpApi.messageAnswer(this.option.wid, content, function(response) {
-				console.log('messageAnswer success', response)
+				// console.log('messageAnswer success', response)
 				if (response.status_code === 200 ||
 					response.status_code === 201)  {
 					//
@@ -2370,7 +2399,7 @@ export default {
 			//
 			let app = this
 			httpApi.rateAnswer(aid, mid, true, function(response) {
-				console.log('rateAnswerHelpful success：', response)
+				// console.log('rateAnswerHelpful success：', response)
 				if (response.status_code === 200) {
 					var message = response.data;
 					app.pushToMessageArray(message);
@@ -2387,7 +2416,7 @@ export default {
 			//
 			let app = this
 			httpApi.rateAnswer(aid, mid, false, function(response) {
-				console.log('rateAnswerHelpless success：', response)
+				// console.log('rateAnswerHelpless success：', response)
 				if (response.status_code === 200) {
 					var message = response.data;
 					app.pushToMessageArray(message);
@@ -2399,12 +2428,12 @@ export default {
 				console.log('rateAnswerUseless error', error)
 			})
 		},
-		//
+		// 跳转满意度评价页面
 		showRatePage () {
 			this.isInviteRate = false;
 			this.gotoRatePage()
 		},
-		//
+		// 真正跳转满意度评价页面
 		gotoRatePage () {
 			//
 			uni.navigateTo({
@@ -2551,6 +2580,7 @@ export default {
 		discard() {
 			return;
 		},
+		// 判断是否可以撤回消息
 		can_recall(message) {
 		  return (
 			this.callRecallMessage(message) &&
@@ -2610,6 +2640,7 @@ export default {
 				// #endif
 			}
 		},
+		// 隐藏置顶语
 		closeTopTip () {
 			// console.log('closeTopTip');
 			this.showTopTip = false
@@ -2623,6 +2654,7 @@ export default {
 				this.quickButtonArrow = '↑'
 			}
 		},
+		// 点击快捷按钮
 		quickButtonItemClicked(item) {
 			// console.log(item)
 			if (item.type === 'url') {
@@ -2664,11 +2696,12 @@ export default {
 				this.scrollToBottom()
 			}
 		},
+		// 加载快捷按钮
 		getQuickButtons () {
 			//
 			let app = this
 			httpApi.getQuickButtons(this.option.wid, function(response) {
-				console.log('getQuickButtons success:', app.option.wid, response)
+				// console.log('getQuickButtons success:', app.option.wid, response)
 				if (response.data.length > 0) {
 					app.showQuickButton = true
 				}
@@ -2677,6 +2710,7 @@ export default {
 				console.log('getQuickButtons error', error)
 			})
 		},
+		// 加载技能组设置
 		getPrechatSettings () {
 			let app = this
 			httpApi.getPrechatSettings(this.option.wid, function(response) {
@@ -2687,8 +2721,8 @@ export default {
 				console.log('getPrechatSettings error', error)
 			})
 		},
+		// 检测-消息是否超时发送失败
 		checkTimeoutMessage() {
-		  // 检测-消息是否超时发送失败
 		  for (let i = 0; i < this.messages.length; i++) {
 			const message = this.messages[i];
 			if (this.is_self(message) && this.is_sending(message)) {
@@ -2702,25 +2736,11 @@ export default {
 			  } else if (diff > 5) {
 				// 5秒没有发送成功，则尝试使用http rest接口发送
 				this.resendButtonClicked(message)
-				// let content = ''
-				// if (message.type === constants.MESSAGE_TYPE_TEXT) {
-				// 	content = message.content
-				// } else if (message.type === constants.MESSAGE_TYPE_IMAGE) {
-				// 	content = message.imageUrl
-				// } else if (message.type === constants.MESSAGE_TYPE_FILE) {
-				// 	content = message.fileUrl
-				// } else if (message.type === constants.MESSAGE_TYPE_VOICE) {
-				// 	content = message.voiceUrl
-				// } else if (message.type === constants.MESSAGE_TYPE_VIDEO) {
-				// 	content = message.videoOrShortUrl
-				// } else if (message.type === constants.MESSAGE_TYPE_COMMODITY) {
-				// 	content = this.commodityInfo();
-				// }
-				// this.sendMessageJsonRest(message.mid, message.type, content)
 			  }
 			}
 		  }
 		}
+		//
 	},
 	mounted() {
 	  // 如果长连接断开，则定时刷新聊天记录
