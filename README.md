@@ -1,6 +1,6 @@
 # 萝卜丝智能客服-uniapp sdk
 
-- [官网](https://www.bytedesk.com/)
+- [官网](https://www.weikefu.net/)
 - [价格](https://www.weikefu.net/pages/price.html)
 - [管理后台](https://www.weikefu.net/admin)
 - [客服工作台](https://www.weikefu.net/chaty)
@@ -19,7 +19,8 @@
 - 支持消息撤回
 - 支持发送商品信息
 - 未读消息数查询接口
-- 支持绑定第三方账号及多账号切换
+- 对接第三方账号系统/多用户切换
+- 支持vue2/vue3
 
 ## Demo下载
 
@@ -257,7 +258,6 @@ onUnload() {
 
 ## 其他
 
-- [Flutter SDK](https://gitee.com/270580156/bytedesk-flutter)
 - [UniApp SDK](https://github.com/bytedesk/bytedesk-uniapp)
 - [iOS SDK](https://github.com/bytedesk/bytedesk-ios)
 - [Android SDK](https://github.com/bytedesk/bytedesk-android)
