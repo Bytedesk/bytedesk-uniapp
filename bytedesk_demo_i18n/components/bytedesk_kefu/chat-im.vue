@@ -1613,10 +1613,10 @@ export default {
 		},
 		doSendMessage (json) {
 			// 判断网络是否断开，如果断开，则提示并直接返回
-			if (!this.isNetworkConnected) {
-				uni.showToast({ title: '网络断开，请稍后重试', icon:'none', duration: 2000 });
-				return
-			}
+			// if (!this.isNetworkConnected) {
+			// 	uni.showToast({ title: '网络断开，请稍后重试', icon:'none', duration: 2000 });
+			// 	return
+			// }
 			if (stompApi.isConnected()) {
 				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
 			} else {

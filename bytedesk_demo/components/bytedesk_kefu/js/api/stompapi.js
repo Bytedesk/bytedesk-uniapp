@@ -134,7 +134,7 @@ var stompApi = {
 	  // console.log(socketTask);
 	  
 	  socketTask.onOpen((result) => {
-	  	stompApi.printLog("SocketOpen:" + result)
+	  	stompApi.printLog("SocketOpen:" + JSON.stringify(result))
 		socketConnecting = false;
 	  	socketConnected = true;
 	  	webSocket.onopen();
@@ -146,7 +146,7 @@ var stompApi = {
 	  })
 	  
 	  socketTask.onError((result) => {
-	  	stompApi.printLog("SocketError:" + result)
+	  	stompApi.printLog("SocketError:" + JSON.stringify(result))
 		socketConnecting = false
 	  	if (!socketConnected) {
 	  	  // 为断开重连做准备
@@ -163,7 +163,7 @@ var stompApi = {
 	  })
 	  
 	  socketTask.onClose((result) => {
-	  	stompApi.printLog("SocketClose:" + result)
+	  	stompApi.printLog("SocketClose:" + JSON.stringify(result))
 	  	socketConnected = false;
 		socketTask = false
 	  	// 为断开重连做准备

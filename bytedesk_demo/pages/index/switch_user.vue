@@ -53,7 +53,6 @@
 				uni.showLoading({ title: '退出登录中', icon:'none', duration: 2000 });
 				// 退出登录
 				httpApi.logout(response => {
-					
 					uni.hideLoading();
 					uni.showToast({ title:'退出登录成功', icon:'none', duration: 2000 })
 				}, error => {

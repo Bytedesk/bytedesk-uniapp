@@ -106,14 +106,23 @@
 							<view class="left">
 								<image :src="message.user.avatar"></image>
 							</view>
-							<!-- 右-用户名称-时间-消息 -->
+							<!-- 左侧-用户名称-时间-消息 -->
 							<view class="right">
 								<view class="username">
 									<view class="name">{{ message.user.nickname }}</view> 
 								</view>
 								<!-- 文字消息 -->
 								<view v-if="is_type_text(message)" class="bubble" @longtap="longtap(message)">
-									<rich-text :nodes="replaceFace(message.content)"></rich-text>
+									<!-- <rich-text :nodes="replaceFace(message.content)"></rich-text> -->
+									<view class="flex-column-start" style="color: #2fa39b;">
+										<rich-text :nodes="replaceFace(message.content)" style="color: black;font-size: 25rpx; margin-top:20rpx;margin-bottom:10rpx;"></rich-text>
+										<hr class="hr-solid" v-if="message.content.length > 0 && message.answers && message.answers.length > 0">
+										<view class="flex-row-start  padding-top-sm" v-for="(item, index) in message.answers" :key="index">
+											<text @click="queryAnswer(item)" style="margin-top: 20rpx;">
+												{{ item.question }}
+											</text>
+										</view>
+									</view>
 								</view>
 								<!-- 事件消息 -->
 								<view v-if="is_type_event(message)" class="bubble">
@@ -1093,20 +1102,22 @@ export default {
 				this.thread = message.thread;
 				// // 设置当前为人工客服
 				this.isRobot = false;
-				// // 防止会话超时自动关闭，重新标记本地打开会话
+				this.robotUser = message.user
+				// 防止会话超时自动关闭，重新标记本地打开会话
 				this.isThreadClosed = false;
-				// // 显示商品信息
+				// 显示商品信息
 				// this.appendCommodityInfo()
 			} else if (response.status_code === 201) {
 				// message.content = '继续之前会话';
 				// if (this.isManulRequestThread || this.loadHistory === '0') {
 					this.pushToMessageArray(message);
 				// }
-				// // 1. 保存thread
+				// 1. 保存thread
 				this.thread = message.thread;
-				// // 设置当前为人工客服
+				// 设置当前为人工客服
 				this.isRobot = false;
-				// // 防止会话超时自动关闭，重新标记本地打开会话
+				this.robotUser = message.user
+				// 防止会话超时自动关闭，重新标记本地打开会话
 				this.isThreadClosed = false;
 				// // 显示商品信息
 				// this.appendCommodityInfo()
@@ -1117,6 +1128,7 @@ export default {
 				this.thread = message.thread;
 				// 是否正在排队
 				this.isQueuing = true
+				this.robotUser = message.user
 				//
 			} else if (response.status_code === 203) {
 				// 当前非工作时间，请自助查询或留言
@@ -1996,7 +2008,7 @@ export default {
 			if (topic.length > 0) {
 				// 从localstorage里面加载消息
 				var localMessages = uni.getStorageSync(topic);
-				console.log('localMessages:', localMessages)
+				// console.log('localMessages:', localMessages)
 				if (localMessages != null && localMessages.length > 0) {
 					var localMessageObjects = JSON.parse(localMessages)
 					for (var i = 0; i < localMessageObjects.length; i++) {

@@ -375,6 +375,7 @@ export function registerUser(username, nickname, password, avatar, subDomain, su
     success (res) {
 		// console.log('registerUser success:', res.data.data)
 		if (res.data.status_code === 200) {
+			// 注册IM用户成功
 			try {
 			  uni.setStorageSync(constants.uid, res.data.data.uid);
 			  // console.log(res.data.data.uid)
@@ -388,6 +389,7 @@ export function registerUser(username, nickname, password, avatar, subDomain, su
 				// error
 			}
 		} else {
+			// 用户名已经存在
 			try {
 			  uni.setStorageSync(constants.uid, res.data.data);
 			  uni.setStorageSync(constants.username, username + '@' + subDomain);

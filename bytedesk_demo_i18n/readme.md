@@ -1,6 +1,6 @@
 # 萝卜丝智能客服-uniapp sdk
 
-- [官网](https://www.bytedesk.com/)
+- [官网](https://www.weikefu.net/)
 - [价格](https://www.weikefu.net/pages/price.html)
 - [管理后台](https://www.weikefu.net/admin)
 - [客服工作台](https://www.weikefu.net/chaty)
@@ -19,6 +19,7 @@
 - 支持消息撤回
 - 支持发送商品信息
 - 未读消息数查询接口
+- 支持vue2/vue3
 
 ## Demo下载
 

@@ -1843,11 +1843,6 @@ export default {
 				uni.showToast({ title: 'uid不能为空', icon:'none', duration: 2000 });
 				return
 			}
-			// 判断网络是否断开，如果断开，则提示并直接返回
-			if (!this.isNetworkConnected) {
-				uni.showToast({ title: '网络断开，请稍后重试', icon:'none', duration: 2000 });
-				return
-			}
 			// 发送消息
 			if (stompApi.isConnected()) {
 				// 通过长连接，发送消息
