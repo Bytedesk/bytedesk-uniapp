@@ -13,6 +13,7 @@
 - 支持web/h5/小程序/安卓/iOS等全平台
 - 支持人工客服
 - 支持机器人
+- 支持视频客服
 - 支持文字、图片、语音
 - 支持消息预知：对方正在输入
 - 支持消息状态：送达、已读
@@ -138,6 +139,15 @@ startChat () {
 | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/rate.png?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/setting.jpg?raw=true" width="250"> |
 
 ## 以下步骤为非必须步骤，开发者可根据需要调用
+
+### 视频客服
+
+- 权限配置
+
+- 集成代码
+```
+登录管理后台：https://www.bytedesk.com/admin，客服管理-》技能组-》获取视频客服代码
+```
 
 ### 获取未读消息数目
 

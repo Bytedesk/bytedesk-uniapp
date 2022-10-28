@@ -28,6 +28,11 @@
 			<!-- 如果不想集成SDK，也可以直接集成H5页面即可，其余操作均可忽略，只需一步集成H5链接即可 -->
 			<uni-list-item title="H5客服" clickable @click="startH5Chat()" note="H5客服一步搞定" showArrow />
 		</uni-list>
+		<uni-section title="视频客服" type="line"></uni-section>
+		<uni-list :border="true">
+			<!-- 请确保音视频权限已经配置 -->
+			<uni-list-item title="视频客服" clickable @click="startVideoChat()" note="视频客服一步搞定" showArrow />
+		</uni-list>
 		<!-- <uni-section title="TODO:小程序码" type="line"></uni-section> -->
 		<!-- <uni-list :border="true"> -->
 			<!-- 服务器端生成小程序码 -->
@@ -196,6 +201,14 @@ export default {
 			// 如果不想集成SDK，也可以直接集成H5页面即可，其余操作均可忽略，只需一步集成H5链接即可 
 			// 登录管理后台：https://www.bytedesk.com/admin，客服管理-》技能组-》获取组客服代码
 			let url = "https://uni.kumaox.com/chat/h5/index.html?sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&hidenav=1&aid=&ph=ph";
+			uni.navigateTo({
+				url:"../../components/bytedesk_kefu/webview?url=" + encodeURIComponent(url)
+			})
+		},
+		// 集成Video链接
+		startVideoChat () {
+			// 登录管理后台：https://www.bytedesk.com/admin，客服管理-》技能组-》获取视频客服代码
+			let url = "https://uni.kumaox.com/chat/h5/video.html?sub=vip&uid=201808221551193&wid=201807171659201&type=workGroup&hidenav=1&aid=&ph=ph";
 			uni.navigateTo({
 				url:"../../components/bytedesk_kefu/webview?url=" + encodeURIComponent(url)
 			})
