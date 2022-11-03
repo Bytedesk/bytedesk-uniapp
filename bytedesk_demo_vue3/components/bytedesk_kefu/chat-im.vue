@@ -148,13 +148,13 @@
 		<!-- 抽屉栏 -->
 		<view class="popup-layer" :class="popupLayerClass" @touchmove.stop.prevent="discard">
 			<!-- 表情 --> 
-			<!-- <swiper class="emoji-swiper" :class="{hidden:hideEmoji}" indicator-dots="true" duration="150">
-				<swiper-item v-for="(page,pid) in emojiList" :key="pid">
-					<view v-for="(em,eid) in page" :key="eid" @tap="addEmoji(em)">
-						<image mode="widthFix" :src="'/image/emoji/'+em.url"></image>
+			<swiper class="emoji-swiper" :class="{hidden:hideEmoji}" indicator-dots="true" duration="150">
+				<swiper-item v-for="(page, pid) in emojis" :key="pid">
+					<view v-for="(item, index) in page" :key="index" @tap="addEmoji(item)">
+						<image mode="widthFix" :src="emotionUrl(item.file)"></image>
 					</view>
 				</swiper-item>
-			</swiper> -->
+			</swiper>
 			<!-- 更多功能 相册-拍照 -->
 			<view class="more-layer" :class="{hidden:hideMore}">
 				<view class="list">
@@ -197,9 +197,10 @@
 					<view class="box">
 						<textarea auto-height="true" v-model="inputContent" @focus="textareaFocus"/>
 					</view>
-<!-- 					<view class="em" @tap="chooseEmoji">
+					<!-- 表情 -->
+					<view class="em" @tap="chooseEmoji">
 						<view class="icon biaoqing"></view>
-					</view> -->
+					</view>
 				</view>
 			</view>
 			<!-- #ifndef H5 -->
@@ -522,7 +523,72 @@ export default {
 				'[献吻]': '203.gif',
 				'[左太极]': '204.gif',
 				'[右太极]': '205.gif'
-			}
+			},
+			// emoji表情, code代表来自微信端的表情字符，目前已经在服务器端处理替换为title字段，故code字段暂无用途
+			emojis: [
+				[
+					{ title: '[微笑]', file: '100.gif' },
+					{ title: '[撇嘴]', file: '101.gif' },
+					{ title: '[色]', file: '102.gif' },
+					{ title: '[发呆]', file: '103.gif' },
+					{ title: '[得意]', file: '104.gif' },
+					{ title: '[流泪]', file: '105.gif' },
+					{ title: '[害羞]', file: '106.gif' },
+					{ title: '[闭嘴]', file: '107.gif' },
+					{ title: '[睡]', file: '108.gif' },
+					{ title: '[大哭]', file: '109.gif' },
+					{ title: '[尴尬]', file: '110.gif' },
+					{ title: '[发怒]', file: '111.gif' },
+					{ title: '[调皮]', file: '112.gif' },
+					{ title: '[呲牙]', file: '113.gif' },
+					{ title: '[惊讶]', file: '114.gif' },
+					{ title: '[难过]', file: '115.gif' },
+					{ title: '[酷]', file: '116.gif' },
+					{ title: '[冷汗]', file: '117.gif' },
+					{ title: '[抓狂]', file: '118.gif' },
+					{ title: '[吐]', file: '119.gif' },
+					{ title: '[偷笑]', file: '120.gif' },
+					{ title: '[愉快]', file: '121.gif' },
+					{ title: '[白眼]', file: '122.gif' },
+					{ title: '[傲慢]', file: '123.gif' },
+				],
+				
+				[
+					{ title: '[饥饿]', file: '124.gif' },
+					{ title: '[困]', file: '125.gif' },
+					{ title: '[惊恐]', file: '126.gif' },
+					{ title: '[流汗]', file: '127.gif' },
+					{ title: '[憨笑]', file: '128.gif' },
+					{ title: '[悠闲]', file: '129.gif' },
+					{ title: '[奋斗]', file: '130.gif' },
+					{ title: '[咒骂]', file: '131.gif' },
+					{ title: '[疑问]', file: '132.gif' },
+					{ title: '[嘘]', file: '133.gif' },
+					{ title: '[晕]', file: '134.gif' },
+					{ title: '[疯了]', file: '135.gif' },
+					{ title: '[衰]', file: '136.gif' },
+					{ title: '[骷髅]', file: '137.gif' },
+					{ title: '[敲打]', file: '138.gif' },
+					{ title: '[再见]', file: '139.gif' },
+					{ title: '[擦汗]', file: '140.gif' },
+					{ title: '[抠鼻]', file: '141.gif' },
+					{ title: '[鼓掌]', file: '142.gif' },
+					{ title: '[糗大了]', file: '143.gif' },
+					{ title: '[坏笑]', file: '144.gif' },
+					{ title: '[左哼哼]', file: '145.gif' },
+					{ title: '[右哼哼]', file: '146.gif' },
+					{ title: '[哈欠]', file: '147.gif' },
+				],
+				
+				[
+					{ title: '[鄙视]', file: '148.gif' },
+					{ title: '[委屈]', file: '149.gif' },
+					{ title: '[快哭]', file: '150.gif' },
+					{ title: '[阴险]', file: '151.gif' },
+					{ title: '[亲亲]', file: '152.gif' },
+					{ title: '[吓]', file: '153.gif' }
+				]
+			]
 		};
 	},
 	onLoad(option) {
@@ -2161,19 +2227,22 @@ export default {
 			});
 		},
 		// 选择表情
-		// chooseEmoji(){
-		// 	this.hideMore = true;
-		// 	if(this.hideEmoji){
-		// 		this.hideEmoji = false;
-		// 		this.openDrawer();
-		// 	}else{
-		// 		this.hideDrawer();
-		// 	}
-		// },
+		chooseEmoji(){
+			this.hideMore = true;
+			if(this.hideEmoji){
+				this.hideEmoji = false;
+				this.openDrawer();
+			}else{
+				this.hideDrawer();
+			}
+		},
 		//添加表情
-		// addEmoji(em){
-		// 	this.inputContent+=em.alt;
-		// },
+		addEmoji(item){
+			this.inputContent += item.title;
+		},
+		emotionUrl(file) {
+		  return this.emotionBaseUrl + file;
+		},
 		//获取焦点，如果不是选表情ing,则关闭抽屉
 		textareaFocus(){
 			if(this.popupLayerClass=='showLayer' && this.hideMore == false){
