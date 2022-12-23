@@ -3,6 +3,7 @@
 		<uni-list>
 			<uni-list-item title="联系客服" :to="`./chat_type`" note="人工/机器人/电商/附言/H5" showArrow />
 			<uni-list-item title="用户信息" :to="`./user_info`" note="自定义用户昵称/头像" showArrow />
+			<!-- <uni-list-item title="设备信息" :to="`./device_info`" note="同步设备信息" showArrow /> -->
 			<uni-list-item title="在线状态" :to="`./online_status`" note="客服是否在线" showArrow />
 			<uni-list-item title="历史会话" :to="`./history_thread`" note="历史会话记录" showArrow />
 			<uni-list-item title="消息提示" :to="`./setting`" note="声音/振动提示开启/关闭" showArrow />

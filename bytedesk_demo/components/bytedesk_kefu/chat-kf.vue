@@ -682,6 +682,9 @@ export default {
 			// console.log('networkType：', res.networkType); //网络类型
 		});
 	},
+	onPullDownRefresh() {
+		this.loadMoreMessages()
+	},
 	onReady () {
 		// 登录
 		uni.setNavigationBarTitle({
@@ -2441,23 +2444,24 @@ export default {
 		},
 		// 输入框输入机器人问答-查询答案
 		messageAnswer (content) {
+			// FIXME: 会引入bug，当本地时间戳比服务器时间戳快的话，会出现消息排序错误，暂时注释掉
 			// 直接在界面显示输入问题
-			this.appendQueryMessage(content)
+			// this.appendQueryMessage(content)
 			let app = this;
 			// 包含’人工‘二字
 			if (content.indexOf('人工') !== -1) {
 				// 请求人工客服
 				app.requestAgent()
 				return;
-			} 
+			}
 			// 从服务器请求答案
 			httpApi.messageAnswer(this.option.wid, content, function(response) {
 				// console.log('messageAnswer success', response)
 				if (response.status_code === 200 ||
 					response.status_code === 201)  {
 					//
-					// let queryMessage = response.data.query;
-					// app.pushToMessageArray(queryMessage);
+					let queryMessage = response.data.query;
+					app.pushToMessageArray(queryMessage);
 					// 
 					let replyMessage = response.data.reply;
 					replyMessage.type = 'robot_result'; // 返回类型特殊处理一下

@@ -54,7 +54,7 @@
 								</view>
 								<!-- 文字消息 -->
 								<view v-if="is_type_text(message)" class="bubble" @longtap="longtap(message)">
-									<rich-text :nodes="message.content"></rich-text>
+									<rich-text :nodes="replaceFace(message.content)"></rich-text>
 								</view>
 								<!-- 事件消息 -->
 								<view v-if="is_type_event(message)" class="bubble">
@@ -128,14 +128,9 @@
 									<view class="flex-column-start" style="color: #2fa39b;">
 										<rich-text :nodes="message.content" style="color: black;font-size: 25rpx;cmargin-top: 20rpx;"></rich-text>
 										<view class="flex-row-start  padding-top-sm" v-for="(item, index) in message.answers" :key="index">
-											<text @click="queryAnswer(item)" style="margin-top: 20rpx;">
+											<text style="margin-top: 20rpx;">
 												{{item.question}}
 											</text>
-										</view>
-										<!-- TODO: 首先选择是否有帮助，如果用户选择没有帮助，则出现‘人工客服’按钮-->
-										<view class="flex-row-start  padding-top-sm">
-											<text class="my-neirong-sm">没有你要的答案?</text>
-											<text class="padding-left" style="color: #007AFF;" @click="requestAgent()">人工客服</text>
 										</view>
 									</view>
 								</view>
@@ -642,64 +637,30 @@ export default {
 	onShow(){
 		this.scrollTop = 9999999;
 	},
+	onPullDownRefresh() {
+		this.loadMoreMessages()
+	},
 	onReady () {
 		// 登录
 		uni.setNavigationBarTitle({
 		　　title:this.option.title
 		})
-		if (this.option.agentclient === '1') {
-			console.log('客服端打开会话')
-			this.isAgentClient = true
-			this.thread.tid = this.option.tid
-			this.thread.topic = this.option.topic
-			this.thread.type = this.option.type
-			this.thread.visitor.uid = this.option.uid
-			this.thread.visitor.nickname = this.option.nickname
-			this.thread.visitor.avatar = this.option.avatar
-			//
-			this.visitorUid = this.option.topic.split('/')[1]
-			// console.log('visitorUid:', this.visitorUid)
-			this.loadHistoryMessages(this.visitorUid);
-			// this.loadHistoryMessagesByTopic(this.option.topic)
-			// 添加订阅topic
-			let topic = this.thread.topic.replace(/\//g, ".");
-			stompApi.subscribeTopic(topic)
-			//
-		} else if (this.option.scan != null &&
-			(this.option.scan.startsWith('a') || this.option.scan.startsWith('w'))) {
-			console.log('扫小程序码打开')
-			// TODO: 调用微信授权登录
-			// #ifdef MP-WEIXIN
-			// #endif
-			// #ifdef MP-QQ
-			// #endif
-			// TODO: 判断是否已经初始化，如果已经初始化则直接调用接口请求客服，否则首先初始化
-			try {
-				//
-				this.isLogin = uni.getStorageSync(constants.isLogin);
-				if (this.isLogin) {
-					this.requestThreadScan()
-				} else {
-					// 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
-					let subDomain = 'vip'
-					// 登录后台->渠道管理-》uniapp中创建应用获取appkey
-					let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
-					//
-					bytedesk.initWithCallback(subDomain, appKey, function(result){
-						console.log('initWithCallback success:', result)
-						// TODO: 初始化完毕之后，再调用
-						this.requestThreadScan()
-					}, function(error) {
-						console.log('initWithCallback error:', error)
-					});
-				}
-			} catch (e){
-				//TODO handle the exception
-			}
-		} else {
-			// 正常打开
-			this.requestThread()
-		}
+		console.log('客服端打开会话')
+		this.isAgentClient = true
+		this.thread.tid = this.option.tid
+		this.thread.topic = this.option.topic
+		this.thread.type = this.option.type
+		this.thread.visitor.uid = this.option.uid
+		this.thread.visitor.nickname = this.option.nickname
+		this.thread.visitor.avatar = this.option.avatar
+		//
+		this.visitorUid = this.option.topic.split('/')[1]
+		// console.log('visitorUid:', this.visitorUid)
+		this.loadHistoryMessages(this.visitorUid);
+		// 添加订阅topic
+		let topic = this.thread.topic.replace(/\//g, ".");
+		stompApi.subscribeTopic(topic)
+		//
 	},
 	computed: {
 		...mapGetters([ 'userInfo' ]),
@@ -944,144 +905,29 @@ export default {
 				});
 			});
 		},
-		// 请求会话
-		requestThread () {
-			//
-			if (this.option.type === undefined || this.option.type === null) {
-				return
-			}
-			try {
-			    //
-			    this.uid = uni.getStorageSync(constants.uid)
-			    this.username = uni.getStorageSync(constants.username)
-			    this.nickname = uni.getStorageSync(constants.nickname)
-			    this.avatar = uni.getStorageSync(constants.avatar)
-				// console.log('uid 1:', this.uid)
-			} catch (error) {
-			    console.error('read uid/username error', error)
-			}
-			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
-			// this.loadHistoryMessages(this.uid);
-			//
-			let app = this
-			httpApi.requestThread(this.option.wid, this.option.type, this.option.aid, function(response) {
-				console.log('request thread success', app.option.wid, app.option.type, app.option.aid, response)
-				//
-				app.dealWithThread(response);
-			}, function(error) {
-				console.log('request thread error', error)
-			})
-		},
-		// 请求人工客服
-		requestAgent () {
-			//
-			if (this.option.type === undefined || this.option.type === null) {
-				return
-			}
-			//
-			let app = this
-			httpApi.requestAgent(this.option.wid, this.option.type, this.option.aid, function(response) {
-				console.log('request agent success', app.option.wid, app.option.type, app.option.aid, response)
-				//
-				app.dealWithThread(response);
-			}, function(error) {
-				console.log('request agent error', error)
-			})
-		},
-		// 请求客服会话-扫小程序码
-		requestThreadScan () {
-			//
-			try {
-			    //
-			    this.uid = uni.getStorageSync(constants.uid)
-			    this.username = uni.getStorageSync(constants.username)
-			    this.nickname = uni.getStorageSync(constants.nickname)
-			    this.avatar = uni.getStorageSync(constants.avatar)
-			} catch (error) {
-			    console.error('read uid/username error', error)
-			}
-			// 在请求会话之前加载聊天记录，否则会重复显示最近会话的欢迎语
-			// this.loadHistoryMessages(this.uid);
-			//
-			let app = this
-			httpApi.requestThreadScan(this.option.scan, function(response) {
-				console.log('request thread scan success', app.option.id, response)
-				//
-				app.dealWithThread(response);
-			}, function(error) {
-				console.log('request thread scan error', error)
-			})
-		},
 		loadMoreMessages () {
-			if (this.option.agentclient === '1') {
-				this.loadHistoryMessages(this.visitorUid)
-			} else {
-				this.loadHistoryMessages(this.uid)
-			}
-			// this.loadHistoryMessagesByTopic(this.thread.topic)
+			this.loadHistoryMessages(this.visitorUid)
 		},
 		// 加载更多聊天记录
 		loadHistoryMessages (uid) {
-			if (this.isManulRequestThread || this.loadHistory === '0') {
+			if (this.isManulRequestThread) {
+				console.log('isManulRequestThread')
 				return;
 			}
-			if(this.isHistoryLoading){
+			if (this.loadHistory === '0') {
+				console.log('this.loadHistory === 0')
+				return;
+			}
+			if(this.isHistoryLoading) {
+				console.log('isHistoryLoading')
 				return ;
 			}
 			// TODO: 加载历史聊天记录
 			this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
 			this.scrollAnimation = false;//关闭滑动动画
 			let app = this
-			httpApi.loadHistoryMessages(uid, this.page, 10, function(response) {
-				console.log('loadHistoryMessages: ', response)
-				//
-				if (response.status_code === 200) {
-					// for (let i = 0; i < response.data.content.length; i++) {
-					// 	const element = response.data.content[i]
-					// 	app.messages.unshift(element)
-					// }
-					var length = response.data.content.length
-					for (var i = 0; i < length; i++) {
-						var message = response.data.content[i];
-						if (message.type === 'notification_form_request' ||
-						  message.type === 'notification_form_result') {
-						  // 暂时忽略表单消息
-						} else if (message.type === 'notification_thread_reentry') {
-						  // 连续的 ‘继续会话’ 消息，只显示最后一条
-						  if (i + 1 < length) {
-							var nextmsg = response.data.content[i + 1];
-							if (nextmsg.type === 'notification_thread_reentry') {
-							  continue
-							} else {
-							  	app.messages.unshift(message);
-							}
-						  }
-						} else {
-						  	app.messages.unshift(message);
-						}
-					}
-				}
-				app.scrollToBottom()
-				app.page += 1
-				app.isHistoryLoading = false;
-			}, function(error) {
-				console.log('load history messages error', error)
-			})
-		},
-		loadHistoryMessagesByTopic (topic) {
-			//
-			if (this.isManulRequestThread || this.loadHistory === '0') {
-				return;
-			}
-			if(this.isHistoryLoading){
-				return ;
-			}
-			// TODO: 加载历史聊天记录
-			this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
-			this.scrollAnimation = false;//关闭滑动动画
-			let app = this
-			httpApi.loadHistoryMessagesByTopic(topic, this.page, 10, function(response) {
-				console.log('loadHistoryMessagesByTopic: ', response)
+			httpApi.loadHistoryMessages(uid, app.page, 10, function(response) {
+				console.log('loadHistoryMessages: ', app.page, response)
 				//
 				if (response.status_code === 200) {
 					// for (let i = 0; i < response.data.content.length; i++) {
@@ -1120,42 +966,6 @@ export default {
 		loadLatestMessage () {
 			// 长连接断开的情况拉取
 			if (!stompApi.isConnected()) {
-				//
-				// let app = this
-				// let count = this.loadHistory ? 10 : 1
-				// httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
-				// 	console.log('loadHistoryMessagesByTopic: ', response)
-				// 	//
-				// 	if (response.status_code === 200) {
-				// 		// for (let i = 0; i < response.data.content.length; i++) {
-				// 		// 	const element = response.data.content[i]
-				// 		// 	app.pushToMessageArray(element)
-				// 		// }
-				// 		var length = response.data.content.length
-				// 		for (var i = 0; i < length; i++) {
-				// 			var message = response.data.content[i];
-				// 			if (message.type === 'notification_form_request' ||
-				// 			  message.type === 'notification_form_result') {
-				// 			  // 暂时忽略表单消息
-				// 			} if (message.type === 'notification_thread_reentry') {
-				// 			  // 连续的 ‘继续会话’ 消息，只显示最后一条
-				// 			  if (i + 1 < length) {
-				// 				var nextmsg = response.data.content[i + 1];
-				// 				if (nextmsg.type === 'notification_thread_reentry') {
-				// 				  continue
-				// 				} else {
-				// 				  	app.pushToMessageArray(message);
-				// 				}
-				// 			  }
-				// 			} else {
-				// 			  	app.pushToMessageArray(message);
-				// 			}
-				// 		}
-				// 	}
-				// 	// app.scrollToBottom()
-				// }, function(error) {
-				// 	console.log('load history messages error', error)
-				// })
 				let uid = ''
 				if (this.option.agentclient === '1') {
 					uid = this.visitorUid
@@ -1165,7 +975,7 @@ export default {
 				let app = this
 				let count = this.loadHistory ? 10 : 1
 				httpApi.loadHistoryMessages(uid, 0, count, function(response) {
-					// console.log('load recent Messages: ', response)
+					console.log('load recent Messages: ', response)
 					if (response.status_code === 200) {
 						// for (let i = 0; i < response.data.content.length; i++) {
 						// 	const element = response.data.content[i]
@@ -1196,106 +1006,6 @@ export default {
 					console.log('load recent messages error', error)
 				})
 			}
-		},
-		// 加载从某条消息记录之后的消息
-		// loadMessagesFrom (uid, id) {
-		// 	let app = this
-		// 	httpApi.loadMessagesFrom(uid, id, function(response) {
-		// 		// console.log('loadMessagesFrom: ', response)
-		// 		if (response.status_code === 200) {
-		// 			for (let i = 0; i < response.data.content.length; i++) {
-		// 				const element = response.data.content[i]
-		// 				// console.log('element:', element);
-		// 				// app.messages.unshift(element)
-		// 				app.pushToMessageArray(element)
-		// 			}
-		// 		}
-		// 		app.scrollToBottom()
-		// 	}, function(error) {
-		// 		console.log('load messages from error', error)
-		// 	})
-		// },
-		// 
-		dealWithThread (response) {
-			// console.log('')
-			let message = response.data;
-			if (response.status_code === 200) {
-				//
-				// if (this.isManulRequestThread || this.loadHistory === '0') {
-					this.pushToMessageArray(message);
-				// }
-				// // 1. 保存thread
-				this.thread = message.thread;
-				// // 设置当前为人工客服
-				this.isRobot = false;
-				// // 防止会话超时自动关闭，重新标记本地打开会话
-				this.isThreadClosed = false;
-				// // 显示商品信息
-				// this.appendCommodityInfo()
-			} else if (response.status_code === 201) {
-				// message.content = '继续之前会话';
-				// if (this.isManulRequestThread || this.loadHistory === '0') {
-					this.pushToMessageArray(message);
-				// }
-				// // 1. 保存thread
-				this.thread = message.thread;
-				// // 设置当前为人工客服
-				this.isRobot = false;
-				// // 防止会话超时自动关闭，重新标记本地打开会话
-				this.isThreadClosed = false;
-				// // 显示商品信息
-				// this.appendCommodityInfo()
-			} else if (response.status_code === 202) {
-				// 排队
-				this.pushToMessageArray(message);
-				// // 1. 保存thread
-				this.thread = message.thread;
-				//
-			} else if (response.status_code === 203) {
-				// 当前非工作时间，请自助查询或留言
-				this.pushToMessageArray(message);
-		// 		this.leaveMessageTip = message.content;
-		// 		// 1. 保存thread
-				this.thread = message.thread;
-		// 		// 显示留言界面
-		// 		this.switchLeaveMessage();
-			} else if (response.status_code === 204) {
-				// 当前无客服在线，请自助查询或留言
-				this.pushToMessageArray(message);
-				// this.leaveMessageTip = message.content;
-				// // 1. 保存thread
-				this.thread = message.thread;
-				// // 显示留言界面
-				// this.switchLeaveMessage();
-			} else if (response.status_code === 205) {
-				// 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-				this.pushToMessageArray(message);
-				// // 1. 保存thread
-				this.thread = message.thread;
-			} else if (response.status_code === 206) {
-				// 返回机器人初始欢迎语 + 欢迎问题列表
-				// if (this.isManulRequestThread || this.loadHistory === '0') {
-				// 	this.pushToMessageArray(message);
-				// }
-				// 1. 保存thread
-				// this.thread = message.thread;
-				// 返回机器人初始欢迎语 + 欢迎问题列表
-				this.pushToMessageArray(message);
-				// 1. 保存thread
-				this.thread = message.thread;
-				// 2. 设置当前状态为机器人问答
-				this.isRobot = true;
-			} else if (response.status_code === -1) {
-				this.login();
-			} else if (response.status_code === -2) {
-				// sid 或 wid 错误
-				// this.$message.error('siteId或者工作组id错误');
-			} else if (response.status_code === -3) {
-				// alert('您已经被禁言')
-			}
-			this.scrollToBottom();
-			// // 建立长连接
-			this.byteDeskConnect();
 		},
 		appendCommodityInfo () {
 			let goods = this.option.goods
@@ -1687,12 +1397,8 @@ export default {
 			if (this.inputContent.trim().length === 0) {
 				return;
 			}
-			if (this.isRobot) {
-				this.messageAnswer(this.inputContent);
-			} else {
-				// 发送/广播会话消息
-				this.sendTextMessageSync(this.inputContent)
-			}
+			// 发送/广播会话消息
+			this.sendTextMessageSync(this.inputContent)
 			// 清空输入框
 			this.inputContent = "";
 			// 设置焦点
@@ -1996,24 +1702,6 @@ export default {
 			}
 			this.sendMessageJsonRest(message.mid, message.type, content)
 		},
-		// doSendMessage (json) {
-		// 	if (stompApi.isConnected()) {
-		// 		stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-		// 	} else {
-		// 		let app = this
-		// 		httpApi.sendMessageRest(JSON.stringify(json), function(json) {
-		// 			// console.log('sendMessageRest success:', json)
-		// 			var messageObject = JSON.parse(json);
-		// 			messageObject.status = 'stored'
-		// 			// uni.$emit('message', messageObject);
-		// 			app.onMessageReceived(messageObject)
-		// 		}, function(error) {
-		// 			console.log('send message rest error:', error)
-		// 		})
-		// 	}
-		// 	// 先插入本地
-		// 	this.onMessageReceived(json)
-		// },
 		pushToMessageArray(message) {
 			// 判断是否已经存在
 			let contains = false
@@ -2039,6 +1727,7 @@ export default {
 					return 0
 				});
 			}
+			this.scrollToBottom()
 		},
 		// 建立长连接
 		byteDeskConnect () {
@@ -2477,58 +2166,6 @@ export default {
 			let timestamp = moment(new Date()).format('YYYYMMDDHHmmss'); 
 			return timestamp + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()
 			// return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
-		},
-		queryAnswer (answer) {
-			console.log('answer:', answer);
-			let app = this
-			httpApi.queryAnswer(this.thread.tid, answer.aid, function(response) {
-				console.log('queryAnswer success', response)
-				//
-				if (response.status_code === 200)  {
-					//
-					let queryMessage = response.data.query;
-					let replyMessage = response.data.reply;
-					//
-					app.pushToMessageArray(queryMessage);
-					app.pushToMessageArray(replyMessage);
-					//
-					// app.scrollToBottom()
-					app.scrollToMessage(replyMessage)
-				} else {
-					// app.$message.warning(response.message)
-					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
-				}
-			}, function(error) {
-				console.log('queryAnswer error', error)
-			})
-		},
-		messageAnswer (content) {
-			let app = this;
-			// 包含’人工‘二字
-			if (content.indexOf('人工') !== -1) {
-				// 请求人工客服
-				app.requestAgent()
-				return;
-			} 
-			httpApi.messageAnswer(this.option.wid, this.option.type, this.option.aid, content, function(response) {
-				console.log('messageAnswer success', response)
-				if (response.status_code === 200 ||
-					response.status_code === 201)  {
-					//
-					let queryMessage = response.data.query;
-					let replyMessage = response.data.reply;
-					//
-					app.pushToMessageArray(queryMessage);
-					app.pushToMessageArray(replyMessage);
-					// app.scrollToBottom()
-					app.scrollToMessage(replyMessage)
-				} else {
-					// app.$message.warning(response.data.message)
-					uni.showToast({ title: response.message, icon:'none', duration: 2000 });
-				}
-			}, function(error) {
-				console.log('messageAnswer error', error)
-			})
 		},
 		//更多功能(点击+弹出) 
 		showMore() {
