@@ -1712,6 +1712,120 @@ export function unmarkNodisturb(uid, tid, successcb, failedcb) {
 	})
 }
 
+/**
+ * 上传设备信息-浏览器
+ * 
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function uploadDeviceInfoBrowser(browserInfo, deviceType, fingerprint, language, os, osVersion, referrer, url, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('未登录，请务必确保提前调用init接口')
+	  return
+	}
+	//
+	uni.request({
+	  url: constants.API_BASE_URL + '/api/fingerprint2/browser',
+	  data: {
+	    'browserInfo': encodeURI(browserInfo), // 浏览器
+		'deviceType': encodeURI(deviceType), // 设备类型
+		'fingerprint': encodeURI(fingerprint), // 设备指纹
+		'language': encodeURI(language), // 语言
+		'os': encodeURI(os), // 操作系统
+		'osVersion': encodeURI(osVersion), // 操作系统版本
+		'referrer': encodeURI(referrer), // 来源网址
+		'url': encodeURI(url), // 当前网址
+	    'client': constants.client
+	  },
+	  header: header,
+	  method: 'POST',
+	  success (res) {
+	    successcb(res.data)
+	  },
+	  fail (res) {
+	    failedcb(res.data)
+	  }
+	})
+}
+
+/**
+ * 上传设备信息-安卓
+ * 
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function uploadDeviceInfoAndroid(sdkVersion, osVersion, deviceModel, brand, languageInfo, appVersion, appVersionName, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('未登录，请务必确保提前调用init接口')
+	  return
+	}
+	//
+	uni.request({
+	  url: constants.API_BASE_URL + '/api/fingerprint2/android/deviceInfo',
+	  data: {
+	    'sdkVersion': encodeURI(sdkVersion), // sdk版本
+		'osVersion': encodeURI(osVersion), // 系统版本号
+		'deviceModel': encodeURI(deviceModel), // 手机型号
+		'brand': encodeURI(brand), // 手机厂商
+		'languageInfo': encodeURI(languageInfo), // 系统语言
+		'appVersion': encodeURI(appVersion), // 应用版本号
+		'appVersionName': encodeURI(appVersionName), // 应用版本名
+	    'client': constants.client
+	  },
+	  header: header,
+	  method: 'POST',
+	  success (res) {
+	    successcb(res.data)
+	  },
+	  fail (res) {
+	    failedcb(res.data)
+	  }
+	})
+}
+
+/**
+ * 上传设备信息-iOS
+ * 
+ * @param {*} successcb 成功回调
+ * @param {*} failedcb 失败回调
+ */
+export function uploadDeviceInfoIos(os, osVersion, deviceName, deviceModel, appName, languageInfo, appVersion, appCountry, successcb, failedcb) {
+	//
+	let header = visitorApiHeader()
+	if (header['Authorization'] === undefined) {
+	  failedcb('未登录，请务必确保提前调用init接口')
+	  return
+	}
+	//
+	uni.request({
+	  url: constants.API_BASE_URL + '/api/fingerprint2//ios/deviceInfo',
+	  data: {
+	    'os': encodeURI(os), // 操作系统
+		'osVersion': encodeURI(osVersion), // 系统版本号
+		'deviceName': encodeURI(deviceName), // 设备名称
+		'deviceModel': encodeURI(deviceModel), // 手机型号
+		'appName': encodeURI(appName), // 应用名
+		'languageInfo': encodeURI(languageInfo), // 系统语言
+		'appVersion': encodeURI(appVersion), // 应用版本号
+		'appCountry': encodeURI(appCountry), // 所属国家
+	    'client': constants.client
+	  },
+	  header: header,
+	  method: 'POST',
+	  success (res) {
+	    successcb(res.data)
+	  },
+	  fail (res) {
+	    failedcb(res.data)
+	  }
+	})
+}
+
+
 // 拉取技能组-快捷按钮
 export function getQuickButtons (workGroupWid, successcb, failedcb) {
   //
