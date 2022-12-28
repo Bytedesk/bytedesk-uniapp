@@ -73,7 +73,7 @@ export function login(username, password, subDomain, successcb, failedcb) {
 		successcb(result.data)
 	}, function(error) {
 		console.log('login error')
-		failedcb(error.data)
+		failedcb(error)
 	})
 }
 
@@ -1886,7 +1886,7 @@ export function logout(successcb, failedcb) {
 	uni.request({
 		url: constants.API_BASE_URL + '/api/user/logout',
 		data: {
-		  'client': constants.HTTP_CLIENT
+		  'client': constants.client
 		},
 		header: header,
 		method: 'POST',

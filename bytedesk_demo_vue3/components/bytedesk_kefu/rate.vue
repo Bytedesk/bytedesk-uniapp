@@ -55,7 +55,7 @@
 			},
 			headPicValue:{
 				type:String,
-				default:require('@/components/bytedesk_kefu/image/rate/rate_pic.png')
+				// default:require('@/components/bytedesk_kefu/image/rate/rate_pic.png')
 			},
 			headTitleShow:{ //标题
 				type:[String,Boolean],
@@ -75,11 +75,11 @@
 			},
 			starDefault:{ //未选中
 				type:String,
-				default:require('@/components/bytedesk_kefu/image/rate/rate_star.png'),
+				// default:require('@/components/bytedesk_kefu/image/rate/rate_star.png'),
 			},
 			starActive:{
 				type:String,
-				default:require('@/components/bytedesk_kefu/image/rate/rate_star_active.png'),
+				// default:require('@/components/bytedesk_kefu/image/rate/rate_star_active.png'),
 			},
 			score:{  //默认分数
 				type:[Number,String],

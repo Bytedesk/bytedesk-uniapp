@@ -257,12 +257,9 @@
 </template>
 
 <script>
-// import { mapActions, mapGetters } from 'vuex'
 import * as constants from '@/components/bytedesk_kefu/js/constants.js'
 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
-import * as stompApi from '@/components/bytedesk_kefu/js/api/stompapi.js'
-// import moment from '@/components/bytedesk_kefu/js/api/moment.min.js'
-// import Vue from 'vue'
+import * as mqttApi from '@/components/bytedesk_kefu/js/api/mqttapi.js'
 import moment from "moment"
 // 
 export default {
@@ -700,8 +697,8 @@ export default {
 			// this.loadHistoryMessages(this.visitorUid);
 			this.loadHistoryMessagesByTopic(this.option.topic)
 			// 添加订阅topic
-			let topic = this.thread.topic.replace(/\//g, ".");
-			stompApi.subscribeTopic(topic)
+			// let topic = this.thread.topic.replace(/\//g, ".");
+			// mqttApi.subscribeTopic(topic)
 			//
 		} else if (this.option.scan != null &&
 			(this.option.scan.startsWith('a') || this.option.scan.startsWith('w'))) {
@@ -1165,8 +1162,8 @@ export default {
 		// 加载最新10条消息，用于定时拉取最新消息
 		loadLatestMessage () {
 			// 长连接断开的情况拉取。机器人对话不需要拉取
-			if (!stompApi.isConnected() && !this.isRobot) {
-				//
+			if (!mqttApi.isConnected() && !this.isRobot) {
+			// 	//
 				let app = this
 				let count = this.loadHistory ? 10 : 1
 				httpApi.loadHistoryMessagesByTopic(this.thread.topic, 0, count, function(response) {
@@ -1950,11 +1947,11 @@ export default {
 				uni.showToast({ title: '请求会话中, 请稍后', icon:'none', duration: 2000 });
 				return;
 			}
-			if (stompApi.isConnected()) {
-				stompApi.sendMessage(this.threadTopic, JSON.stringify(json));
-			} else {
-				this.doSendMessageRest(json)
-			}
+			// if (mqttApi.isConnected()) {
+			// 	mqttApi.sendMessage(this.threadTopic, JSON.stringify(json));
+			// } else {
+			this.doSendMessageRest(json)
+			// }
 			// 先插入本地
 			this.onMessageReceived(json)
 		},
@@ -2047,18 +2044,18 @@ export default {
 		},
 		// 建立长连接
 		byteDeskConnect () {
-			if (stompApi.isConnected()) {
+			if (mqttApi.isConnected()) {
 				// 订阅topic
-				let topic = this.thread.topic.replace(/\//g, ".");
-				stompApi.subscribeTopic(topic);
+				// let topic = this.thread.topic.replace(/\//g, ".");
+				// mqttApi.subscribeTopic(topic);
 				// 获取本地缓存聊天记录
-				let messagesCache = stompApi.getCacheMessages(topic)
-				for (var i = 0; i < messagesCache.length; i++) {
-					let messageObject = messagesCache[i]
-					this.onMessageReceived(messageObject)
-				}
+				// let messagesCache = mqttApi.getCacheMessages(topic)
+				// for (var i = 0; i < messagesCache.length; i++) {
+				// 	let messageObject = messagesCache[i]
+				// 	this.onMessageReceived(messageObject)
+				// }
 			} else {
-				stompApi.connect(this.thread, function() {
+				mqttApi.connect(this.thread, function() {
 					// 长连接成功回调
 				})
 			}
@@ -2774,26 +2771,26 @@ export default {
 		},
 		getQuickButtons () {
 			//
-			let app = this
-			httpApi.getQuickButtons(this.option.wid, function(response) {
-				console.log('getQuickButtons success:', app.option.wid, response)
-				if (response.data.length > 0) {
-					app.showQuickButton = true
-				}
-				app.quickButtons = response.data
-			}, function(error) {
-				console.log('getQuickButtons error', error)
-			})
+			// let app = this
+			// httpApi.getQuickButtons(this.option.wid, function(response) {
+			// 	console.log('getQuickButtons success:', app.option.wid, response)
+			// 	if (response.data.length > 0) {
+			// 		app.showQuickButton = true
+			// 	}
+			// 	app.quickButtons = response.data
+			// }, function(error) {
+			// 	console.log('getQuickButtons error', error)
+			// })
 		},
 		getPrechatSettings () {
-			let app = this
-			httpApi.getPrechatSettings(this.option.wid, function(response) {
-				// console.log('getPrechatSettings success:', app.option.wid, response)
-				app.showTopTip = response.data.showTopTip
-				app.topTip = response.data.topTip
-			}, function(error) {
-				console.log('getPrechatSettings error', error)
-			})
+			// let app = this
+			// httpApi.getPrechatSettings(this.option.wid, function(response) {
+			// 	// console.log('getPrechatSettings success:', app.option.wid, response)
+			// 	app.showTopTip = response.data.showTopTip
+			// 	app.topTip = response.data.topTip
+			// }, function(error) {
+			// 	console.log('getPrechatSettings error', error)
+			// })
 		},
 		checkTimeoutMessage() {
 		  // 检测-消息是否超时发送失败

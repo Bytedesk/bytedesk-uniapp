@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import * as constants from '../constants.js'
 import * as httpApi from './httpapi.js'
-import * as stompApi from './stompapi.js'
+import * as mqttApi from './mqttapi.js'
 
 /**
  * 简单初始化
@@ -91,11 +91,10 @@ export function initWithUsernameAndNicknameAndAvatar(username, nickname, avatar,
 	})
 }
 
-
 // 建立长连接
 export function connect() {
 	//
-	stompApi.connect(null, function() {
+	mqttApi.connect(null, function() {
 		// 长连接成功回调
 	})
 }

@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@stomp/stompjs": "^6.1.2",
-    "moment": "^2.29.3"
+    "google-protobuf": "^3.21.2",
+    "moment": "^2.29.3",
+    "mqtt": "4.0.1"
   }
 }
