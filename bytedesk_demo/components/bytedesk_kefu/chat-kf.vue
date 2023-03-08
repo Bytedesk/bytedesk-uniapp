@@ -449,6 +449,8 @@ export default {
 			showQuickButton: false,
 			showQuickButtonItem: true,
 			quickButtons: [],
+			// 转人工关键词
+			transferWords: [],
 			//
 			loadHistoryTimer: '',
 			sendMessageTimer: '',
@@ -1160,7 +1162,7 @@ export default {
 		},
 		// 
 		dealWithThread (response) {
-			// console.log('')
+			console.log('dealWithThread：', response)
 			let message = response.data;
 			if (response.status_code === 200) {
 				//
@@ -1234,7 +1236,8 @@ export default {
 				// 2. 设置当前状态为机器人问答
 				this.isRobot = true;
 				this.robotUser = message.user
-				//
+				// 拉取转人工关键词
+				this.getTransferWords()
 			} else if (response.status_code === -1) {
 				this.login();
 			} else if (response.status_code === -2) {
@@ -2454,6 +2457,25 @@ export default {
 				app.requestAgent()
 				return;
 			}
+			// 自定义转人工关键词
+			for (let i = 0; i < app.transferWords.length; i++) {
+				const transferword = app.transferWords[i]
+				if (transferword.type === 'contains') {
+					// 包含
+					if (content.indexOf(transferword.content) !== -1) {
+						// 请求人工客服
+						app.requestAgent()
+						return
+					}
+				} else if (transferword.type === 'match') {
+					// 完全匹配
+					if (content === transferword.content) {
+						// 请求人工客服
+						app.requestAgent()
+						return
+					}
+				}
+			}
 			// 从服务器请求答案
 			httpApi.messageAnswer(this.option.wid, content, function(response) {
 				// console.log('messageAnswer success', response)
@@ -2793,6 +2815,17 @@ export default {
 				app.quickButtons = response.data
 			}, function(error) {
 				console.log('getQuickButtons error', error)
+			})
+		},
+		// 拉取转人工关键词
+		getTransferWords () {
+			//
+			let app = this
+			httpApi.getTransferWords(this.option.wid, function(response) {
+				console.log('getTransferWords success:', app.option.wid, response)
+				app.transferWords = response.data
+			}, function(error) {
+				console.log('getTransferWords error', error)
 			})
 		},
 		// 加载技能组设置

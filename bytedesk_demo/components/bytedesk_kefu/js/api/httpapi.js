@@ -1963,6 +1963,32 @@ export function getQuickButtons (workGroupWid, successcb, failedcb) {
   })
 }
 
+// 拉取技能组-转人工关键词
+export function getTransferWords (workGroupWid, successcb, failedcb) {
+  //
+  let header = visitorApiHeader()
+  if (header['Authorization'] === undefined) {
+    failedcb('未登录，请务必确保提前调用init接口')
+    return
+  }
+  //
+  uni.request({
+    url: constants.API_BASE_URL + '/api/transferword/query/workGroup',
+    data: {
+	  wid: workGroupWid,
+      client: constants.client
+    },
+    header: header,
+    method: 'GET',
+    success (res) {
+      successcb(res.data)
+    },
+    fail (res) {
+      failedcb(res.data)
+    }
+  })
+}
+
 // 技能组设置-如：置顶语
 export function getPrechatSettings (workGroupWid, successcb, failedcb) {
   //

@@ -22,6 +22,7 @@
 - 未读消息数查询接口
 - 对接第三方账号系统/多用户切换
 - 支持vue2/vue3
+- 注意：运行项目bytedesk_demo_vue3之前，首先需要进入项目文件夹执行yarn或者npm install初始化
 
 ## Demo下载
 
