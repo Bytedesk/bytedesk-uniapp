@@ -1247,16 +1247,24 @@ export default {
 				this.leaveMessageTip = message.content;
 		// 		// 1. 保存thread
 				this.thread = message.thread;
-		// 		// 显示留言界面
-				this.switchLeaveMessage();
+				if (message.sessionType === 'form') {
+					// 显示留言表单
+					this.switchLeaveMessage();
+				} else {
+					console.log('聊天页面留言')
+				}
 			} else if (response.status_code === 204) {
 				// 当前无客服在线，请自助查询或留言
 				this.pushToMessageArray(message);
 				this.leaveMessageTip = message.content;
 				// // 1. 保存thread
 				this.thread = message.thread;
-				// // 显示留言界面
-				this.switchLeaveMessage();
+				if (message.sessionType === 'form') {
+					// 显示留言表单
+					this.switchLeaveMessage();
+				} else {
+					console.log('聊天页面留言')
+				}
 			} else if (response.status_code === 205) {
 				// 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
 				this.pushToMessageArray(message);
