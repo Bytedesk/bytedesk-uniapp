@@ -14,7 +14,7 @@ export function anonymousLogin(subDomain, appKey, successcb, failedcb) {
 	try {
 	    const username = uni.getStorageSync(constants.username);
 	    if (username != null && username.length > 0) {
-	        // console.log(username);
+	        console.log(username);
 			// 登录
 			let password = username
 			login(username, password, subDomain, successcb, failedcb);
@@ -97,7 +97,7 @@ export function oauth(username, password, subDomain, successcb, failedcb) {
   // console.log('oauth/token: ', username, password)
   //
   uni.request({
-    url: constants.API_BASE_URL + '/oauth/token',
+    url: constants.API_BASE_URL + '/visitor/token', //'/oauth/token',
     data: {
       username: username,
 	  password: password,
@@ -111,7 +111,7 @@ export function oauth(username, password, subDomain, successcb, failedcb) {
     method: 'POST',
     success(res) {
 	  // TODO: token 持久化
-	  // console.log('oauth:', res);
+	  console.log('oauth:', res);
 	  // {
 	  // 	"data": {
 	  // 		"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDU4NTkxMDQsInVzZXJfbmFtZSI6IjIwMjAxMDIxMTU1ODIzMyIsImp0aSI6IjQwZTNlY2M1LWRmOGYtNGJjNi05NDIyLTdjNmQ4MGFiYTE5YSIsImNsaWVudF9pZCI6ImNsaWVudCIsInNjb3BlIjpbImFsbCJdfQ.yRR9Tk6blGLWuvHJw3pmZphdEVzvMrwjRmvgHZdMYVo",

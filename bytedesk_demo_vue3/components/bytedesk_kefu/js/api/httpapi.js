@@ -97,7 +97,7 @@ export function oauth(username, password, subDomain, successcb, failedcb) {
   // console.log('oauth/token: ', username, password)
   //
   uni.request({
-    url: constants.API_BASE_URL + '/oauth/token',
+    url: constants.API_BASE_URL + '/visitor/token', //'/oauth/token',
     data: {
       username: username,
 	  password: password,
