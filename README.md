@@ -167,7 +167,7 @@ httpApi.getUnreadCountVisitor(response => {
 })
 ```
 
-### 开启机器人
+### [开启机器人](https://vip.docs.bytedesk.com/article_202104291459561.html)
 
 机器人会话仅针对技能组开启，指定会话不支持开启机器人
 
