@@ -175,15 +175,15 @@ httpApi.getUnreadCountVisitor(response => {
 
 - 首先添加分类，其次添加问答
 - 
-<img src="https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/20210416111451.png" width="250">
+<img src="./images/robot1.png" width="250">
 
 - 在技能组开启机器人。   找到 “客服管理”-》技能组-》点击相应技能组“编辑”按钮
 - 
-<img src="https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/20210420110954.png" width="250">
+<img src="./images/robot2.png" width="250">
 
 - 找到“默认机器人”和“离线机器人”，选择“是”
 - 
-<img src="https://bytedesk.oss-cn-shenzhen.aliyuncs.com/images/20210420111025.png" width="250">
+<img src="./images/robot3.png" width="250">
 
 - 开始测试使用机器人
 
