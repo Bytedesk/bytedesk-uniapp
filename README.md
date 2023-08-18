@@ -136,8 +136,8 @@ startChat () {
 
 | 首页 | 聊天 | H5 |
 | :----------: | :----------: | :----------: |
-| <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/index.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/robot.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/h5.jpg?raw=true" width="250"> |
-| <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/chat.jpg?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/rate.png?raw=true" width="250"> | <img src="https://raw.githubusercontent.com/Bytedesk/bytedesk-uniapp/main/setting.jpg?raw=true" width="250"> |
+| <img src="./index.jpg?raw=true" width="250"> | <img src="./robot.jpg?raw=true" width="250"> | <img src="./h5.jpg?raw=true" width="250"> |
+| <img src="./chat.jpg?raw=true" width="250"> | <img src="./rate.png?raw=true" width="250"> | <img src="./setting.jpg?raw=true" width="250"> |
 
 ## 以下步骤为非必须步骤，开发者可根据需要调用
 
