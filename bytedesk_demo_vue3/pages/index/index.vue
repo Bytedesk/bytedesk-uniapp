@@ -2,21 +2,21 @@
 	<view class="bytedesk">
 		<uni-list>
 			<uni-list-item title="联系客服" :to="`./chat_type`" note="人工/机器人/电商/附言/H5" showArrow />
-			<uni-list-item title="用户信息" :to="`./user_info`" note="自定义用户昵称/头像" showArrow />
-			<uni-list-item title="在线状态" :to="`./online_status`" note="客服是否在线" showArrow />
-			<uni-list-item title="历史会话" :to="`./history_thread`" note="历史会话记录" showArrow />
-			<uni-list-item title="消息提示" :to="`./setting`" note="声音/振动提示开启/关闭" showArrow />
-			<uni-list-item title="切换用户" :to="`./switch_user`" note="不同账号之间切换" showArrow />
+			<!-- <uni-list-item title="用户信息" :to="`./user_info`" note="自定义用户昵称/头像" showArrow /> -->
+			<!-- <uni-list-item title="在线状态" :to="`./online_status`" note="客服是否在线" showArrow /> -->
+			<!-- <uni-list-item title="历史会话" :to="`./history_thread`" note="历史会话记录" showArrow /> -->
+			<!-- <uni-list-item title="消息提示" :to="`./setting`" note="声音/振动提示开启/关闭" showArrow /> -->
+			<!-- <uni-list-item title="切换用户" :to="`./switch_user`" note="不同账号之间切换" showArrow /> -->
 			<!-- <uni-list-item title="意见反馈" :to="`./feedback`" note="意见反馈" showArrow /> -->
-			<uni-list-item title="技术支持" note="QQ-3群: 825257535" />
+			<!-- <uni-list-item title="技术支持" note="QQ-3群: 825257535" /> -->
 		</uni-list>
 	</view>
 </template>
 
 <script>
-// 萝卜丝第一步：引入js文件
-import * as bytedesk from '@/components/bytedesk_kefu/js/api/bytedesk.js'
-import * as constants from '@/components/bytedesk_kefu/js/constants.js'
+// 微语一步：引入js文件
+import * as bytedesk from '@/components/bytedesk_sdk/js/bytedesk.js'
+// import * as constants from '@/components/bytedesk_sdk/js/constants.js'
 
 export default {
 	data() {
@@ -27,39 +27,37 @@ export default {
 		}
 	},
 	onLoad() {
-		// 萝卜丝第二步：初始化
-		// 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
-		let subDomain = 'vip'
-		// 登录后台->渠道管理-》uniapp中创建应用获取appkey
-		let appKey = 'f4970e52-8cc8-48fd-84f6-82390640549d'
-		bytedesk.init(subDomain, appKey);
+		// 第二步：初始化
+		// 获取企业uid，登录后台->客服->渠道->uniapp
+		// http://www.weiyuai.cn/admin/cs/channel
+		let orgUid = 'df_org_uid'
+		bytedesk.init(orgUid);
 		// 注：如果需要多平台统一用户（用于同步聊天记录等），可使用:
-		// bytedesk.initWithUsernameAndNicknameAndAvatar('myuniappusername', '我是美女', 'https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/girl.png', subDomain, appKey);
-		// bytedesk.initWithUsername('myuniappusername',subDomain, appKey); // 其中：username为自定义用户名，可与开发者所在用户系统对接
-		// 如果还需要自定义昵称/头像，可以使用 initWithUsernameAndNickname或initWithUsernameAndNicknameAndAvatar，
-		// 具体参数可以参考 @/components/bytedesk_kefu/js/api/bytedesk.js 文件中接口
+		// bytedesk.initWithUidAndNicknameAndAvatar(orgUid, 'myuniappuid', '我是美女', 'https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/girl.png');
+		// bytedesk.initWithUid(orgUid, 'myuniappuid'); // 其中：uid为自定义uid，可与开发者所在用户系统对接，用于多用户切换
+		// 具体参数可以参考 @/components/bytedesk_sdk/js/bytedesk.js 文件中接口
 		
 		// (可选)
-		try {
-			// 读取用户uid
-			this.uid = uni.getStorageSync(constants.uid)
-			// 读取振动、提示音设置
-		    this.vibrate = uni.getStorageSync(constants.vibrate)
-			if (this.vibrate === null || this.vibrate === '') {
-				this.vibrate = true
-			}
-			this.playAudio = uni.getStorageSync(constants.playAudio)
-			if (this.playAudio === null || this.playAudio === '') {
-				this.playAudio = true
-			}
-		} catch (error) {
-		    console.error('read vibrate/playAudio error', error)
-		}
+		// try {
+		// 	// 读取用户uid
+		// 	this.uid = uni.getStorageSync(constants.uid)
+		// 	// 读取振动、提示音设置
+		//     this.vibrate = uni.getStorageSync(constants.vibrate)
+		// 	if (this.vibrate === null || this.vibrate === '') {
+		// 		this.vibrate = true
+		// 	}
+		// 	this.playAudio = uni.getStorageSync(constants.playAudio)
+		// 	if (this.playAudio === null || this.playAudio === '') {
+		// 		this.playAudio = true
+		// 	}
+		// } catch (error) {
+		//     console.error('read vibrate/playAudio error', error)
+		// }
 		
 		// 监听连接状态（可选）
-		uni.$on(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, function(connectionStatus) {
-			console.log('connectionStatus:', connectionStatus);
-		})
+		// uni.$on(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, function(connectionStatus) {
+		// 	console.log('connectionStatus:', connectionStatus);
+		// })
 	},
 	onReady () {
 		// 监听消息通知, 可选

@@ -12,9 +12,9 @@
 
 <script>
 	// 引入js文件
-	import * as constants from '@/components/bytedesk_kefu/js/constants.js'
-	import * as bytedesk from '@/components/bytedesk_kefu/js/api/bytedesk.js'
-	import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
+	import * as constants from '@/components/bytedesk_sdk/js/constants.js'
+	import * as bytedesk from '@/components/bytedesk_sdk/js/bytedesk.js'
+	import * as httpApi from '@/components/bytedesk_sdk/js/httpapi.js'
 	
 	export default {
 		data() {

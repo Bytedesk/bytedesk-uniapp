@@ -1,4 +1,4 @@
-# 萝卜丝智能客服-uniapp sdk
+# 微语-uniapp sdk
 
 - [官网](https://www.weikefu.net/)
 - [价格](https://www.weikefu.net/pages/price.html)
@@ -8,7 +8,7 @@
 
 ## 部分功能
 
-- 萝卜丝官方技术支持
+- 微语方技术支持
 - 全部基于vuejs开发，不依赖原生SDK，100%全部开源，支持自定义界面
 - 支持web/h5/小程序/安卓/iOS等全平台
 - 支持人工客服
@@ -31,28 +31,20 @@
 
 ## 配置步骤说明（共两步）
 
-- 首先：将 bytedesk_kefu 文件夹拷贝到 components 文件夹，
+- 首先：将 bytedesk_sdk 文件夹拷贝到 components 文件夹，
 - 然后：在pages.json中添加以下几个页面，具体可参考demo中pages.json文件
 
 ```js
 {
-	"path": "components/bytedesk_kefu/chat-kf",
+	"path": "components/bytedesk_sdk/chat-kf",
 	"style": {
-		"navigationBarTitleText": "萝卜丝智能客服",
+		"navigationBarTitleText": "微语",
 		"navigationBarBackgroundColor":"#007AFF",
 		"navigationBarTextStyle":"white"
 	}
 },
 {
-	"path": "components/bytedesk_kefu/chat-im",
-	"style": {
-		"navigationBarTitleText": "萝卜丝智能客服",
-		"navigationBarBackgroundColor":"#007AFF",
-		"navigationBarTextStyle":"white"
-	}
-},
-{
-	"path": "components/bytedesk_kefu/rate",
+	"path": "components/bytedesk_sdk/rate",
 	"style": {
 		"navigationBarTitleText": "满意度评价",
 		"navigationBarBackgroundColor":"#007AFF",
@@ -60,15 +52,15 @@
 	}
 },
 {
-	"path": "components/bytedesk_kefu/webview",
+	"path": "components/bytedesk_sdk/webview",
 	"style": {
-		"navigationBarTitleText": "萝卜丝H5",
+		"navigationBarTitleText": "微语5",
 		"navigationBarBackgroundColor":"#007AFF",
 		"navigationBarTextStyle":"white"
 	}
 },
 {
-	"path": "components/bytedesk_kefu/leavemsg",
+	"path": "components/bytedesk_sdk/leavemsg",
 	"style": {
 		"navigationBarTitleText": "留言",
 		"navigationBarBackgroundColor":"#007AFF",
@@ -84,13 +76,13 @@ bytedesk_demo和bytedesk_demo_i18n的区别仅仅在于后者支持国际化，�
 - 第一步：引入文件。在调用客服的vue页面，如：index.vue，引入
 
 ```js
-import * as bytedesk from '@/components/bytedesk_kefu/js/api/bytedesk.js'
+import * as bytedesk from '@/components/bytedesk_sdk/js/bytedesk.js'
 ```
 
 - 第二步：初始化。在index.vue页面onLoad函数
 
 ```js
-// 萝卜丝第二步：初始化
+// 微语二步：初始化
 // 注意：init的接口要提前调用，最好在打开App的时候就调用。不要跟打开客服页面接口放在一起同时调用，否则会因未初始化完毕报错 'not login'
 // 获取subDomain，也即企业号：登录后台->客服管理->客服账号->企业号
 let subDomain = 'vip'
@@ -101,7 +93,7 @@ bytedesk.init(subDomain, appKey);
 // bytedesk.initWithUsernameAndNicknameAndAvatar('myuniappusername', '我是美女', 'https://bytedesk.oss-cn-shenzhen.aliyuncs.com/avatars/girl.png', subDomain, appKey);
 // bytedesk.initWithUsername('myuniappusername',subDomain, appKey); // 其中：username为自定义用户名，可与开发者所在用户系统对接
 // 如果还需要自定义昵称/头像，可以使用 initWithUsernameAndNickname或initWithUsernameAndNicknameAndAvatar，
-// 具体参数可以参考 @/components/bytedesk_kefu/js/api/bytedesk.js 文件中接口
+// 具体参数可以参考 @/components/bytedesk_sdk/js/bytedesk.js 文件中接口
 ```
 
 - 第三步：开始会话
@@ -126,7 +118,7 @@ bytedesk.init(subDomain, appKey);
 startChat () {
   // console.log('start chat')
   uni.navigateTo({
-  	url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=萝卜丝'
+  	url: '../../components/bytedesk_sdk/chat-kf?wid=' + this.workGroupWid + '&type=workGroup&aid=&title=微语
   });
 }
 ```
@@ -154,7 +146,7 @@ startChat () {
 
 用于访客端-查询访客所有未读消息数目
 ```
-1. 首先引入 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js' (后面说明将省略此步骤说明)
+1. 首先引入 import * as httpApi from '@/components/bytedesk_sdk/js/httpapi.js' (后面说明将省略此步骤说明)
 2. 调用接口：
 httpApi.getUnreadCountVisitor(response => {
 	// console.log('getUnreadCountVisitor: ', response.data)
@@ -209,8 +201,8 @@ goods_categoryCode 可选，商品信息类别，参数goods=1的情况有效
 let goodsUrl = encodeURI('https://item.m.jd.com/product/12172344.html')
 // 增加商品信息参数
 uni.navigateTo({
-	url: '../../components/bytedesk_kefu/chat-kf?wid=' + this.workGroupWid 
-		+ '&type=workGroup&aid=&title=萝卜丝' 
+	url: '../../components/bytedesk_sdk/chat-kf?wid=' + this.workGroupWid 
+		+ '&type=workGroup&aid=&title=微语 
 		+ '&goods=1' 
 		+ '&goods_categoryCode=101' 
 		+ '&goods_content=商品详情' 
@@ -247,7 +239,7 @@ onUnload() {
 具体请参考bytedesk_demo/pages/index/user_info.vue文件
 
 ```
-首先引入 import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
+首先引入 import * as httpApi from '@/components/bytedesk_sdk/js/httpapi.js'
 ```
 
 - 查询当前用户信息：昵称、头像、备注
@@ -380,9 +372,9 @@ getAgentStatus () {
 - 引入文件
 ```
 // 引入js文件
-import * as constants from '@/components/bytedesk_kefu/js/constants.js'
-import * as bytedesk from '@/components/bytedesk_kefu/js/api/bytedesk.js'
-import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
+import * as constants from '@/components/bytedesk_sdk/js/constants.js'
+import * as bytedesk from '@/components/bytedesk_sdk/js/bytedesk.js'
+import * as httpApi from '@/components/bytedesk_sdk/js/httpapi.js'
 ```
 
 - 执行登录之前请先判断是否有用户登录
@@ -428,8 +420,8 @@ initWithUsernameAndNicknameAndAvatar(username, nickname, avatar, subDomain, appK
 
 // 官方文档 https://uniapp.dcloud.net.cn/collocation/i18n
 // 国际化 json 文件，文件内容详见下面的示例
-import en from './components/bytedesk_kefu/i18n/en.json'
-import cn from './components/bytedesk_kefu/i18n/cn.json'
+import en from './components/bytedesk_sdk/i18n/en.json'
+import cn from './components/bytedesk_sdk/i18n/cn.json'
 const messages = {
     en,
     cn

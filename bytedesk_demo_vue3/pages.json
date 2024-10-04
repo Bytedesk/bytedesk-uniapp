@@ -1,9 +1,9 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "萝卜丝智能客服",
+				"navigationBarTitleText": "微语",
 				"navigationBarBackgroundColor":"#007AFF",
 				"navigationBarTextStyle":"white"
 			}
@@ -89,15 +89,15 @@
 			}
 		},
 		{
-			"path": "components/bytedesk_kefu/chat-kf",
+			"path": "components/bytedesk_sdk/chat-kf",
 			"style": {
-				"navigationBarTitleText": "萝卜丝智能客服",
+				"navigationBarTitleText": "微语",
 				"navigationBarBackgroundColor":"#007AFF",
 				"navigationBarTextStyle":"white"
 			}
 		},
 		{
-			"path": "components/bytedesk_kefu/rate",
+			"path": "components/bytedesk_sdk/rate",
 			"style": {
 				"navigationBarTitleText": "满意度评价",
 				"navigationBarBackgroundColor":"#007AFF",
@@ -105,15 +105,15 @@
 			}
 		},
 		{
-			"path": "components/bytedesk_kefu/webview",
+			"path": "components/bytedesk_sdk/webview",
 			"style": {
-				"navigationBarTitleText": "萝卜丝H5",
+				"navigationBarTitleText": "微语5",
 				"navigationBarBackgroundColor":"#007AFF",
 				"navigationBarTextStyle":"white"
 			}
 		},
 		{
-			"path": "components/bytedesk_kefu/leavemsg",
+			"path": "components/bytedesk_sdk/leavemsg",
 			"style": {
 				"navigationBarTitleText": "留言",
 				"navigationBarBackgroundColor":"#007AFF",
@@ -124,7 +124,7 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "萝卜丝智能客服",
+		"navigationBarTitleText": "微语",
 		"navigationBarnavigationBarBackgroundColor": "#F8F8F8",
 		"navigationBarBackgroundColor": "#F8F8F8"
 	}

@@ -11,7 +11,7 @@
 
 <script>
 	// 引入js文件
-	import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
+	import * as httpApi from '@/components/bytedesk_sdk/js/httpapi.js'
 	
 	export default {
 		data() {
@@ -29,46 +29,46 @@
 				let size = 20;
 				//
 				let app = this
-				httpApi.getVisitorThreads(page, size, function(response) {
-					console.log('getVisitorThreads success:', response)
-					// for (var i = 0; i < response.data.content.length; i++) {
-					// 	let thread = response.data.content[i]
-					// 	if (thread.type === 'workgroup') {
-					// 		app.workGroupThreadList.push(thread)
-					// 	} else {
-					// 		app.agentThreadList.push(thread)
-					// 	}
-					// }
-					for (var i = 0; i < response.data.content.length; i++) {
-						let thread = response.data.content[i]
-						if (thread.type === 'workgroup') {
-							let contains = false
-							for (var j = 0; j < app.workGroupThreadList.length; j++) {
-								let wthread = app.workGroupThreadList[j]
-								if (wthread.topic === thread.topic) {
-									contains = true
-								}
-							}
-							if (!contains) {
-								app.workGroupThreadList.push(thread)
-							}
-						} else {
-							let contains = false
-							for (var j = 0; j < app.agentThreadList.length; j++) {
-								let wthread = app.agentThreadList[j]
-								if (wthread.topic === thread.topic) {
-									contains = true
-								}
-							}
-							if (!contains) {
-								app.agentThreadList.push(thread)
-							}
-						}
-					}
-				}, function(error) {
-					console.log('getVisitorThreads error', error)
-					uni.showToast({ title: error, duration: 2000 });
-				})
+				// httpApi.getVisitorThreads(page, size, function(response) {
+				// 	console.log('getVisitorThreads success:', response)
+				// 	// for (var i = 0; i < response.data.content.length; i++) {
+				// 	// 	let thread = response.data.content[i]
+				// 	// 	if (thread.type === 'workgroup') {
+				// 	// 		app.workGroupThreadList.push(thread)
+				// 	// 	} else {
+				// 	// 		app.agentThreadList.push(thread)
+				// 	// 	}
+				// 	// }
+				// 	for (var i = 0; i < response.data.content.length; i++) {
+				// 		let thread = response.data.content[i]
+				// 		if (thread.type === 'workgroup') {
+				// 			let contains = false
+				// 			for (var j = 0; j < app.workGroupThreadList.length; j++) {
+				// 				let wthread = app.workGroupThreadList[j]
+				// 				if (wthread.topic === thread.topic) {
+				// 					contains = true
+				// 				}
+				// 			}
+				// 			if (!contains) {
+				// 				app.workGroupThreadList.push(thread)
+				// 			}
+				// 		} else {
+				// 			let contains = false
+				// 			for (var j = 0; j < app.agentThreadList.length; j++) {
+				// 				let wthread = app.agentThreadList[j]
+				// 				if (wthread.topic === thread.topic) {
+				// 					contains = true
+				// 				}
+				// 			}
+				// 			if (!contains) {
+				// 				app.agentThreadList.push(thread)
+				// 			}
+				// 		}
+				// 	}
+				// }, function(error) {
+				// 	console.log('getVisitorThreads error', error)
+				// 	uni.showToast({ title: error, duration: 2000 });
+				// })
 			}
 		}
 	}

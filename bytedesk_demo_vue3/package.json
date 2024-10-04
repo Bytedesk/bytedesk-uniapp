@@ -4,8 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@stomp/stompjs": "^7.0.0",
     "google-protobuf": "^3.21.2",
     "moment": "^2.29.3",
-    "mqtt": "4.0.1"
+    "mqtt": "4.0.1",
+    "vue-i18n": "^9.14.1",
+    "ws": "^8.18.0"
   }
 }

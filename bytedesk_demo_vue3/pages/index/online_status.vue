@@ -10,7 +10,7 @@
 
 <script>
 	// 引入js文件
-	import * as httpApi from '@/components/bytedesk_kefu/js/api/httpapi.js'
+	import * as httpApi from '@/components/bytedesk_sdk/js/httpapi.js'
 	
 	export default {
 		data() {
@@ -34,26 +34,26 @@
 			getWorkGroupStatus () {
 				// 获取技能组在线状态：当技能组中至少有一个客服在线时，显示在线
 				let app = this
-				httpApi.getWorkGroupStatus(this.workGroupWid, function(response) {
-					console.log('getWorkGroupStatus success:', response)
-					// online代表在线，否则为离线
-					app.workGroupOnlineStatus = response.data.status
-				}, function(error) {
-					console.log('getWorkGroupStatus error', error)
-					uni.showToast({ title: error, duration: 2000 });
-				})
+				// httpApi.getWorkGroupStatus(this.workGroupWid, function(response) {
+				// 	console.log('getWorkGroupStatus success:', response)
+				// 	// online代表在线，否则为离线
+				// 	app.workGroupOnlineStatus = response.data.status
+				// }, function(error) {
+				// 	console.log('getWorkGroupStatus error', error)
+				// 	uni.showToast({ title: error, duration: 2000 });
+				// })
 			},
 			getAgentStatus () {
 				// 获取指定客服在线状态
 				let app = this
-				httpApi.getAgentStatus(this.agentUid, function(response) {
-					console.log('getAgentStatus success:', response)
-					// online代表在线，否则为离线
-					app.agentOnlineStatus = response.data.status
-				}, function(error) {
-					console.log('getAgentStatus error', error)
-					uni.showToast({ title: error, duration: 2000 });
-				})
+				// httpApi.getAgentStatus(this.agentUid, function(response) {
+				// 	console.log('getAgentStatus success:', response)
+				// 	// online代表在线，否则为离线
+				// 	app.agentOnlineStatus = response.data.status
+				// }, function(error) {
+				// 	console.log('getAgentStatus error', error)
+				// 	uni.showToast({ title: error, duration: 2000 });
+				// })
 			}
 		}
 	}
