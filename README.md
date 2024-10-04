@@ -106,8 +106,8 @@ startChat () {
 
 |                     首页                     |                     聊天                     |                       H5                       |
 | :------------------------------------------: | :------------------------------------------: | :--------------------------------------------: |
-| <img src="./index.jpg?raw=true" width="250"> | <img src="./robot.jpg?raw=true" width="250"> |   <img src="./h5.jpg?raw=true" width="250">    |
-| <img src="./chat.jpg?raw=true" width="250">  | <img src="./rate.png?raw=true" width="250">  | <img src="./setting.jpg?raw=true" width="250"> |
+| <img src="./images/index.jpg?raw=true" width="250"> | <img src="./images/robot.jpg?raw=true" width="250"> |   <img src="./images/h5.jpg?raw=true" width="250">    |
+| <img src="./images/chat.jpg?raw=true" width="250">  | <img src="./images/rate.png?raw=true" width="250">  | <img src="./images/setting.jpg?raw=true" width="250"> |
 
 ## 以下步骤为非必须步骤，开发者可根据需要调用
 
@@ -143,13 +143,13 @@ httpApi.getUnreadCountVisitor(response => {
 - 登录[管理后台](https://www.weiyuai.cn/admin)
 
 - 首先添加分类，其次添加问答
-- <img src="./images/robot1.png" width="250">
+- <img src="./images/images/robot1.png" width="250">
 
 - 在技能组开启机器人。 找到 “客服管理”-》技能组-》点击相应技能组“编辑”按钮
-- <img src="./images/robot2.png" width="250">
+- <img src="./images/images/robot2.png" width="250">
 
 - 找到“默认机器人”和“离线机器人”，选择“是”
-- <img src="./images/robot3.png" width="250">
+- <img src="./images/images/robot3.png" width="250">
 
 - 开始测试使用机器人 -->
 
