@@ -47,7 +47,7 @@ export default {
 			unreadMessageCount: "0",
 			// 获取技能组uid，登录后台->客服->渠道->uniapp
 			// http://www.weiyuai.cn/admin/cs/channel
-			workGroupWid: 'df_wg_uid', // 默认人工
+			workGroupUid: 'df_wg_uid', // 默认人工
 			// 获取指定客服uid，登录后台->客服->渠道->uniapp
 			// http://www.weiyuai.cn/admin/cs/channel
 			agentUid: 'df_ag_uid'
@@ -121,7 +121,7 @@ export default {
 		startH5Chat () {
 			// 如果不想集成SDK，也可以直接集成H5页面即可，其余操作均可忽略，只需一步集成H5链接即可 
 			// 登录管理后台：https://www.weiyuai.cn/admin，客服-》技能组-》获取组客服代码
-			let url = "https://www.weiyuai.cn/chat/?org=df_org_uid&t=1&sid=df_wg_uid&";
+			let url = "https://www.weiyuai.cn/chat/?org=df_org_uid&t=1&sid=df_wg_uid&navbar=0&";
 			uni.navigateTo({
 				url:"../../components/bytedesk_sdk/webview?url=" + encodeURIComponent(url)
 			})

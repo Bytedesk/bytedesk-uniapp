@@ -184,12 +184,12 @@
 				</view>
 			</view>
 		</view>
-		<div v-if="showQuickButton" id="byteDesk-quick-question">
+		<!-- <div v-if="showQuickButton" id="byteDesk-quick-question">
 			<span id="byteDesk-quick-question-arrow" @click="switchQuickButtonItems()">{{ quickButtonArrow }}</span>
 			<span v-if="showQuickButtonItem" class="byteDesk-quick-question-item" 
 				v-for="item in quickButtons" :key="item.qid" 
 				@click="quickButtonItemClicked(item)">{{ item.title }}</span>
-		</div>
+		</div> -->
 		<!-- 底部输入栏 -->
 		<view class="input-box" :class="popupLayerClass" @touchmove.stop.prevent="discard">
 			<!-- H5下不能录音，输入栏布局改动一下 -->
@@ -935,27 +935,27 @@ export default {
 		},
 		doSendMessageRest(json) {
 			console.log('doSendMessageRest:', json)
-			// let app = this
-			// httpApi.sendMessageRest(JSON.stringify(json), function(response) {
-			// 	// console.log('sendMessageRest success:', response)
-			// 	let message = JSON.parse(response.data)
-			// 	for (let i = app.messages.length - 1; i >= 0; i--) {
-			// 		const msg = app.messages[i]
-			// 		// console.log('uid:', msg.uid, message.uid)
-			// 		if (msg.uid === message.uid) {
-			// 			// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
-			// 			if (app.messages[i].status === 'read' ||
-			// 				app.messages[i].status === 'received') {
-			// 				return
-			// 			}
-			// 			// Vue.set(app.messages[i], 'status', 'stored')
-			// 			app.messages[i].status = 'stored'
-			// 			return
-			// 		}
-			// 	}
-			// }, function(error) {
-			// 	console.log('send message rest error:', error)
-			// })
+			let app = this
+			bytedesk.sendMessageRest(JSON.stringify(json), function(response) {
+				console.log('sendMessageRest success:', response)
+				let message = JSON.parse(response.data)
+				for (let i = app.messages.length - 1; i >= 0; i--) {
+					const msg = app.messages[i]
+					// console.log('uid:', msg.uid, message.uid)
+					if (msg.uid === message.uid) {
+						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						if (app.messages[i].status === 'read' ||
+							app.messages[i].status === 'received') {
+							return
+						}
+						// Vue.set(app.messages[i], 'status', 'stored')
+						app.messages[i].status = 'stored'
+						return
+					}
+				}
+			}, function(error) {
+				console.log('send message rest error:', error)
+			})
 		},
 		// 本地消息存储
 		pushToMessageArray(message) {
@@ -1146,9 +1146,9 @@ export default {
 			}
 		},
 		//
-		currentTimestamp () {
-			return moment().format('YYYY-MM-DD HH:mm:ss')
-		},
+		// currentTimestamp () {
+		// 	return moment().format('YYYY-MM-DD HH:mm:ss')
+		// },
 		// 点击商品回调
 		commodityCallback (message) {
 			// console.log('commodity:', message)
@@ -1431,55 +1431,55 @@ export default {
 			this.showTopTip = false
 		},
 		// 切换
-		switchQuickButtonItems() {
-			this.showQuickButtonItem = !this.showQuickButtonItem
-			if (this.showQuickButtonItem) {
-				this.quickButtonArrow = '↓'
-			} else {
-				this.quickButtonArrow = '↑'
-			}
-		},
-		quickButtonItemClicked(item) {
-			// console.log(item)
-			if (item.type === 'url') {
-				window.open(item.content)
-			} else {
-				var localId = this.guid();
-				var message = {
-					uid: localId,
-					type: 'text',
-					content: item.title,
-					createdAt: this.currentTimestamp(),
-					localId: localId,
-					status: 'stored',
-					user: {
-						uid: this.my_uid(),
-						username: this.username,
-						nickname: this.my_nickname(),
-						avatar: this.my_avatar()
-					}
-				};
-				this.pushToMessageArray(message);
-				//
-				var localId2 = this.guid();
-				var message2 = {
-					uid: localId2,
-					type: 'text',
-					content: item.content,
-					createdAt: this.currentTimestamp(),
-					localId: localId,
-					status: 'stored',
-					user: {
-						uid: '',
-						username: '',
-						nickname: '系统',
-						avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png'
-					}
-				};
-				this.pushToMessageArray(message2);
-				this.scrollToBottom()
-			}
-		},
+		// switchQuickButtonItems() {
+		// 	this.showQuickButtonItem = !this.showQuickButtonItem
+		// 	if (this.showQuickButtonItem) {
+		// 		this.quickButtonArrow = '↓'
+		// 	} else {
+		// 		this.quickButtonArrow = '↑'
+		// 	}
+		// },
+		// quickButtonItemClicked(item) {
+		// 	// console.log(item)
+		// 	if (item.type === 'url') {
+		// 		window.open(item.content)
+		// 	} else {
+		// 		var localId = this.guid();
+		// 		var message = {
+		// 			uid: localId,
+		// 			type: 'text',
+		// 			content: item.title,
+		// 			createdAt: utils.currentTimestamp(),
+		// 			localId: localId,
+		// 			status: 'stored',
+		// 			user: {
+		// 				uid: this.my_uid(),
+		// 				username: this.username,
+		// 				nickname: this.my_nickname(),
+		// 				avatar: this.my_avatar()
+		// 			}
+		// 		};
+		// 		this.pushToMessageArray(message);
+		// 		//
+		// 		var localId2 = this.guid();
+		// 		var message2 = {
+		// 			uid: localId2,
+		// 			type: 'text',
+		// 			content: item.content,
+		// 			createdAt: utils.currentTimestamp(),
+		// 			localId: localId,
+		// 			status: 'stored',
+		// 			user: {
+		// 				uid: '',
+		// 				username: '',
+		// 				nickname: '系统',
+		// 				avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png'
+		// 			}
+		// 		};
+		// 		this.pushToMessageArray(message2);
+		// 		this.scrollToBottom()
+		// 	}
+		// },
 		loadMoreMessages() {},
 		checkTimeoutMessage() {
 		  // 检测-消息是否超时发送失败

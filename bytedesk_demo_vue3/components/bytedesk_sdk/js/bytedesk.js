@@ -2,7 +2,7 @@
  * @Author: jack ning github@bytedesk.com
  * @Date: 2022-03-10 14:57:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-01 10:34:00
+ * @LastEditTime: 2024-10-05 11:37:32
  * @FilePath: /bytedesk_uniapp/bytedesk_demo_vue3/components/bytedesk_sdk/js/api/bytedesk.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -112,9 +112,9 @@ export function initWithUidAndNicknameAndAvatar(orgUid, uid, nickname, avatar) {
 }
 
 // 请求一对一客服会话
-export function requestAgentThread(sid, successcb, failedcb) {
-	requestThread("0", sid, false, successcb, failedcb)
-}
+// export function requestAgentThread(sid, successcb, failedcb) {
+// 	requestThread("0", sid, false, successcb, failedcb)
+// }
 
 // 请求一对一客服会话，forceAgent为true时强制分配给人工客服
 // export function requestAgentThread(sid, forceAgent, successcb, failedcb) {
@@ -122,9 +122,9 @@ export function requestAgentThread(sid, successcb, failedcb) {
 // }
 
 // 请求技能组会话
-export function requestWorkgroupThread(sid, successcb, failedcb) {
-	requestThread("1", sid, false, successcb, failedcb)
-}
+// export function requestWorkgroupThread(sid, successcb, failedcb) {
+// 	requestThread("1", sid, false, successcb, failedcb)
+// }
 
 // 请求技能组会话，forceAgent为true时强制分配给人工客服
 // export function requestWorkgroupThread(sid, forceAgent, successcb, failedcb) {

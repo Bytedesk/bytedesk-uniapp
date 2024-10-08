@@ -1,27 +1,27 @@
 // 本地测试
-export const IS_DEBUG = true;
-export const API_BASE_URL = 'http://127.0.0.1:9003';
-export const BASE_HOST = "127.0.0.1:9003";
-export const BASE_URL = "http://127.0.0.1:9003";
-export const STOMP_WS_URL = "ws://127.0.0.1:9003/stomp"
-export const STOMP_SOCKJS_URL = "http://127.0.0.1:9003/sockjs";
-export const UPLOAD_FILE_URL = "http://127.0.0.1:9003/visitor/api/v1/upload/file";
+// export const IS_DEBUG = true;
+// export const API_BASE_URL = 'http://127.0.0.1:9003';
+// export const BASE_HOST = "127.0.0.1:9003";
+// export const BASE_URL = "http://127.0.0.1:9003";
+// export const STOMP_WS_URL = "ws://127.0.0.1:9003/stomp"
+// export const STOMP_SOCKJS_URL = "http://127.0.0.1:9003/sockjs";
+// export const UPLOAD_FILE_URL = "http://127.0.0.1:9003/visitor/api/v1/upload/file";
 // 
 // export const MQTT_PORT = 9885;
 // export const MQTT_WS_HOST = '127.0.0.1';
 // export const MQTT_HOST = 'wss://127.0.0.1:9885/websocket';
 
 // 线上环境
-// export const IS_DEBUG = false;
-// export const API_BASE_URL = 'https://api.weiyuai.cn';
-// export const MQTT_PORT = 3885;
-// export const MQTT_WS_HOST = 'api.weiyuai.cn';
-// export const MQTT_HOST = 'wss://api.weiyuai.cn/websocket';
-// export const BASE_HOST = "api.weiyuai.cn";
-// export const BASE_URL = "https://api.weiyuai.cn";
-// export const STOMP_WS_URL = "wss://api.weiyuai.cn/stomp";
-// export const STOMP_SOCKJS_URL = "https://api.weiyuai.cn/sockjs";
-// export const UPLOAD_FILE_URL = "https://api.weiyuai.cn/visitor/api/v1/upload/file";
+export const IS_DEBUG = false;
+export const API_BASE_URL = 'https://api.weiyuai.cn';
+export const MQTT_PORT = 3885;
+export const MQTT_WS_HOST = 'api.weiyuai.cn';
+export const MQTT_HOST = 'wss://api.weiyuai.cn/websocket';
+export const BASE_HOST = "api.weiyuai.cn";
+export const BASE_URL = "https://api.weiyuai.cn";
+export const STOMP_WS_URL = "wss://api.weiyuai.cn/stomp";
+export const STOMP_SOCKJS_URL = "https://api.weiyuai.cn/sockjs";
+export const UPLOAD_FILE_URL = "https://api.weiyuai.cn/visitor/api/v1/upload/file";
 //
 export const HTTP_CLIENT = 'uniapp';
 export const PLATFORM = "weiyuai";
@@ -219,11 +219,11 @@ export const AUTO_REPLY_TYPE_KEYWORD = "KEYWORD";
 export const AUTO_REPLY_TYPE_LLM = "LLM";
 // 
 export const EVENT_BUS_MESSAGE = 'BYTEDESK_EVENT_BUS_MESSAGE';
-// stomp连接中
-export const STOMP_CONNECTION_STATUS_CONNECTING = 'connecting';
-// stomp连接成功
-export const STOMP_CONNECTION_STATUS_CONNECTED = 'connected';
-// stomp连接断开
-export const STOMP_CONNECTION_STATUS_DISCONNECTED = 'disconnncted';
+// 连接中
+export const CONNECTION_STATUS_CONNECTING = 'connecting';
+// 连接成功
+export const CONNECTION_STATUS_CONNECTED = 'connected';
+// 连接断开
+export const CONNECTION_STATUS_DISCONNECTED = 'disconnncted';
 // 长连接状态
-export const EVENT_BUS_STOMP_CONNECTION_STATUS = 'EVENT_BUS_STOMP_CONNECTION_STATUS';
+export const EVENT_BUS_CONNECTION_STATUS = 'EVENT_BUS_CONNECTION_STATUS';

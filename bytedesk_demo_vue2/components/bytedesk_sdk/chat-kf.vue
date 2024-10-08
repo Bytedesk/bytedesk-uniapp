@@ -190,12 +190,12 @@
 				<button class="mini-btn" size="mini">123</button>
 			</view>
 		</view> -->
-		<div v-if="showQuickButton" id="byteDesk-quick-question">
+		<!-- <div v-if="showQuickButton" id="byteDesk-quick-question">
 			<span id="byteDesk-quick-question-arrow" @click="switchQuickButtonItems()">{{ quickButtonArrow }}</span>
 			<span v-if="showQuickButtonItem" class="byteDesk-quick-question-item" 
 				v-for="item in quickButtons" :key="item.qid" 
 				@click="quickButtonItemClicked(item)">{{ item.title }}</span>
-		</div>
+		</div> -->
 		<!-- 底部输入栏 -->
 		<view class="input-box" :class="popupLayerClass" @touchmove.stop.prevent="discard">
 			<!-- H5下不能录音，输入栏布局改动一下 -->
@@ -889,7 +889,7 @@ export default {
 				"type": type,
 				"content": content,
 				"status": constants.MESSAGE_STATUS_SENDING,
-				"createdAt": this.currentTimestamp(),
+				"createdAt": utils.currentTimestamp(),
 				"client": constants.HTTP_CLIENT,
 				"extra": JSON.stringify(messageExtra),
 				"user": {
@@ -938,26 +938,26 @@ export default {
 		},
 		doSendMessageRest(json) {
 			console.log('doSendMessageRest:', json)
-			// let app = this
-			// httpApi.sendMessageRest(JSON.stringify(json), function(response) {
-			// 	console.log('sendMessageRest success:', response)
-			// 	let message = JSON.parse(response.data)
-			// 	for (let i = app.messages.length - 1; i >= 0; i--) {
-			// 		const msg = app.messages[i]
-			// 		// console.log('uid:', msg.uid, message.uid)
-			// 		if (msg.uid === message.uid) {
-			// 			// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
-			// 			if (app.messages[i].status === 'read' ||
-			// 				app.messages[i].status === 'received') {
-			// 				return
-			// 			}
-			// 			Vue.set(app.messages[i], 'status', 'stored')
-			// 			return
-			// 		}
-			// 	}
-			// }, function(error) {
-			// 	console.log('send message rest error:', error)
-			// })
+			let app = this
+			bytedesk.sendRestMessage(JSON.stringify(json), function(response) {
+				console.log('sendMessageRest success:', response)
+				let message = JSON.parse(response.data)
+				for (let i = app.messages.length - 1; i >= 0; i--) {
+					const msg = app.messages[i]
+					// console.log('uid:', msg.uid, message.uid)
+					if (msg.uid === message.uid) {
+						// 可更新顺序 read > received > stored > sending, 前面的状态可更新后面的
+						if (app.messages[i].status === 'read' ||
+							app.messages[i].status === 'received') {
+							return
+						}
+						Vue.set(app.messages[i], 'status', 'stored')
+						return
+					}
+				}
+			}, function(error) {
+				console.log('send message rest error:', error)
+			})
 		},
 		// 本地消息存储
 		pushToMessageArray(message) {
@@ -1098,9 +1098,9 @@ export default {
 			}
 		},
 		//
-		currentTimestamp () {
-			return moment().format('YYYY-MM-DD HH:mm:ss')
-		},
+		// currentTimestamp () {
+		// 	return moment().format('YYYY-MM-DD HH:mm:ss')
+		// },
 		// 点击商品回调
 		commodityCallback (message) {
 			// console.log('commodity:', message)

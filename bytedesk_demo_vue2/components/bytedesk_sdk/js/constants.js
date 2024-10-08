@@ -1,24 +1,24 @@
 // 常量
 module.exports = {
   // 本地测试
-  IS_DEBUG: true,
-  BASE_HOST: "127.0.0.1:9003",
-  BASE_URL: "http://127.0.0.1:9003",
-  STOMP_WS_URL: "ws://127.0.0.1:9003/stomp",
-  STOMP_SOCKJS_URL: "http://127.0.0.1:9003/sockjs",
-  UPLOAD_FILE_URL: "http://127.0.0.1:9003/visitor/api/v1/upload/file",
+  // IS_DEBUG: true,
+  // BASE_HOST: "127.0.0.1:9003",
+  // BASE_URL: "http://127.0.0.1:9003",
+  // STOMP_WS_URL: "ws://127.0.0.1:9003/stomp",
+  // STOMP_SOCKJS_URL: "http://127.0.0.1:9003/sockjs",
+  // UPLOAD_FILE_URL: "http://127.0.0.1:9003/visitor/api/v1/upload/file",
   //
   // MQTT_PORT: 9885,
   // MQTT_WS_HOST: '127.0.0.1',
   // MQTT_HOST: 'wss://127.0.0.1:9885/websocket',
   // 
   // 线上环境
-  // IS_DEBUG:false
-  // BASE_HOST: "api.weiyuai.cn",
-  // BASE_URL: "https://api.weiyuai.cn",
-  // STOMP_WS_URL: "wss://api.weiyuai.cn/stomp",
-  // STOMP_SOCKJS_URL: "https://api.weiyuai.cn/sockjs",
-  // UPLOAD_FILE_URL: "https://api.weiyuai.cn/visitor/api/v1/upload/file",
+  IS_DEBUG: false,
+  BASE_HOST: "api.weiyuai.cn",
+  BASE_URL: "https://api.weiyuai.cn",
+  STOMP_WS_URL: "wss://api.weiyuai.cn/stomp",
+  STOMP_SOCKJS_URL: "https://api.weiyuai.cn/sockjs",
+  UPLOAD_FILE_URL: "https://api.weiyuai.cn/visitor/api/v1/upload/file",
   // 
   // MQTT_PORT:3885
   // MQTT_WS_HOST:'api.weiyuai.cn'
@@ -219,12 +219,12 @@ module.exports = {
   AUTO_REPLY_TYPE_LLM: "LLM",
   // 
   EVENT_BUS_MESSAGE: 'BYTEDESK_EVENT_BUS_MESSAGE',
-  // stomp连接中
-  STOMP_CONNECTION_STATUS_CONNECTING: 'connecting',
-  // stomp连接成功
-  STOMP_CONNECTION_STATUS_CONNECTED: 'connected',
-  // stomp连接断开
-  STOMP_CONNECTION_STATUS_DISCONNECTED: 'disconnncted',
+  // 连接中
+  CONNECTION_STATUS_CONNECTING: 'connecting',
+  // 连接成功
+  CONNECTION_STATUS_CONNECTED: 'connected',
+  // 连接断开
+  CONNECTION_STATUS_DISCONNECTED: 'disconnncted',
   // 长连接状态
-  EVENT_BUS_STOMP_CONNECTION_STATUS: 'EVENT_BUS_STOMP_CONNECTION_STATUS',
+  EVENT_BUS_CONNECTION_STATUS: 'EVENT_BUS_CONNECTION_STATUS',
 }

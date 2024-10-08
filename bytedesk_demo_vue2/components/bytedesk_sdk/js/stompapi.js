@@ -3,7 +3,6 @@ const constants = require('./constants.js')
 const Stomp = require('./stomp.min.js').Stomp;
 //
 let uid;
-// let username;
 let nickname;
 let avatar;
 //
@@ -12,7 +11,7 @@ let stompReconnectTimes = 0;
 // 订阅主题topic
 let subscribedTopics = []
 // socket连接中
-let socketConnecting = false
+// let socketConnecting = false
 // socket是否连接
 let socketConnected = false;
 // socketTask实例
@@ -343,52 +342,7 @@ var stompApi = {
 
 	//
 	sendReceiptMessage: function (messageObject) {
-		//   if (messageObject.user.uid !== this.uid 
-		// 	&& messageObject.type !== 'robot' 
-		// 	&& messageObject.type !== "robot_result"
-		// 	&& messageObject.type !== 'notification_preview'
-		// 	&& messageObject.type !== 'notification_receipt'
-		// 	&& messageObject.type !== 'notification_recall'
-		// 	&& messageObject.type !== 'notification_form_request'
-		// 	&& messageObject.type !== 'notification_form_result'
-		// 	&& messageObject.type !== 'notification_connect'
-		// 	&& messageObject.type !== 'notification_disconnect') {
-		// 	//
-		// 	// let topic = messageObject.thread.topic.replace(/\//g, ".");
-		// 	// var json = {
-		// 	// 	"mid": stompApi.guid(),
-		// 	// 	"timestamp": stompApi.currentTimestamp(),
-		// 	// 	"client": constants.client,
-		// 	// 	"version": "1",
-		// 	// 	"type": "notification_receipt",
-		// 	// 	"status": constants.MESSAGE_STATUS_SENDING,
-		// 	// 	"user": {
-		// 	// 		"uid": uid,
-		// 	// 		"username": username,
-		// 	// 		"nickname": nickname,
-		// 	// 		"avatar": avatar,
-		// 	// 		"extra": {
-		// 	// 			"agent": false
-		// 	// 		}
-		// 	// 	},
-		// 	// 	"receipt": {
-		// 	// 		"mid": messageObject.mid,
-		// 	// 		"status": constants.MESSAGE_STATUS_RECEIVED
-		// 	// 	},
-		// 	// 	"thread": {
-		// 	// 		"tid": messageObject.thread.tid,
-		// 	// 		"type": messageObject.thread.type,
-		// 	// 		// "content": content,
-		// 	// 		"nickname": nickname,
-		// 	// 		"avatar": avatar,
-		// 	// 		"topic": topic,
-		// 	// 		"client": constants.client,
-		// 	// 		"timestamp": stompApi.currentTimestamp(),
-		// 	// 		"unreadCount": 0
-		// 	// 	}
-		// 	// };
-		// 	// stompApi.sendMessage(topic, JSON.stringify(json));
-		//   }
+		console.log('sendReceiptMessage:', messageObject)
 	},
 
 	// 打印log

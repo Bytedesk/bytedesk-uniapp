@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import * as constants from './constants.js'
 import * as httpApi from './httpapi.js'
-import * as stompApi from './stompapi.js'
+// import * as stompApi from './stompapi.js'
 
 /**
  * 简单初始化
@@ -53,7 +53,6 @@ export function initWithCallback(orgUid, successcb, failedcb) {
  */
 export function initWithUid(orgUid, uid) {
 	const nickname = uni.getStorageSync(constants.VISITOR_NICKNAME);
-	// 
 	initWithUidAndNickname(orgUid, uid, nickname)
 }
 
@@ -62,14 +61,12 @@ export function initWithUid(orgUid, uid) {
  */
 export function initWithUidAndNickname(orgUid, uid, nickname) {
 	const avatar = uni.getStorageSync(constants.VISITOR_AVATAR);
-	// 
 	initWithUidAndNicknameAndAvatar(orgUid, uid, nickname, avatar)
 }
 
 // 自定义昵称 + 头像初始化登录
 export function initWithNicknameAndAvatar(orgUid, nickname, avatar) {
 	const uid = uni.getStorageSync(constants.VISITOR_UID);
-	// 
 	initWithUidAndNicknameAndAvatar(orgUid, uid, nickname, avatar)
 }
 
@@ -104,9 +101,9 @@ export function initWithUidAndNicknameAndAvatar(orgUid, uid, nickname, avatar) {
 }
 
 // 请求一对一客服会话
-export function requestAgentThread(sid, successcb, failedcb) {
-	requestThread("0", sid, false, successcb, failedcb)
-}
+// export function requestAgentThread(sid, successcb, failedcb) {
+// 	requestThread("0", sid, false, successcb, failedcb)
+// }
 
 // 请求一对一客服会话，forceAgent为true时强制分配给人工客服
 // export function requestAgentThread(sid, forceAgent, successcb, failedcb) {
@@ -114,9 +111,9 @@ export function requestAgentThread(sid, successcb, failedcb) {
 // }
 
 // 请求技能组会话
-export function requestWorkgroupThread(sid, successcb, failedcb) {
-	requestThread("1", sid, false, successcb, failedcb)
-}
+// export function requestWorkgroupThread(sid, successcb, failedcb) {
+// 	requestThread("1", sid, false, successcb, failedcb)
+// }
 
 // 请求技能组会话，forceAgent为true时强制分配给人工客服
 // export function requestWorkgroupThread(sid, forceAgent, successcb, failedcb) {

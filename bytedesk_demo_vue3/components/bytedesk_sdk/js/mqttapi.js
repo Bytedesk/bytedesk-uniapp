@@ -104,8 +104,8 @@ export function mqttConnect (callback) {
 	}      
     printLog('mqtt connecting...')
 	// 更新连接状态：连接中...
-    let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTING
-    uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+    let connectionStatus = constants.CONNECTION_STATUS_CONNECTING
+    uni.$emit(constants.EVENT_BUS_CONNECTION_STATUS, connectionStatus)
     // to disable logging, set it to an empty function:
     mqttClient.on('connect', function () {
       printLog('connected');
@@ -115,7 +115,7 @@ export function mqttConnect (callback) {
       mqttReconnectTimes = 0
       // 更新连接状态：连接成功
     //   let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTED
-      uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, 'connected')
+      uni.$emit(constants.EVENT_BUS_CONNECTION_STATUS, 'connected')
 	  // 长连接成功回调
 	  callback()
     }, function (error) {
@@ -128,8 +128,8 @@ export function mqttConnect (callback) {
         // bus.$emit(constants.EVENT_BUS_LOGOUT, 'logout')
       }
       // 更新连接状态: 断开
-      let connectionStatus = constants.STOMP_CONNECTION_STATUS_DISCONNECTED
-      uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+      let connectionStatus = constants.CONNECTION_STATUS_DISCONNECTED
+      uni.$emit(constants.EVENT_BUS_CONNECTION_STATUS, connectionStatus)
       // 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
       setTimeout(function () {
         printLog('reconnecting...')
