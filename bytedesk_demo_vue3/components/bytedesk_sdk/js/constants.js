@@ -14,14 +14,15 @@
 // 线上环境
 export const IS_DEBUG = false;
 export const API_BASE_URL = 'https://api.weiyuai.cn';
-export const MQTT_PORT = 3885;
-export const MQTT_WS_HOST = 'api.weiyuai.cn';
-export const MQTT_HOST = 'wss://api.weiyuai.cn/websocket';
 export const BASE_HOST = "api.weiyuai.cn";
 export const BASE_URL = "https://api.weiyuai.cn";
 export const STOMP_WS_URL = "wss://api.weiyuai.cn/stomp";
 export const STOMP_SOCKJS_URL = "https://api.weiyuai.cn/sockjs";
 export const UPLOAD_FILE_URL = "https://api.weiyuai.cn/visitor/api/v1/upload/file";
+// 
+// export const MQTT_PORT = 3885;
+// export const MQTT_WS_HOST = 'api.weiyuai.cn';
+// export const MQTT_HOST = 'wss://api.weiyuai.cn/websocket';
 //
 export const HTTP_CLIENT = 'uniapp';
 export const PLATFORM = "weiyuai";

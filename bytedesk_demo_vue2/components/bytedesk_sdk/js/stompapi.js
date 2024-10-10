@@ -207,9 +207,9 @@ var stompApi = {
 		stompClient.heartbeat.incoming = 20000;
 		stompApi.printLog('stomp connecting...')
 		// 更新连接状态：连接中...
-		let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTING
+		let connectionStatus = constants.CONNECTION_STATUS_CONNECTING
 		// commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
-		uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+		uni.$emit(constants.EVENT_BUS_CONNECTION_STATUS, connectionStatus)
 		// to disable logging, set it to an empty function:
 		if (constants.IS_PRODUCTION) {
 			stompClient.debug = function (value) { }
@@ -230,9 +230,9 @@ var stompApi = {
 				stompApi.subscribeTopic(tp)
 			}
 			// 更新连接状态：连接成功
-			let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTED
+			let connectionStatus = constants.CONNECTION_STATUS_CONNECTED
 			// commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
-			uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+			uni.$emit(constants.EVENT_BUS_CONNECTION_STATUS, connectionStatus)
 			// 长连接成功回调
 			callback()
 		}, function (error) {
@@ -244,9 +244,9 @@ var stompApi = {
 				// bus.$emit(constants.EVENT_BUS_LOGOUT, 'logout')
 			}
 			// 更新连接状态: 断开
-			let connectionStatus = constants.STOMP_CONNECTION_STATUS_DISCONNECTED
+			let connectionStatus = constants.CONNECTION_STATUS_DISCONNECTED
 			// commit(types.UPDATE_USER_CONNECTION, { connectionStatus }, { root: true })
-			uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+			uni.$emit(constants.EVENT_BUS_CONNECTION_STATUS, connectionStatus)
 			// 10秒后重新连接，实际效果：每10秒重连一次，直到连接成功
 			setTimeout(function () {
 				stompApi.printLog('reconnecting...')

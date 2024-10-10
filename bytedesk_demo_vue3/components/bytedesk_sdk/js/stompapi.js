@@ -218,8 +218,8 @@ export function stompConnect(topic, orgUid) {
 	});
 	console.log('stomp connecting...')
 	// 更新连接状态：连接中...
-	// let connectionStatus = constants.STOMP_CONNECTION_STATUS_CONNECTING
-	// uni.$emit(constants.EVENT_BUS_STOMP_CONNECTION_STATUS, connectionStatus)
+	// let connectionStatus = constants.CONNECTION_STATUS_CONNECTING
+	// uni.$emit(constants.EVENT_BUS_CONNECTION_STATUS, connectionStatus)
 	if (!constants.IS_DEBUG) {
 		stompClient.debug = function (value) { }
 	}

@@ -7,10 +7,6 @@ module.exports = {
   // STOMP_WS_URL: "ws://127.0.0.1:9003/stomp",
   // STOMP_SOCKJS_URL: "http://127.0.0.1:9003/sockjs",
   // UPLOAD_FILE_URL: "http://127.0.0.1:9003/visitor/api/v1/upload/file",
-  //
-  // MQTT_PORT: 9885,
-  // MQTT_WS_HOST: '127.0.0.1',
-  // MQTT_HOST: 'wss://127.0.0.1:9885/websocket',
   // 
   // 线上环境
   IS_DEBUG: false,
@@ -19,10 +15,6 @@ module.exports = {
   STOMP_WS_URL: "wss://api.weiyuai.cn/stomp",
   STOMP_SOCKJS_URL: "https://api.weiyuai.cn/sockjs",
   UPLOAD_FILE_URL: "https://api.weiyuai.cn/visitor/api/v1/upload/file",
-  // 
-  // MQTT_PORT:3885
-  // MQTT_WS_HOST:'api.weiyuai.cn'
-  // MQTT_HOST:'wss://api.weiyuai.cn/websocket'
   //
   HTTP_CLIENT: 'uniapp',
   PLATFORM: "weiyuai",
