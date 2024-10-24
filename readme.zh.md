@@ -3,7 +3,7 @@
 - [官网](https://www.weiyuai.cn/)
 - [萝卜丝->请切换此分支](https://gitee.com/270580156/bytedesk-uniapp/tree/luobosi/)
 
-## Language
+## 语言
 
 - [English](./README.md)
 - [中文](./README.zh.md)
