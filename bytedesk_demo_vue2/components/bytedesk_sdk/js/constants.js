@@ -7,7 +7,7 @@ module.exports = {
   // STOMP_WS_URL: "ws://127.0.0.1:9003/stomp",
   // STOMP_SOCKJS_URL: "http://127.0.0.1:9003/sockjs",
   // UPLOAD_FILE_URL: "http://127.0.0.1:9003/visitor/api/v1/upload/file",
-  // 
+  
   // 线上环境
   IS_DEBUG: false,
   BASE_HOST: "api.weiyuai.cn",
@@ -76,7 +76,7 @@ module.exports = {
   THREAD_TYPE_GROUP: "GROUP",
   THREAD_TYPE_LEAVEMSG: "LEAVEMSG",
   THREAD_TYPE_FEEDBACK: "FEEDBACK",
-  THREAD_TYPE_ASISTANT: "ASISTANT",
+  THREAD_TYPE_ASSISTANT: "ASSISTANT",
   THREAD_TYPE_CHANNEL: "CHANNEL",
   THREAD_TYPE_LOCAL: "LOCAL",
   //
@@ -172,7 +172,7 @@ module.exports = {
   MESSAGE_TYPE_INVITE_ACCEPT: "INVITE_ACCEPT", // 邀请-接受
   MESSAGE_TYPE_INVITE_REJECT: "INVITE_REJECT", // 邀请-拒绝
   //
-  TOPIC_FILE_ASISTANT: "file",
+  TOPIC_FILE_ASSISTANT: "file",
   TOPIC_SYSTEM_NOTIFICATION: "system",
   // 注意：没有 '/' 开头，防止stomp主题中奖 '/' 替换为 '.'之后，在最前面多余一个 '.'
   TOPIC_USER_PREFIX: "user/",
@@ -193,7 +193,7 @@ module.exports = {
   TOPIC_ORG_KB_PREFIX: "org/kb/",
   TOPIC_ORG_KBDOC_PREFIX: "org/kbdoc/",
   //
-  KB_TYPE_ASISTANT: "ASISTANT",
+  KB_TYPE_ASSISTANT: "ASSISTANT",
   KB_TYPE_HELPDOC: "HELPDOC",
   KB_TYPE_LLM: "LLM",
   KB_TYPE_KEYWORD: "KEYWORD",

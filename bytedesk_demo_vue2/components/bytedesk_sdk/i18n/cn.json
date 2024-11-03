@@ -67,7 +67,7 @@
   "i18n.guess.faq": "猜你相问",
   "i18n.hot.faq": "热门问题",
   "i18n.change.faq": "换一换",
-  "i18n.file.asistant": "文件助手",
+  "i18n.file.assistant": "文件助手",
   "i18n.thread.content.image": "图片",
   "i18n.thread.content.file": "文件",
   "i18n.system.notification": "系统通知",
@@ -80,7 +80,7 @@
   "i18n.robot.nickname": "默认机器人",
   "i18n.robot.description": "默认机器人描述",
   "i18n.robot.noreply": "未找到相应答案",
-  "i18n.robot.agent.asistant.nickname": "客服助手",
+  "i18n.robot.agent.assistant.nickname": "客服助手",
   "i18n.llm.prompt":
     "你是一个聪明、对人类有帮助的人工智能，你可以对人类提出的问题给出有用、详细、礼貌的回答",
   "i18n.agent.nickname": "默认客服",

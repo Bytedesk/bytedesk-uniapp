@@ -2,7 +2,7 @@
  * @Author: jack ning github@bytedesk.com
  * @Date: 2022-03-10 14:57:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-05 11:37:32
+ * @LastEditTime: 2024-10-18 18:50:11
  * @FilePath: /bytedesk_uniapp/bytedesk_demo_vue3/components/bytedesk_sdk/js/api/bytedesk.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -19,6 +19,7 @@ export function init(orgUid) {
 	// 本地持久化
 	initWithCallback(orgUid, function(result) {
 		// console.log('init success:', result)
+		// TODO: 拉取离线消息
 	}, function(error) {
 		// console.log('init error:', error)
 	})

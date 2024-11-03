@@ -898,7 +898,7 @@ export default {
 					"uid": this.thread.uid,
 					"topic": this.thread.topic,
 					"type": this.thread.type,
-					"status": this.thread.status,
+					"state": this.thread.state,
 					"user": this.thread.user
 				}
 			};

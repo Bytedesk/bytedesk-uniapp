@@ -11,6 +11,7 @@ export function init(orgUid) {
 	// 本地持久化
 	initWithCallback(orgUid, function(result) {
 		// console.log('init success:', result)
+		// TODO: 拉取离线消息
 	}, function(error) {
 		// console.log('init error:', error)
 	})

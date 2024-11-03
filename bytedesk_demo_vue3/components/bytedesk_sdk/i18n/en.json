@@ -67,7 +67,7 @@
   "i18n.guess.faq": "Guess",
   "i18n.hot.faq": "Hot",
   "i18n.change.faq": "Change",
-  "i18n.file.asistant": "file assistant",
+  "i18n.file.assistant": "file assistant",
   "i18n.thread.content.image": "image",
   "i18n.thread.content.file": "file",
   "i18n.system.notification": "notification",
@@ -80,7 +80,7 @@
   "i18n.robot.nickname": "DefaultRobot",
   "i18n.robot.description": "Default Robot Description",
   "i18n.robot.noreply": "Answer Not Found",
-  "i18n.robot.agent.asistant.nickname": "DefaultAsistant",
+  "i18n.robot.agent.assistant.nickname": "DefaultAsistant",
   "i18n.llm.prompt":
     "You are a smart and helpful artificial intelligence, capable of providing useful, detailed, and polite answers to human questions.",
   "i18n.agent.nickname": "DefaultAgent",

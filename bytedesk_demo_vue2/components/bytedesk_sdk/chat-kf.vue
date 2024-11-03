@@ -851,8 +851,8 @@ export default {
 			// 	$("input")[1].focus()
 			// }, 100);
 		},
-		sendImageMessage(imageUrl) {
-			this.sendMessage(constants.MESSAGE_TYPE_IMAGE, imageUrl)
+		sendImageMessage(content) {
+			this.sendMessage(constants.MESSAGE_TYPE_IMAGE, content)
 		},
 		// 发送预知消息
 		sendPreviewMessage() {
@@ -876,7 +876,7 @@ export default {
 				uni.showToast({ title: this.$t('msgtoolong'), icon:'none', duration: 2000 });
 				return;
 			}
-			if (this.thread.tid === '') {
+			if (this.thread.uid === '') {
 				uni.showToast({ title: this.$t('pleaseWait'), icon:'none', duration: 2000 });
 				return;
 			}
@@ -901,7 +901,7 @@ export default {
 					"uid": this.thread.uid,
 					"topic": this.thread.topic,
 					"type": this.thread.type,
-					"status": this.thread.status,
+					"state": this.thread.state,
 					"user": this.thread.user
 				}
 			};
@@ -923,7 +923,7 @@ export default {
 				return
 			}
 			// 会话请求成功之后，才能够发送消息
-			if (this.thread.tid === '') {
+			if (this.thread.uid === '') {
 				uni.showToast({ title: '请求会话中, 请稍后', icon:'none', duration: 2000 });
 				return;
 			}
@@ -940,7 +940,7 @@ export default {
 			console.log('doSendMessageRest:', json)
 			let app = this
 			bytedesk.sendRestMessage(JSON.stringify(json), function(response) {
-				console.log('sendMessageRest success:', response)
+				console.log('sendRestMessage success:', response)
 				let message = JSON.parse(response.data)
 				for (let i = app.messages.length - 1; i >= 0; i--) {
 					const msg = app.messages[i]
@@ -1175,7 +1175,7 @@ export default {
 		gotoRatePage () {
 			//
 			uni.navigateTo({
-				url: './rate?tid=' + this.thread.tid + '&invite=' + this.isInviteRate
+				url: './rate?uid=' + this.thread.uid + '&invite=' + this.isInviteRate
 			});
 		},
 		//更多功能(点击+弹出) 

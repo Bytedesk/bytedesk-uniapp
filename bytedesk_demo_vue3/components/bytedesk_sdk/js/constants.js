@@ -6,10 +6,6 @@
 // export const STOMP_WS_URL = "ws://127.0.0.1:9003/stomp"
 // export const STOMP_SOCKJS_URL = "http://127.0.0.1:9003/sockjs";
 // export const UPLOAD_FILE_URL = "http://127.0.0.1:9003/visitor/api/v1/upload/file";
-// 
-// export const MQTT_PORT = 9885;
-// export const MQTT_WS_HOST = '127.0.0.1';
-// export const MQTT_HOST = 'wss://127.0.0.1:9885/websocket';
 
 // 线上环境
 export const IS_DEBUG = false;
@@ -19,10 +15,7 @@ export const BASE_URL = "https://api.weiyuai.cn";
 export const STOMP_WS_URL = "wss://api.weiyuai.cn/stomp";
 export const STOMP_SOCKJS_URL = "https://api.weiyuai.cn/sockjs";
 export const UPLOAD_FILE_URL = "https://api.weiyuai.cn/visitor/api/v1/upload/file";
-// 
-// export const MQTT_PORT = 3885;
-// export const MQTT_WS_HOST = 'api.weiyuai.cn';
-// export const MQTT_HOST = 'wss://api.weiyuai.cn/websocket';
+
 //
 export const HTTP_CLIENT = 'uniapp';
 export const PLATFORM = "weiyuai";
@@ -85,7 +78,7 @@ export const THREAD_TYPE_MEMBER = "MEMBER";
 export const THREAD_TYPE_GROUP = "GROUP";
 export const THREAD_TYPE_LEAVEMSG = "LEAVEMSG";
 export const THREAD_TYPE_FEEDBACK = "FEEDBACK";
-export const THREAD_TYPE_ASISTANT = "ASISTANT";
+export const THREAD_TYPE_ASSISTANT = "ASSISTANT";
 export const THREAD_TYPE_CHANNEL = "CHANNEL";
 export const THREAD_TYPE_LOCAL = "LOCAL";
 //
@@ -181,7 +174,7 @@ export const MESSAGE_TYPE_INVITE = "INVITE"; // 邀请
 export const MESSAGE_TYPE_INVITE_ACCEPT = "INVITE_ACCEPT"; // 邀请-接受
 export const MESSAGE_TYPE_INVITE_REJECT = "INVITE_REJECT"; // 邀请-拒绝
 //
-export const TOPIC_FILE_ASISTANT = "file";
+export const TOPIC_FILE_ASSISTANT = "file";
 export const TOPIC_SYSTEM_NOTIFICATION = "system";
 // 注意：没有 '/' 开头，防止stomp主题中奖 '/' 替换为 '.'之后，在最前面多余一个 '.'
 export const TOPIC_USER_PREFIX = "user/";
@@ -202,7 +195,7 @@ export const TOPIC_ORG_WORKGROUP_PREFIX = "org/workgroup/";
 export const TOPIC_ORG_KB_PREFIX = "org/kb/";
 export const TOPIC_ORG_KBDOC_PREFIX = "org/kbdoc/";
 //
-export const KB_TYPE_ASISTANT = "ASISTANT";
+export const KB_TYPE_ASSISTANT = "ASSISTANT";
 export const KB_TYPE_HELPDOC = "HELPDOC";
 export const KB_TYPE_LLM = "LLM";
 export const KB_TYPE_KEYWORD = "KEYWORD";
