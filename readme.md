@@ -1,9 +1,4 @@
----
-sidebar_label: Shop Callback
-sidebar_position: 3
----
-
-# 电商系统对接-商品/订单回调
+# 微语uniapp对接演示demo
 
 本文面向接入方开发者，介绍如何在 UniApp、微信小程序或 iframe 宿主页面中，监听访客端聊天窗口中的消息气泡点击事件，并在用户点击商品消息或订单消息时跳转到对应的商品详情页或订单详情页。
 
