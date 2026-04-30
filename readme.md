@@ -1,5 +1,7 @@
 # 微语uniapp对接演示demo
 
+# 微语uniapp对接演示demo
+
 本文面向接入方开发者，介绍如何在 UniApp、微信小程序或 iframe 宿主页面中，监听访客端聊天窗口中的消息气泡点击事件，并在用户点击商品消息或订单消息时跳转到对应的商品详情页或订单详情页。
 
 适用场景：
@@ -546,24 +548,3 @@ navbar=0
 - iframe：window.addEventListener('message', ...)
 - UniApp：web-view 的 @message
 - 微信小程序：web-view 的 bindmessage
-
-## 七、参考实现
-
-可参考仓库中的以下实现：
-
-- visitor 端消息点击事件发送：frontend/apps/visitor/src/pages/Chat/components/MessageRenderer.tsx
-- UniApp 首页生成聊天链接：frontend/apps/visitorUniapp/pages/index/index.vue
-- UniApp 客服页监听与跳转：frontend/apps/visitorUniapp/pages/chat/index.vue
-- UniApp 商品详情页：frontend/apps/visitorUniapp/pages/goods/detail/index.vue
-- UniApp 订单详情页：frontend/apps/visitorUniapp/pages/order/detail/index.vue
-- React 商品消息对接示例：frontend/apps/visitorSdk/examples/react-demo/src/pages/GoodsInfoDemo.tsx
-- React 订单消息对接示例：frontend/apps/visitorSdk/examples/react-demo/src/pages/OrderInfoDemo.tsx
-
-## 八、与商品/订单对接文档配合阅读
-
-如果你还没有完成商品信息或订单信息传参，请先阅读：
-
-- [访客端商品信息对接](../development/goods_info.md)
-- [访客端订单信息对接](../development/order_info.md)
-
-本页解决的是“打开会话之后，如何监听消息点击并跳转回业务详情页”；而商品/订单对接文档解决的是“如何把商品和订单数据传进客服系统”。两部分通常需要配合使用。
