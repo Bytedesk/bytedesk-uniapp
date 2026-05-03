@@ -1,57 +1,50 @@
 <template>
 	<view class="page">
 		<view class="panel">
-			<text class="hero-title">Bytedesk Visitor UniApp Demo</text>
-			<text class="hero-subtitle">通过 URL 嵌入 visitor chat，并监听消息气泡点击事件。</text>
-
 			<view class="card">
-				<text class="section-title">当前演示</text>
-				<view class="segment-row">
-					<view v-for="item in bizScenes" :key="item.value" class="segment-item"
-						:class="{ 'segment-item-active': bizScene === item.value }" @click="switchBizScene(item.value)">
-						<text class="segment-text">{{ item.label }}</text>
-					</view>
-				</view>
-				<text class="tip">{{ currentSceneTip }}</text>
-				<view class="action-row">
-					<view class="action-button action-button-primary" @click="openCurrentChat">
-						<text class="action-button-text action-button-text-primary">{{ openChatButtonText }}</text>
+				<view class="scene-list">
+					<view
+						v-for="item in bizScenes"
+						:key="item.value"
+						class="scene-item"
+						@click="openSceneChat(item)"
+					>
+						<view class="scene-copy">
+							<view class="scene-row">
+								<text class="scene-title">{{ item.label }}</text>
+								<view class="scene-arrow" aria-hidden="true"></view>
+							</view>
+							<text class="scene-description">{{ item.description }}</text>
+						</view>
 					</view>
 				</view>
 
-				<text class="tip">{{ lastActionText }}</text>
 			</view>
 
-		</view>
-
-		<view class="url-footer">
-			<text class="url-footer-label">当前客服链接 URL</text>
-			<text selectable class="url-footer-value">{{ chatUrl }}</text>
 		</view>
 	</view>
 </template>
 
 <script>
-const LOCAL_CHAT_BASE_URL = 'http://127.0.0.1:9006'
-const PROD_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
-const DEFAULT_CHAT_BASE_URL = process.env.NODE_ENV === 'development' ? LOCAL_CHAT_BASE_URL : PROD_CHAT_BASE_URL
-const CHAT_PAGE_PATH = '/pages/chat/index'
-const CHAT_PAGE_URL_STORAGE_KEY = 'visitor_uniapp_chat_page_url'
-const CHAT_PAGE_TITLE_STORAGE_KEY = 'visitor_uniapp_chat_page_title'
+import {
+	buildChatUrl,
+	CHAT_PAGE_PATH,
+	CHAT_PAGE_TITLE_STORAGE_KEY,
+	CHAT_PAGE_URL_STORAGE_KEY,
+	DEFAULT_CHAT_PROFILE,
+	getDefaultHtmlBaseUrl,
+	getSelectedUserProfile
+} from '../../common/demo-config'
 
 export default {
 	data() {
 		return {
-			htmlBaseUrl: DEFAULT_CHAT_BASE_URL,
+			htmlBaseUrl: getDefaultHtmlBaseUrl(),
 			chatProfile: {
-				org: 'df_org_uid',
-				t: '1',
-				sid: 'df_wg_uid'
+				...DEFAULT_CHAT_PROFILE
 			},
 			visitorProfile: {
-				visitorUid: 'visitor_001',
-				nickname: '访客小明',
-				avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
+				...getSelectedUserProfile()
 			},
 			goodsInfoDemo: {
 				uid: 'goods_uniapp_001',
@@ -105,105 +98,115 @@ export default {
 				// })
 			},
 			bizScenes: [
-				{ value: 'plain', label: '普通会话演示' },
-				{ value: 'goods', label: '商品消息演示' },
-				{ value: 'order', label: '订单消息演示' }
+				{
+					value: 'plain',
+					label: '普通会话演示',
+					description: '直接打开普通客服会话，不携带商品卡片和订单卡片参数。'
+				},
+				{
+					value: 'goods',
+					label: '商品消息演示',
+					description: '打开商品场景客服会话，并自动发送商品卡片。',
+					autoSendBizInfo: '1'
+				},
+				{
+					value: 'goods-confirm',
+					label: '商品消息演示（弹窗确认发送）',
+					description: '打开商品场景客服会话，通过弹窗确认后再发送商品卡片。',
+					autoSendBizInfo: '0'
+				},
+				{
+					value: 'order',
+					label: '订单消息演示',
+					description: '打开订单场景客服会话，并自动发送订单卡片。',
+					autoSendBizInfo: '1'
+				},
+				{
+					value: 'order-confirm',
+					label: '订单消息演示（弹窗确认发送）',
+					description: '打开订单场景客服会话，通过弹窗确认后再发送订单卡片。',
+					autoSendBizInfo: '0'
+				}
 			],
-			bizScene: 'plain',
-			lastActionText: '点击按钮后会跳转到独立客服页，消息气泡点击事件会在客服页内打印。'
+			lastActionText: '点击任意列表项后会跳转到独立客服页，消息气泡点击事件会在客服页内打印。'
 		}
 	},
-	computed: {
-		currentBizParamKey() {
-			if (this.bizScene === 'order') {
+	onShow() {
+		this.syncSelectedUserProfile()
+	},
+	methods: {
+		syncSelectedUserProfile() {
+			this.visitorProfile = {
+				...getSelectedUserProfile()
+			}
+			this.orderInfoDemo = {
+				...this.orderInfoDemo,
+				visitorUid: this.visitorProfile.visitorUid
+			}
+		},
+		getSceneParamKey(scene) {
+			if (scene.value === 'order' || scene.value === 'order-confirm') {
 				return 'orderInfo'
 			}
 
-			if (this.bizScene === 'goods') {
+			if (scene.value === 'goods' || scene.value === 'goods-confirm') {
 				return 'goodsInfo'
 			}
 
 			return ''
 		},
-		currentBizPayload() {
-			if (this.bizScene === 'order') {
+		getScenePayload(scene) {
+			if (scene.value === 'order' || scene.value === 'order-confirm') {
 				return this.orderInfoDemo
 			}
 
-			if (this.bizScene === 'goods') {
+			if (scene.value === 'goods' || scene.value === 'goods-confirm') {
 				return this.goodsInfoDemo
 			}
 
 			return null
 		},
-		currentSceneTip() {
-			if (this.bizScene === 'plain') {
-				return '点击按钮后会打开普通客服会话，不传商品卡片和订单卡片参数。'
-			}
-
-			return this.bizScene === 'order'
-				? '点击按钮后会打开订单场景客服会话，并自动发送订单卡片。点击订单气泡后进入订单详情页。'
-				: '点击按钮后会打开商品场景客服会话，并自动发送商品卡片。点击商品气泡后进入商品详情页。'
-		},
-		openChatButtonText() {
-			if (this.bizScene === 'plain') {
-				return '打开普通客服会话'
-			}
-
-			return this.bizScene === 'order' ? '打开订单客服会话' : '打开商品客服会话'
-		},
-		currentChatTitle() {
-			if (this.bizScene === 'plain') {
+		getSceneTitle(scene) {
+			if (scene.value === 'plain') {
 				return '普通客服会话'
 			}
 
-			return this.bizScene === 'order' ? '订单客服会话' : '商品客服会话'
+			return scene.value === 'order' || scene.value === 'order-confirm' ? '订单客服会话' : '商品客服会话'
 		},
-		chatUrl() {
-			const baseHtmlUrl = this.htmlBaseUrl.replace(/\/?chat(?:\/thread)?\/?$/, '')
-			const params = new URLSearchParams()
-			params.append('org', this.chatProfile.org)
-			params.append('t', this.chatProfile.t)
-			params.append('sid', this.chatProfile.sid)
-			params.append('lang', 'zh-cn')
-			params.append('navbar', '0')
-			params.append('visitorUid', this.visitorProfile.visitorUid)
-			params.append('nickname', this.visitorProfile.nickname)
-			params.append('avatar', this.visitorProfile.avatar)
-			if (this.currentBizParamKey && this.currentBizPayload) {
-				params.append(this.currentBizParamKey, JSON.stringify(this.currentBizPayload))
-			}
-			return `${baseHtmlUrl}/chat?${params.toString()}`
-		}
-	},
-	onLoad() {
-	},
-	methods: {
-		switchBizScene(nextScene) {
-			if (nextScene === this.bizScene) {
-				return
+		resolveAutoSendBizInfo(scene) {
+			if (scene.value === 'goods' || scene.value === 'goods-confirm' || scene.value === 'order' || scene.value === 'order-confirm') {
+				return scene.autoSendBizInfo || '1'
 			}
 
-			this.bizScene = nextScene
-				if (nextScene === 'plain') {
-					this.lastActionText = '已切换到普通会话演示，请点击按钮后打开不传商品和订单的客服会话。'
-					return
-				}
-
-			this.lastActionText = nextScene === 'order'
-				? '已切换到订单消息演示，请点击按钮后再打开订单客服会话。'
-				: '已切换到商品消息演示，请点击按钮后再打开商品客服会话。'
+			return ''
 		},
-		openCurrentChat() {
-			const pageTitle = this.currentChatTitle
-				if (this.bizScene === 'plain') {
-					this.lastActionText = '普通客服会话页已打开，当前不会传商品卡片和订单卡片参数。'
-				} else {
-					this.lastActionText = this.bizScene === 'order'
-						? '订单客服会话页已打开，请在独立页面内点击订单卡片测试跳转。'
-						: '商品客服会话页已打开，请在独立页面内点击商品卡片测试跳转。'
-				}
-			uni.setStorageSync(CHAT_PAGE_URL_STORAGE_KEY, this.chatUrl)
+		buildSceneChatUrl(scene) {
+			return buildChatUrl({
+				htmlBaseUrl: this.htmlBaseUrl,
+				chatProfile: this.chatProfile,
+				visitorProfile: this.visitorProfile,
+				bizKey: this.getSceneParamKey(scene),
+				bizPayload: this.getScenePayload(scene),
+				autoSendBizInfo: this.resolveAutoSendBizInfo(scene),
+				lang: 'zh-cn',
+				navbar: 0
+			})
+		},
+		openSceneChat(scene) {
+			this.syncSelectedUserProfile()
+			const pageTitle = this.getSceneTitle(scene)
+			const chatUrl = this.buildSceneChatUrl(scene)
+			console.log('[visitorUniapp] open chat url:', chatUrl)
+			if (scene.value === 'plain') {
+				this.lastActionText = '普通客服会话页已打开，当前不会传商品卡片和订单卡片参数。'
+			} else {
+				const isOrderScene = scene.value === 'order' || scene.value === 'order-confirm'
+				const sendModeText = this.resolveAutoSendBizInfo(scene) === '1' ? '自动发送' : '弹窗确认'
+				this.lastActionText = isOrderScene
+					? `订单客服会话页已打开，当前为${sendModeText}模式，请在独立页面内测试订单卡片。`
+					: `商品客服会话页已打开，当前为${sendModeText}模式，请在独立页面内测试商品卡片。`
+			}
+			uni.setStorageSync(CHAT_PAGE_URL_STORAGE_KEY, chatUrl)
 			uni.setStorageSync(CHAT_PAGE_TITLE_STORAGE_KEY, pageTitle)
 			uni.navigateTo({
 				url: CHAT_PAGE_PATH
@@ -256,56 +259,92 @@ export default {
 	color: #173127;
 }
 
-.segment-row {
+.profile-summary {
 	display: flex;
-	gap: 16rpx;
+	align-items: center;
+	gap: 18rpx;
+	margin-bottom: 18rpx;
+	padding: 18rpx;
+	border-radius: 20rpx;
+	background: #f4f8f3;
 }
 
-.segment-item {
-	flex: 1;
-	padding: 18rpx 20rpx;
-	border-radius: 18rpx;
-	background: #edf3ee;
-	text-align: center;
+.profile-avatar {
+	width: 84rpx;
+	height: 84rpx;
+	border-radius: 50%;
+	background: #dce9e1;
+	flex-shrink: 0;
 }
 
-.segment-item-active {
-	background: #1f6f54;
+.profile-copy {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
 }
 
-.segment-text {
-	font-size: 26rpx;
+.profile-name {
+	font-size: 28rpx;
+	font-weight: 600;
 	color: #173127;
 }
 
-.segment-item-active .segment-text {
-	color: #ffffff;
+.profile-meta {
+	margin-top: 6rpx;
+	font-size: 22rpx;
+	color: #607269;
+	word-break: break-all;
 }
 
-.action-row {
+
+.scene-list {
 	display: flex;
+	flex-direction: column;
 	gap: 16rpx;
-	margin-top: 20rpx;
 }
 
-.action-button {
-	flex: 1;
-	padding: 20rpx 24rpx;
+.scene-item {
+	display: flex;
+	align-items: center;
+	padding: 22rpx 20rpx;
 	border-radius: 18rpx;
-	text-align: center;
+	background: #edf3ee;
 }
 
-.action-button-primary {
-	background: #1f6f54;
+.scene-copy {
+	flex: 1;
+	min-width: 0;
 }
 
-.action-button-text {
+.scene-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16rpx;
+}
+
+
+.scene-title {
 	font-size: 26rpx;
+	color: #173127;
 	font-weight: 600;
 }
 
-.action-button-text-primary {
-	color: #ffffff;
+.scene-arrow {
+	width: 16rpx;
+	height: 16rpx;
+	border-top: 4rpx solid #1f6f54;
+	border-right: 4rpx solid #1f6f54;
+	transform: rotate(45deg);
+	flex-shrink: 0;
+}
+
+.scene-description {
+	display: block;
+	margin-top: 8rpx;
+	font-size: 23rpx;
+	line-height: 1.6;
+	color: #607269;
 }
 
 .tip {
@@ -314,27 +353,5 @@ export default {
 	font-size: 24rpx;
 	line-height: 1.6;
 	color: #607269;
-}
-
-.url-footer {
-	padding: 18rpx 24rpx 28rpx;
-	background: rgba(255, 255, 255, 0.92);
-	box-shadow: 0 -10rpx 30rpx rgba(32, 59, 43, 0.06);
-}
-
-.url-footer-label {
-	display: block;
-	margin-bottom: 10rpx;
-	font-size: 22rpx;
-	font-weight: 600;
-	color: #5d6d65;
-}
-
-.url-footer-value {
-	display: block;
-	font-size: 22rpx;
-	line-height: 1.6;
-	color: #173127;
-	word-break: break-all;
 }
 </style>

@@ -3,7 +3,20 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "Bytedesk Visitor UniApp"
+				"navigationBarTitleText": "微语"
+			}
+		},
+		{
+			"path": "pages/thread/index",
+			"style": {
+				"navigationBarTitleText": "历史会话",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/profile/index",
+			"style": {
+				"navigationBarTitleText": "我的"
 			}
 		},
 		{
@@ -21,7 +34,19 @@
 		{
 			"path": "pages/chat/index",
 			"style": {
-				"navigationBarTitleText": "客服会话"
+				"navigationBarTitleText": "客服会话",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [
+							{
+								"text": "详情",
+								"fontSize": "14px",
+								"color": "transparent",
+								"width": "52px"
+							}
+						]
+					}
+				}
 			}
 		}
 	],
@@ -30,6 +55,32 @@
 		"navigationBarTitleText": "Bytedesk Visitor UniApp",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#6d746c",
+		"selectedColor": "#1f6f54",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "black",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png"
+			},
+			{
+				"pagePath": "pages/thread/index",
+				"text": "消息",
+				"iconPath": "static/tabbar/message.png",
+				"selectedIconPath": "static/tabbar/message-active.png"
+			},
+			{
+				"pagePath": "pages/profile/index",
+				"text": "我的",
+				"iconPath": "static/tabbar/profile.png",
+				"selectedIconPath": "static/tabbar/profile-active.png"
+			}
+		]
 	},
 	"uniIdRouter": {}
 }
