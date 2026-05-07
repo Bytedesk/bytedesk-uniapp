@@ -9,3 +9,14 @@
 - [x] 在visitorUniapp中，从thread中点击某条会话打开chat页面时，在调试模式下需要在导航右上角显示详情按钮，点击可以查看会话详情
 - [x] thread的list中item的content还显示为i18n.welcome.tip, 需要进行翻译。 参考visitor中ThreadList中content翻译
 - [x] chat页面右上角会话详情按钮颜色跟背景颜色一样无法区分
+- [x] 参考frontend/apps/visitorUniapp项目，帮我实现：frontend/apps/visitoriOS、frontend/apps/visitorAndroid、frontend/apps/visitorFlutter项目，分别实现三个tab，每个tab都完全参考的visitorUniapp实现
+- [x] 去掉visitorUniapp/visitoriOS/visitorAndroid/visitorFlutter中本地测试链接，直接默认使用线上地址 https://cdn.weiyuai.cn
+- [x] 补充完善visitorUniapp/visitoriOS/visitorAndroid/visitorFlutter中readme文件，介绍功能和使用步骤
+- [x] 参考visitorUniapp，需要在visitoriOS/visitorAndroid/visitorFlutter中实现监听点击商品和订单并打开相应详情页面
+- [x] 在visitoriOS中点击首页演示中：1.list item之间不要有间隔，仅使用分割线即可，2. 不要使用pop方式，使用push方式打开客服链接页面
+- [x] 在visitoriOS中点击商品消息气泡或订单消息气泡时，还是不能打开详情页面
+- [x] 在visitorAndroid中点击商品消息气泡或订单消息气泡时，还是不能打开详情页面
+- [] 在visitorFlutter中点击商品消息气泡或订单消息气泡时，还是不能打开详情页面
+- [x] 在visitorAndroid/visitorFlutter中首页和会话列表 list item之间不要有间隔，仅使用分割线即可，
+- [x] 在visitoriOS/visitorAndroid/visitorFlutter中会话页面list item中去掉 一对一 等标识，只需要显示：头像、昵称、内容、时间戳、访客未读消息数visitorUnreadCount
+- [] 在visitoriOS/visitorAndroid/visitorFlutter中，对于历史会话Thread中的会话，当orgUid=df_org_uid时，需要在内容content左侧使用tag形式标记为：平台

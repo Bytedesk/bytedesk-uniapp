@@ -1,9 +1,7 @@
-const LOCAL_CHAT_BASE_URL = 'http://127.0.0.1:9006'
 const PROD_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
-const DEFAULT_CHAT_BASE_URL = process.env.NODE_ENV === 'development' ? LOCAL_CHAT_BASE_URL : PROD_CHAT_BASE_URL
-const LOCAL_API_BASE_URL = 'http://127.0.0.1:9003'
 const PROD_API_BASE_URL = 'https://api.weiyuai.cn'
-const DEFAULT_API_BASE_URL = process.env.NODE_ENV === 'development' ? LOCAL_API_BASE_URL : PROD_API_BASE_URL
+const DEFAULT_CHAT_BASE_URL = PROD_CHAT_BASE_URL
+const DEFAULT_API_BASE_URL = PROD_API_BASE_URL
 
 export const CHAT_PAGE_PATH = '/pages/chat/index'
 export const CHAT_PAGE_URL_STORAGE_KEY = 'visitor_uniapp_chat_page_url'
@@ -198,6 +196,22 @@ function appendIfPresent(params, key, value) {
   }
 }
 
+function createQueryParams() {
+  const entries = []
+
+  return {
+    append(name, value) {
+      entries.push([
+        encodeURIComponent(String(name)),
+        encodeURIComponent(String(value))
+      ])
+    },
+    toString() {
+      return entries.map((item) => `${item[0]}=${item[1]}`).join('&')
+    }
+  }
+}
+
 export function buildChatUrl(options = {}) {
   const htmlBaseUrl = normalizeBaseHtmlUrl(options.htmlBaseUrl)
   const chatProfile = options.chatProfile || DEFAULT_CHAT_PROFILE
@@ -206,7 +220,7 @@ export function buildChatUrl(options = {}) {
   const bizPayload = options.bizPayload || null
   const autoSendBizInfo = options.autoSendBizInfo
   const path = options.path || '/chat'
-  const params = new URLSearchParams()
+  const params = createQueryParams()
 
   params.append('org', chatProfile.org || '')
   params.append('t', chatProfile.t || '1')
