@@ -56,12 +56,64 @@ export default {
                 return {}
             }
 
-            try {
-                return JSON.parse(decodeURIComponent(payload))
-            } catch (error) {
-                console.warn('parse goods payload failed', error)
+            const candidates = [payload]
+
+            if (typeof payload === 'string') {
+                try {
+                    const decodedPayload = decodeURIComponent(payload)
+                    if (decodedPayload !== payload) {
+                        candidates.push(decodedPayload)
+                    }
+                } catch (error) {
+                    console.warn('decode goods payload failed', error)
+                }
+            }
+
+            for (let index = 0; index < candidates.length; index += 1) {
+                try {
+                    return this.normalizeGoods(JSON.parse(candidates[index]))
+                } catch (error) {
+                    if (index === candidates.length - 1) {
+                        console.warn('parse goods payload failed', error)
+                    }
+                }
+            }
+
+            return {}
+        },
+        normalizeGoods(payload) {
+            const source = this.unwrapPayload(payload)
+            if (!source || typeof source !== 'object') {
                 return {}
             }
+
+            return {
+                uid: source.uid || source.goodsUid || source.id || '',
+                title: source.title || source.goodsTitle || source.name || '',
+                image: source.image || source.goodsImage || source.cover || '',
+                description: source.description || source.goodsDescription || source.summary || '',
+                price: source.price ?? source.goodsPrice ?? source.amount ?? 0,
+                quantity: source.quantity ?? source.goodsQuantity ?? 1,
+                shopUid: source.shopUid || source.storeUid || '',
+                url: source.url || source.goodsUrl || '',
+                tagList: Array.isArray(source.tagList)
+                    ? source.tagList
+                    : Array.isArray(source.goodsTagList)
+                        ? source.goodsTagList
+                        : [],
+                raw: source
+            }
+        },
+        unwrapPayload(payload) {
+            if (!payload || typeof payload !== 'object') {
+                return payload
+            }
+
+            if (payload.value && typeof payload.value === 'object') {
+                return payload.value
+            }
+
+            return payload
         },
         formatPretty(value) {
             return JSON.stringify(value || {}, null, 2)

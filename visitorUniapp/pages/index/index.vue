@@ -208,9 +208,21 @@ export default {
 			}
 			uni.setStorageSync(CHAT_PAGE_URL_STORAGE_KEY, chatUrl)
 			uni.setStorageSync(CHAT_PAGE_TITLE_STORAGE_KEY, pageTitle)
-			uni.navigateTo({
-				url: CHAT_PAGE_PATH
+			const navigateResult = uni.navigateTo({
+				url: CHAT_PAGE_PATH,
+				fail: (error) => {
+					console.error('[visitorUniapp] navigate to chat failed:', error)
+					uni.showToast({
+						title: '打开聊天页失败',
+						icon: 'none'
+					})
+				}
 			})
+			if (navigateResult && typeof navigateResult.catch === 'function') {
+				navigateResult.catch((error) => {
+					console.warn('[visitorUniapp] navigate to chat promise rejected:', error)
+				})
+			}
 		},
 	}
 }

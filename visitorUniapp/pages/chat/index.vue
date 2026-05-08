@@ -2,7 +2,7 @@
     <view class="page">
         <view class="chat-shell">
             <web-view v-if="chatUrl" class="chat-webview" :src="chatUrl" :webview-styles="webviewStyles"
-                @message="handleWebViewMessage"></web-view>
+                @message="handleWebViewMessage" @load="handleWebViewLoad" @error="handleWebViewError"></web-view>
         </view>
 
         <view v-if="showThreadDetailPanel" class="thread-detail-mask" @click="closeThreadDetail">
@@ -170,6 +170,17 @@ export default {
         handleWebViewMessage(event) {
             const packets = event && event.detail ? event.detail.data : []
             this.consumeIncomingPayload(packets)
+        },
+        handleWebViewLoad(event) {
+            console.log('[visitorUniapp] chat web-view loaded:', event && event.detail ? event.detail.src : this.chatUrl)
+        },
+        handleWebViewError(event) {
+            const detail = event && event.detail ? event.detail : {}
+            console.error('[visitorUniapp] chat web-view load failed:', detail)
+            uni.showToast({
+                title: '聊天页加载失败',
+                icon: 'none'
+            })
         },
         consumeIncomingPayload(packet) {
             if (Array.isArray(packet)) {

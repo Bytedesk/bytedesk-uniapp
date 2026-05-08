@@ -1,7 +1,12 @@
+const ONLINE_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
+const ONLINE_API_BASE_URL = 'https://api.weiyuai.cn'
+// const PROD_CHAT_BASE_URL = 'http://127.0.0.1:9006'
+// const PROD_API_BASE_URL = 'http://127.0.0.1:9003'
 const PROD_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
 const PROD_API_BASE_URL = 'https://api.weiyuai.cn'
 const DEFAULT_CHAT_BASE_URL = PROD_CHAT_BASE_URL
 const DEFAULT_API_BASE_URL = PROD_API_BASE_URL
+const ANDROID_EMULATOR_HOST = '10.0.2.2'
 
 export const CHAT_PAGE_PATH = '/pages/chat/index'
 export const CHAT_PAGE_URL_STORAGE_KEY = 'visitor_uniapp_chat_page_url'
@@ -154,11 +159,74 @@ const THREAD_TRANSLATIONS = {
 }
 
 export function getDefaultHtmlBaseUrl() {
-  return DEFAULT_CHAT_BASE_URL
+  return resolveRuntimeBaseUrl(DEFAULT_CHAT_BASE_URL, ONLINE_CHAT_BASE_URL)
 }
 
 export function getDefaultApiBaseUrl() {
-  return DEFAULT_API_BASE_URL
+  return resolveRuntimeBaseUrl(DEFAULT_API_BASE_URL, ONLINE_API_BASE_URL)
+}
+
+function isWechatMiniProgramRuntime() {
+  // #ifdef MP-WEIXIN
+  return true
+  // #endif
+
+  return false
+}
+
+function isAppPlusAndroidRuntime() {
+  // #ifdef APP-PLUS
+  if (typeof uni === 'undefined' || typeof uni.getSystemInfoSync !== 'function') {
+    return false
+  }
+
+  try {
+    const systemInfo = uni.getSystemInfoSync()
+    const platform = String(systemInfo.platform || '').toLowerCase()
+    const osName = String(systemInfo.osName || '').toLowerCase()
+    return platform === 'android' || osName === 'android'
+  } catch (error) {
+    return false
+  }
+  // #endif
+
+  return false
+}
+
+function resolveRuntimeBaseUrl(baseUrl, miniProgramFallbackUrl = '') {
+  const fallbackUrl = String(baseUrl || '')
+  if (!fallbackUrl) {
+    return fallbackUrl
+  }
+
+  try {
+    const parsedUrl = new URL(fallbackUrl)
+
+    if (isWechatMiniProgramRuntime() && (parsedUrl.hostname === '127.0.0.1' || parsedUrl.hostname === 'localhost')) {
+      return String(miniProgramFallbackUrl || fallbackUrl).replace(/\/$/, '')
+    }
+
+    if (!isAppPlusAndroidRuntime()) {
+      return parsedUrl.toString().replace(/\/$/, '')
+    }
+
+    if (parsedUrl.hostname === '127.0.0.1' || parsedUrl.hostname === 'localhost') {
+      parsedUrl.hostname = ANDROID_EMULATOR_HOST
+    }
+    return parsedUrl.toString().replace(/\/$/, '')
+  } catch (error) {
+    if (isWechatMiniProgramRuntime()) {
+      return String(miniProgramFallbackUrl || fallbackUrl).replace(/\/$/, '')
+    }
+
+    if (!isAppPlusAndroidRuntime()) {
+      return fallbackUrl
+    }
+
+    return fallbackUrl
+      .replace('://127.0.0.1', `://${ANDROID_EMULATOR_HOST}`)
+      .replace('://localhost', `://${ANDROID_EMULATOR_HOST}`)
+  }
 }
 
 export function getStoredSelectedUserKey() {
@@ -187,7 +255,7 @@ export function getSelectedUserProfile() {
 }
 
 function normalizeBaseHtmlUrl(htmlBaseUrl) {
-  return (htmlBaseUrl || DEFAULT_CHAT_BASE_URL).replace(/\/?chat(?:\/thread)?\/?$/, '')
+  return resolveRuntimeBaseUrl(htmlBaseUrl || DEFAULT_CHAT_BASE_URL, ONLINE_CHAT_BASE_URL).replace(/\/?chat(?:\/thread)?\/?$/, '')
 }
 
 function appendIfPresent(params, key, value) {
@@ -243,7 +311,7 @@ export function buildChatUrl(options = {}) {
 }
 
 export function buildThreadApiUrl(options = {}) {
-  const apiBaseUrl = (options.apiBaseUrl || DEFAULT_API_BASE_URL).replace(/\/$/, '')
+  const apiBaseUrl = resolveRuntimeBaseUrl(options.apiBaseUrl || DEFAULT_API_BASE_URL, ONLINE_API_BASE_URL).replace(/\/$/, '')
   return `${apiBaseUrl}/visitor/api/v1/threads`
 }
 

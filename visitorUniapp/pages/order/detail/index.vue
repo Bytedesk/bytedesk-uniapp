@@ -59,12 +59,79 @@ export default {
                 return {}
             }
 
-            try {
-                return JSON.parse(decodeURIComponent(payload))
-            } catch (error) {
-                console.warn('parse order payload failed', error)
+            const candidates = [payload]
+
+            if (typeof payload === 'string') {
+                try {
+                    const decodedPayload = decodeURIComponent(payload)
+                    if (decodedPayload !== payload) {
+                        candidates.push(decodedPayload)
+                    }
+                } catch (error) {
+                    console.warn('decode order payload failed', error)
+                }
+            }
+
+            for (let index = 0; index < candidates.length; index += 1) {
+                try {
+                    return this.normalizeOrder(JSON.parse(candidates[index]))
+                } catch (error) {
+                    if (index === candidates.length - 1) {
+                        console.warn('parse order payload failed', error)
+                    }
+                }
+            }
+
+            return {}
+        },
+        normalizeOrder(payload) {
+            const source = this.unwrapPayload(payload)
+            if (!source || typeof source !== 'object') {
                 return {}
             }
+
+            const goodsSource = source.goods && typeof source.goods === 'object'
+                ? source.goods
+                : source
+            const shippingSource = source.shippingAddress && typeof source.shippingAddress === 'object'
+                ? source.shippingAddress
+                : source
+
+            return {
+                uid: source.uid || source.orderUid || '',
+                visitorUid: source.visitorUid || '',
+                shopUid: source.shopUid || source.storeUid || '',
+                status: source.status || '',
+                statusText: source.statusText || source.orderStatusText || '',
+                totalAmount: source.totalAmount ?? source.amount ?? source.orderPrice ?? source.goodsPrice ?? 0,
+                paymentMethod: source.paymentMethod || source.payType || '',
+                goods: {
+                    uid: goodsSource.uid || source.goodsUid || source.orderUid || '',
+                    title: goodsSource.title || source.goodsTitle || source.orderTitle || source.title || '',
+                    image: goodsSource.image || source.goodsImage || source.orderImage || source.image || '',
+                    description: goodsSource.description || source.goodsDescription || source.orderDescription || source.description || '',
+                    price: goodsSource.price ?? source.goodsPrice ?? source.orderPrice ?? 0,
+                    quantity: goodsSource.quantity ?? source.goodsQuantity ?? source.orderQuantity ?? 1,
+                    shopUid: goodsSource.shopUid || source.shopUid || ''
+                },
+                shippingAddress: {
+                    name: shippingSource.name || source.shippingName || '',
+                    phone: shippingSource.phone || source.shippingPhone || '',
+                    address: shippingSource.address || source.shippingAddress || ''
+                },
+                raw: source
+            }
+        },
+        unwrapPayload(payload) {
+            if (!payload || typeof payload !== 'object') {
+                return payload
+            }
+
+            if (payload.value && typeof payload.value === 'object') {
+                return payload.value
+            }
+
+            return payload
         },
         formatPretty(value) {
             return JSON.stringify(value || {}, null, 2)
