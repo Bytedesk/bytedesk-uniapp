@@ -49,6 +49,7 @@ export default {
 			goodsInfoDemo: {
 				uid: 'goods_uniapp_001',
 				title: '轻奢通勤双肩包',
+				navigateToPath: '/pages/goods/detail/index?type=goods&goodsUid=goods_uniapp_001&shopUid=shop_001',
 				image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80',
 				description: '适合日常通勤和短途出差的多功能双肩包。',
 				price: 399,
@@ -66,12 +67,14 @@ export default {
 				uid: 'order_uniapp_001',
 				visitorUid: 'visitor_001',
 				shopUid: 'shop_001',
+				navigateToPath: '/pages/order/detail/index?type=order&orderUid=order_uniapp_001&shopUid=shop_001',
 				time: '2026-03-11 10:30:00',
 				status: 'paid',
-				statusText: '已付款，待发货',
+				statusText: '待发货',
 				goods: {
 					uid: 'goods_uniapp_001',
 					title: '轻奢通勤双肩包',
+					navigateToPath: '/pages/goods/detail/index?type=goods&goodsUid=goods_uniapp_001&shopUid=shop_001',
 					image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80',
 					description: '适合日常通勤和短途出差的多功能双肩包。',
 					price: 399,

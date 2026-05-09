@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { createMessageNavigationGuard, shouldSkipMiniProgramHostNavigation } from '../../common/chat-message-navigation-guard'
 import { CHAT_PAGE_THREAD_STORAGE_KEY, CHAT_PAGE_TITLE_STORAGE_KEY, CHAT_PAGE_URL_STORAGE_KEY, UNIAPP_DEBUG } from '../../common/demo-config'
 
 const EVENT_NAME = 'MESSAGE_BUBBLE_CLICK'
@@ -38,6 +39,7 @@ export default {
             threadDetail: null,
             lastBubbleClickEvent: null,
             lastActionText: '点击客服会话里的消息气泡后，会在这里打印 onMessageBubbleClick 事件。',
+            messageNavigationGuard: createMessageNavigationGuard(),
             windowMessageHandler: null,
             webviewStyles: {
                 progress: {
@@ -232,6 +234,7 @@ export default {
                     type: candidate.clickedMessageType,
                     content: this.parseMaybeJson(candidate.content),
                     extra: this.parseMaybeJson(candidate.extra),
+                    miniProgramDirectNavigateHandled: Boolean(candidate.miniProgramDirectNavigateHandled),
                     position: candidate.position,
                     status: candidate.status
                 }
@@ -243,6 +246,7 @@ export default {
                     type: candidate.type,
                     content: this.parseMaybeJson(candidate.content),
                     extra: this.parseMaybeJson(candidate.extra),
+                    miniProgramDirectNavigateHandled: Boolean(candidate.miniProgramDirectNavigateHandled),
                     position: candidate.position,
                     status: candidate.status
                 }
@@ -273,6 +277,16 @@ export default {
         handleBubbleClick(event) {
             this.lastBubbleClickEvent = event
             const messageType = String(event.type || '').toUpperCase()
+
+            if (shouldSkipMiniProgramHostNavigation(event)) {
+                this.lastActionText = `忽略已由 H5 直跳处理的 ${messageType || 'UNKNOWN'} 消息点击事件。`
+                return
+            }
+
+            if (!this.messageNavigationGuard.shouldNavigate(event)) {
+                this.lastActionText = `忽略重复的 ${messageType || 'UNKNOWN'} 消息点击事件，避免返回时再次打开详情页。`
+                return
+            }
 
             if (messageType === GOODS_MESSAGE_TYPE) {
                 this.lastActionText = '收到商品消息点击事件，正在打开商品详情页。'
