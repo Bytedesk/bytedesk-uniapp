@@ -295,7 +295,7 @@ export function buildChatUrl(options = {}) {
   params.append('sid', chatProfile.sid || '')
   params.append('lang', options.lang || 'zh-cn')
   params.append('navbar', options.navbar === undefined ? '0' : String(options.navbar))
-  appendIfPresent(params, 'v', '1')
+  appendIfPresent(params, 'v', '2')
   appendIfPresent(params, 'visitorUid', visitorProfile.visitorUid)
   appendIfPresent(params, 'nickname', visitorProfile.nickname)
   appendIfPresent(params, 'avatar', visitorProfile.avatar)
