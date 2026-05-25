@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { getBizMessageCallbackDebugMeta, isBizMessageCallbackDebugEnabled, logBizMessageCallbackDebug } from '../../common/biz-message-callback-debug'
 import { createMessageNavigationGuard, shouldSkipMiniProgramHostNavigation } from '../../common/chat-message-navigation-guard'
 import { CHAT_PAGE_THREAD_STORAGE_KEY, CHAT_PAGE_TITLE_STORAGE_KEY, CHAT_PAGE_URL_STORAGE_KEY, UNIAPP_DEBUG } from '../../common/demo-config'
 
@@ -35,6 +36,7 @@ export default {
             chatUrl: '',
             chatOrigin: '',
             isDebugMode: UNIAPP_DEBUG,
+            bizMessageCallbackDebugEnabled: false,
             showThreadDetailPanel: false,
             threadDetail: null,
             lastBubbleClickEvent: null,
@@ -57,11 +59,19 @@ export default {
         }
     },
     onLoad() {
-        const nextUrl = this.readStorageValue(uni.getStorageSync(CHAT_PAGE_URL_STORAGE_KEY))
+        const nextUrl = this.normalizeChatUrlForUniApp(this.readStorageValue(uni.getStorageSync(CHAT_PAGE_URL_STORAGE_KEY)))
         this.chatUrl = nextUrl
         this.chatOrigin = this.getOrigin(nextUrl)
+        this.bizMessageCallbackDebugEnabled = isBizMessageCallbackDebugEnabled(nextUrl)
+        if (nextUrl) {
+            uni.setStorageSync(CHAT_PAGE_URL_STORAGE_KEY, nextUrl)
+        }
         const title = this.readStorageValue(uni.getStorageSync(CHAT_PAGE_TITLE_STORAGE_KEY))
         this.threadDetail = this.parseStoredThread(uni.getStorageSync(CHAT_PAGE_THREAD_STORAGE_KEY))
+        logBizMessageCallbackDebug(this.bizMessageCallbackDebugEnabled, 'host-init.uniapp', {
+            chatUrl: nextUrl,
+            debugMeta: getBizMessageCallbackDebugMeta()
+        })
         if (title) {
             uni.setNavigationBarTitle({ title })
         }
@@ -114,6 +124,34 @@ export default {
                 return new URL(value).origin
             } catch (error) {
                 return ''
+            }
+        },
+        isAppPlusRuntime() {
+            // #ifdef APP-PLUS
+            return true
+            // #endif
+
+            return false
+        },
+        normalizeChatUrlForUniApp(value) {
+            if (!value) {
+                return ''
+            }
+
+            try {
+                const url = new URL(value)
+                if (this.isAppPlusRuntime()) {
+                    url.searchParams.set('uniAppHost', '1')
+                } else {
+                    url.searchParams.delete('uniAppHost')
+                }
+                url.searchParams.set('bizMessageCallbackDebug', '1')
+                return url.toString()
+            } catch (error) {
+                const separator = String(value).includes('?') ? '&' : '?'
+                return this.isAppPlusRuntime()
+                    ? `${value}${separator}uniAppHost=1&bizMessageCallbackDebug=1`
+                    : `${value}${separator}bizMessageCallbackDebug=1`
             }
         },
         syncNavigationButton() {
@@ -171,6 +209,9 @@ export default {
         },
         handleWebViewMessage(event) {
             const packets = event && event.detail ? event.detail.data : []
+            logBizMessageCallbackDebug(this.bizMessageCallbackDebugEnabled, 'host-receive.uniapp-webview-message', {
+                packets
+            })
             this.consumeIncomingPayload(packets)
         },
         handleWebViewLoad(event) {
@@ -194,8 +235,13 @@ export default {
 
             const normalized = this.normalizeBubbleClickEvent(packet)
             if (!normalized) {
+                logBizMessageCallbackDebug(this.bizMessageCallbackDebugEnabled, 'host-receive.uniapp-ignored-packet', {
+                    packet
+                })
                 return
             }
+
+            logBizMessageCallbackDebug(this.bizMessageCallbackDebugEnabled, 'host-receive.uniapp-normalized', normalized)
 
             this.handleBubbleClick(normalized)
         },
@@ -233,6 +279,7 @@ export default {
                     uid: candidate.uid,
                     type: candidate.clickedMessageType,
                     content: this.parseMaybeJson(candidate.content),
+                    navigateToPath: typeof candidate.navigateToPath === 'string' ? candidate.navigateToPath : '',
                     extra: this.parseMaybeJson(candidate.extra),
                     miniProgramDirectNavigateHandled: Boolean(candidate.miniProgramDirectNavigateHandled),
                     position: candidate.position,
@@ -245,6 +292,7 @@ export default {
                     uid: candidate.uid,
                     type: candidate.type,
                     content: this.parseMaybeJson(candidate.content),
+                    navigateToPath: typeof candidate.navigateToPath === 'string' ? candidate.navigateToPath : '',
                     extra: this.parseMaybeJson(candidate.extra),
                     miniProgramDirectNavigateHandled: Boolean(candidate.miniProgramDirectNavigateHandled),
                     position: candidate.position,
@@ -277,6 +325,11 @@ export default {
         handleBubbleClick(event) {
             this.lastBubbleClickEvent = event
             const messageType = String(event.type || '').toUpperCase()
+            logBizMessageCallbackDebug(this.bizMessageCallbackDebugEnabled, 'host-handle.uniapp-bubble-click', {
+                messageType,
+                navigateToPath: event.navigateToPath,
+                miniProgramDirectNavigateHandled: Boolean(event.miniProgramDirectNavigateHandled)
+            })
 
             if (shouldSkipMiniProgramHostNavigation(event)) {
                 this.lastActionText = `忽略已由 H5 直跳处理的 ${messageType || 'UNKNOWN'} 消息点击事件。`
@@ -290,13 +343,13 @@ export default {
 
             if (messageType === GOODS_MESSAGE_TYPE) {
                 this.lastActionText = '收到商品消息点击事件，正在打开商品详情页。'
-                this.navigateToDetail('/pages/goods/detail/index', this.toRecord(event.content))
+                this.navigateToResolvedPath(event, '/pages/goods/detail/index')
                 return
             }
 
             if (messageType === ORDER_MESSAGE_TYPE) {
                 this.lastActionText = '收到订单消息点击事件，正在打开订单详情页。'
-                this.navigateToDetail('/pages/order/detail/index', this.toRecord(event.content))
+                this.navigateToResolvedPath(event, '/pages/order/detail/index')
                 return
             }
 
@@ -316,6 +369,24 @@ export default {
             uni.navigateTo({
                 url: `${path}?payload=${encodeURIComponent(JSON.stringify(payload || {}))}`
             })
+        },
+        navigateToResolvedPath(event, fallbackPath) {
+            const resolvedPath = typeof event.navigateToPath === 'string' ? event.navigateToPath.trim() : ''
+            if (resolvedPath) {
+                logBizMessageCallbackDebug(this.bizMessageCallbackDebugEnabled, 'host-navigate.uniapp-resolved-path', {
+                    resolvedPath
+                })
+                uni.navigateTo({
+                    url: resolvedPath
+                })
+                return
+            }
+
+            logBizMessageCallbackDebug(this.bizMessageCallbackDebugEnabled, 'host-navigate.uniapp-fallback-payload', {
+                fallbackPath,
+                payload: this.toRecord(event.content)
+            })
+            this.navigateToDetail(fallbackPath, this.toRecord(event.content))
         },
         closeThreadDetail() {
             this.showThreadDetailPanel = false

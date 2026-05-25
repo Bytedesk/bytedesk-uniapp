@@ -1,9 +1,9 @@
 const ONLINE_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
 const ONLINE_API_BASE_URL = 'https://api.weiyuai.cn'
-const PROD_CHAT_BASE_URL = 'http://127.0.0.1:9006'
-const PROD_API_BASE_URL = 'http://127.0.0.1:9003'
-// const PROD_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
-// const PROD_API_BASE_URL = 'https://api.weiyuai.cn'
+// const PROD_CHAT_BASE_URL = 'http://127.0.0.1:9006'
+// const PROD_API_BASE_URL = 'http://127.0.0.1:9003'
+const PROD_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
+const PROD_API_BASE_URL = 'https://api.weiyuai.cn'
 const DEFAULT_CHAT_BASE_URL = PROD_CHAT_BASE_URL
 const DEFAULT_API_BASE_URL = PROD_API_BASE_URL
 const ANDROID_EMULATOR_HOST = '10.0.2.2'
@@ -193,6 +193,14 @@ function isAppPlusAndroidRuntime() {
   return false
 }
 
+function isAppPlusRuntime() {
+  // #ifdef APP-PLUS
+  return true
+  // #endif
+
+  return false
+}
+
 function resolveRuntimeBaseUrl(baseUrl, miniProgramFallbackUrl = '') {
   const fallbackUrl = String(baseUrl || '')
   if (!fallbackUrl) {
@@ -295,7 +303,11 @@ export function buildChatUrl(options = {}) {
   params.append('sid', chatProfile.sid || '')
   params.append('lang', options.lang || 'zh-cn')
   params.append('navbar', options.navbar === undefined ? '0' : String(options.navbar))
-  appendIfPresent(params, 'v', '3')
+  if (isAppPlusRuntime()) {
+    params.append('uniAppHost', '1')
+  }
+  params.append('bizMessageCallbackDebug', '1')
+  appendIfPresent(params, 'v', '5')
   appendIfPresent(params, 'visitorUid', visitorProfile.visitorUid)
   appendIfPresent(params, 'nickname', visitorProfile.nickname)
   appendIfPresent(params, 'avatar', visitorProfile.avatar)
