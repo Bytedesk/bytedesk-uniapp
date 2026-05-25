@@ -47,7 +47,9 @@ export default {
 				...getSelectedUserProfile()
 			},
 			goodsInfoDemo: {
-				uid: 'goods_uniapp_001',
+				goodsUid: 'goods_uniapp_001',
+				type: 'goods',
+				status: 'ON_SHELF',
 				title: '轻奢通勤双肩包',
 				navigateToPath: '/pages/goods/detail/index?type=goods&goodsUid=goods_uniapp_001&shopUid=shop_001',
 				image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80',

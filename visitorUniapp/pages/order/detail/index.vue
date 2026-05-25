@@ -4,7 +4,7 @@
             <text class="title">订单详情</text>
             <view class="row">
                 <text class="label">订单 UID</text>
-                <text class="value">{{ order.uid || '-' }}</text>
+                <text class="value">{{ order.orderUid || '-' }}</text>
             </view>
             <view class="row">
                 <text class="label">访客 UID</text>
@@ -28,7 +28,19 @@
             </view>
             <view class="row multiline">
                 <text class="label">商品</text>
-                <text class="value">{{ order.goods && order.goods.title ? order.goods.title : '-' }}</text>
+                <text class="value">{{ order.orderTitle || '-' }}</text>
+            </view>
+            <view class="row multiline">
+                <text class="label">商品描述</text>
+                <text class="value">{{ order.orderDescription || '-' }}</text>
+            </view>
+            <view class="row">
+                <text class="label">商品金额</text>
+                <text class="value">{{ formatPrice(order.orderPrice) }}</text>
+            </view>
+            <view class="row">
+                <text class="label">数量</text>
+                <text class="value">{{ order.orderQuantity || 1 }}</text>
             </view>
             <view class="row multiline">
                 <text class="label">收货地址</text>
@@ -90,30 +102,37 @@ export default {
                 return {}
             }
 
-            const goodsSource = source.goods && typeof source.goods === 'object'
-                ? source.goods
-                : source
             const shippingSource = source.shippingAddress && typeof source.shippingAddress === 'object'
                 ? source.shippingAddress
                 : source
 
             return {
-                uid: source.uid || source.orderUid || '',
+                orderUid: source.orderUid || source.uid || '',
+                type: source.type || 'order',
+                title: source.title || source.orderTitle || '',
+                description: source.description || source.orderDescription || '',
+                state: source.state || source.status || '',
+                navigateToPath: source.navigateToPath || '',
                 visitorUid: source.visitorUid || '',
                 shopUid: source.shopUid || source.storeUid || '',
                 status: source.status || '',
                 statusText: source.statusText || source.orderStatusText || '',
                 totalAmount: source.totalAmount ?? source.amount ?? source.orderPrice ?? source.goodsPrice ?? 0,
                 paymentMethod: source.paymentMethod || source.payType || '',
-                goods: {
-                    uid: goodsSource.uid || source.goodsUid || source.orderUid || '',
-                    title: goodsSource.title || source.goodsTitle || source.orderTitle || source.title || '',
-                    image: goodsSource.image || source.goodsImage || source.orderImage || source.image || '',
-                    description: goodsSource.description || source.goodsDescription || source.orderDescription || source.description || '',
-                    price: goodsSource.price ?? source.goodsPrice ?? source.orderPrice ?? 0,
-                    quantity: goodsSource.quantity ?? source.goodsQuantity ?? source.orderQuantity ?? 1,
-                    shopUid: goodsSource.shopUid || source.shopUid || ''
-                },
+                orderTitle: source.orderTitle || source.goodsTitle || source.title || source.goods?.title || '',
+                orderImage: source.orderImage || source.goodsImage || source.image || source.goods?.image || '',
+                orderDescription: source.orderDescription || source.goodsDescription || source.description || source.goods?.description || '',
+                orderPrice: source.orderPrice ?? source.goodsPrice ?? source.goods?.price ?? 0,
+                orderUrl: source.orderUrl || source.goodsUrl || source.url || source.goods?.url || '',
+                orderTagList: Array.isArray(source.orderTagList)
+                    ? source.orderTagList
+                    : Array.isArray(source.goodsTagList)
+                        ? source.goodsTagList
+                        : Array.isArray(source.goods?.tagList)
+                            ? source.goods.tagList
+                            : [],
+                orderExtra: source.orderExtra || source.goodsExtra || source.goods?.extra || '',
+                orderQuantity: source.orderQuantity ?? source.goodsQuantity ?? source.goods?.quantity ?? 1,
                 shippingAddress: {
                     name: shippingSource.name || source.shippingName || '',
                     phone: shippingSource.phone || source.shippingPhone || '',
@@ -137,6 +156,9 @@ export default {
             return JSON.stringify(value || {}, null, 2)
         },
         formatPrice(value) {
+            if (value === undefined || value === null || value === '') {
+                return '-'
+            }
             const numberValue = Number(value || 0)
             return `¥${numberValue.toFixed(2)}`
         },

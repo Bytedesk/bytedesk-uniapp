@@ -5,7 +5,15 @@
             <image v-if="goods.image" class="cover" :src="goods.image" mode="aspectFill"></image>
             <view class="row">
                 <text class="label">商品 UID</text>
-                <text class="value">{{ goods.uid || '-' }}</text>
+                <text class="value">{{ goods.goodsUid || '-' }}</text>
+            </view>
+            <view class="row">
+                <text class="label">类型</text>
+                <text class="value">{{ goods.type || '-' }}</text>
+            </view>
+            <view class="row">
+                <text class="label">状态</text>
+                <text class="value">{{ goods.status || '-' }}</text>
             </view>
             <view class="row">
                 <text class="label">标题</text>
@@ -30,6 +38,10 @@
             <view class="row multiline">
                 <text class="label">标签</text>
                 <text class="value">{{ formatTagList(goods.tagList) }}</text>
+            </view>
+            <view class="row multiline">
+                <text class="label">跳转路径</text>
+                <text class="value">{{ goods.navigateToPath || '-' }}</text>
             </view>
         </view>
 
@@ -88,8 +100,11 @@ export default {
             }
 
             return {
-                uid: source.uid || source.goodsUid || source.id || '',
+                goodsUid: source.goodsUid || source.uid || source.id || '',
+                type: source.type || 'goods',
+                status: source.status || '',
                 title: source.title || source.goodsTitle || source.name || '',
+                navigateToPath: source.navigateToPath || '',
                 image: source.image || source.goodsImage || source.cover || '',
                 description: source.description || source.goodsDescription || source.summary || '',
                 price: source.price ?? source.goodsPrice ?? source.amount ?? 0,
