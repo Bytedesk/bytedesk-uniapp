@@ -2,16 +2,20 @@
 	<view class="page">
 
 		<view class="search-card">
-			<input
-				v-model="searchText"
-				class="search-input"
-				placeholder="搜索会话标题或消息内容"
-				confirm-type="search"
-				@confirm="handleSearchConfirm"
-			/>
-			<view class="search-actions">
+			<view class="search-shell">
+				<input
+					v-model="searchText"
+					class="search-input"
+					placeholder="搜索会话标题或消息内容"
+					confirm-type="search"
+					@confirm="handleSearchConfirm"
+					@input="handleSearchInput"
+				/>
+				<view v-if="searchText" class="search-clear" @click="handleSearchClear">
+					<text class="search-clear-text">x</text>
+				</view>
 				<view class="search-button search-button-primary" @click="handleSearchConfirm">
-					<text class="search-button-text search-button-text-primary">搜索</text>
+					<text class="search-button-icon">⌕</text>
 				</view>
 			</view>
 		</view>
@@ -33,9 +37,12 @@
 
 		<view v-else class="thread-list">
 			<view v-for="item in threadList" :key="item.uid" class="thread-card" @click="openThread(item)">
-				<image v-if="resolveDisplay(item).avatar" class="thread-avatar" :src="resolveDisplay(item).avatar" mode="aspectFill"></image>
-				<view v-else class="thread-avatar thread-avatar-fallback" :class="resolveThreadTypeClass(item)">
-					<text class="thread-avatar-fallback-text">{{ resolveAvatarText(item) }}</text>
+				<view class="thread-avatar-wrap">
+					<image v-if="resolveDisplay(item).avatar" class="thread-avatar" :src="resolveDisplay(item).avatar" mode="aspectFill"></image>
+					<view v-else class="thread-avatar thread-avatar-fallback" :class="resolveThreadTypeClass(item)">
+						<text class="thread-avatar-fallback-text">{{ resolveAvatarText(item) }}</text>
+					</view>
+					<text v-if="resolveUnread(item) > 0" class="thread-unread thread-unread-overlay">{{ resolveUnread(item) }}</text>
 				</view>
 				<view class="thread-main">
 					<view class="thread-row">
@@ -45,15 +52,12 @@
 						</view>
 					</view>
 					<text class="thread-preview">{{ resolveDisplay(item).preview }}</text>
-					<view class="thread-row thread-row-bottom">
-						<text v-if="resolveUnread(item) > 0" class="thread-unread">{{ resolveUnread(item) }}</text>
-					</view>
 				</view>
 			</view>
 
-			<view class="footer-card">
+			<!-- <view class="footer-card">
 				<text class="footer-text">{{ footerText }}</text>
-			</view>
+			</view> -->
 		</view>
 	</view>
 </template>
@@ -145,7 +149,7 @@ export default {
 			return (display.name || '?').slice(0, 1).toUpperCase()
 		},
 		resolveUnread(item) {
-			return Number(item.visitorUnreadCount || item.unreadCount || 0)
+			return Number(item?.visitorUnreadCount ?? item?.unreadCount ?? 0)
 		},
 		resolveThreadTypeValue(item) {
 			return normalizeThreadType(item)
@@ -215,6 +219,18 @@ export default {
 		handleSearchConfirm() {
 			this.appliedSearchText = (this.searchText || '').trim()
 			this.reloadThreads()
+		},
+		handleSearchInput(event) {
+			const value = event && event.detail ? event.detail.value : this.searchText
+			if ((value || '').trim()) {
+				return
+			}
+
+			if (!this.appliedSearchText) {
+				return
+			}
+
+			this.handleSearchClear()
 		},
 		handleSearchClear() {
 			if (!this.searchText && !this.appliedSearchText) {
@@ -327,7 +343,6 @@ export default {
 .hero-card,
 .search-card,
 .state-card,
-.thread-card,
 .footer-card {
 	border-radius: 24rpx;
 	background: rgba(255, 255, 255, 0.94);
@@ -343,36 +358,56 @@ export default {
 
 .search-card {
 	margin-top: 20rpx;
+	padding: 20rpx;
+}
+
+.search-shell {
 	display: flex;
 	align-items: center;
-	gap: 14rpx;
+	gap: 12rpx;
+	padding: 10rpx;
+	border-radius: 999rpx;
+	background: #f4f7fb;
+	border: 2rpx solid rgba(41, 95, 155, 0.08);
 }
 
 .search-input {
 	flex: 1;
 	min-width: 0;
-	height: 76rpx;
-	padding: 0 22rpx;
-	border-radius: 18rpx;
-	background: #f4f7fb;
+	height: 72rpx;
+	padding: 0 10rpx 0 18rpx;
 	font-size: 26rpx;
 	color: #1e3554;
+	background: transparent;
 }
 
-.search-actions {
+.search-clear {
+	width: 44rpx;
+	height: 44rpx;
+	border-radius: 50%;
 	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(122, 135, 151, 0.14);
 	flex-shrink: 0;
+}
+
+.search-clear-text {
+	font-size: 24rpx;
+	line-height: 1;
+	color: #607089;
 }
 
 .search-button {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-width: 132rpx;
-	height: 72rpx;
+	min-width: 124rpx;
+	height: 64rpx;
 	padding: 0 24rpx;
-	border-radius: 18rpx;
+	border-radius: 999rpx;
 	background: #eef3f8;
+	flex-shrink: 0;
 }
 
 .search-button-primary {
@@ -387,6 +422,13 @@ export default {
 
 .search-button-text-primary {
 	color: #ffffff;
+}
+
+.search-button-icon {
+	font-size: 30rpx;
+	line-height: 1;
+	color: #ffffff;
+	font-weight: 600;
 }
 
 .hero-header {
@@ -458,13 +500,29 @@ export default {
 	margin-top: 20rpx;
 	display: flex;
 	flex-direction: column;
-	gap: 18rpx;
+	gap: 0;
+	overflow: hidden;
 }
 
 .thread-card {
 	display: flex;
 	gap: 18rpx;
 	padding: 22rpx;
+	border-radius: 0;
+	background: rgba(255, 255, 255, 0.94);
+	box-shadow: none;
+	border-bottom: 2rpx solid rgba(33, 51, 83, 0.06);
+}
+
+.thread-card:last-child {
+	border-bottom: none;
+}
+
+.thread-avatar-wrap {
+	position: relative;
+	width: 88rpx;
+	height: 88rpx;
+	flex-shrink: 0;
 }
 
 .thread-avatar {
@@ -472,7 +530,6 @@ export default {
 	height: 88rpx;
 	border-radius: 50%;
 	background: #d9e4f5;
-	flex-shrink: 0;
 }
 
 .thread-avatar-fallback {
@@ -555,6 +612,17 @@ export default {
 	line-height: 1.4;
 	text-align: center;
 	color: #ffffff;
+}
+
+.thread-unread-overlay {
+	position: absolute;
+	top: -8rpx;
+	right: -10rpx;
+	min-width: 40rpx;
+	padding: 2rpx 10rpx;
+	box-shadow: 0 6rpx 16rpx rgba(233, 95, 84, 0.28);
+	border: 4rpx solid #ffffff;
+	z-index: 1;
 }
 
 .thread-type-badge {

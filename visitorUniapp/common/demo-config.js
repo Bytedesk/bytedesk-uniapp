@@ -1,9 +1,9 @@
 const ONLINE_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
 const ONLINE_API_BASE_URL = 'https://api.weiyuai.cn'
-// const PROD_CHAT_BASE_URL = 'http://127.0.0.1:9006'
-// const PROD_API_BASE_URL = 'http://127.0.0.1:9003'
-const PROD_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
-const PROD_API_BASE_URL = 'https://api.weiyuai.cn'
+const PROD_CHAT_BASE_URL = 'http://127.0.0.1:9006'
+const PROD_API_BASE_URL = 'http://127.0.0.1:9003'
+// const PROD_CHAT_BASE_URL = 'https://cdn.weiyuai.cn'
+// const PROD_API_BASE_URL = 'https://api.weiyuai.cn'
 const DEFAULT_CHAT_BASE_URL = PROD_CHAT_BASE_URL
 const DEFAULT_API_BASE_URL = PROD_API_BASE_URL
 const ANDROID_EMULATOR_HOST = '10.0.2.2'

@@ -22,4 +22,5 @@
 - [x] 在visitoriOS/visitorAndroid/visitorFlutter中，对于历史会话Thread中的会话，当orgUid=df_org_uid时，需要在内容content左侧使用tag形式标记为：平台
 - [x] 目前在visitorUniapp中以URL的方式集成visitor中chatbox页面，当visitorUniapp打包为微信小程序时无法在chat/index.vue监听到点击商品消息或订单消息气泡事件，在visitorUniapp使用H5运行时可以正常监听消息。现在考虑在visitorUniapp中保留以URL方式嵌入visitor中chatbox页面对话的同时，在visitorUniapp中完全参考visitor中Chatbox页面实现chatbox.vue页面。请首先评估一下是否需要继续修微信小程序中监听事件的bug还是直接在visitorUniapp中实现相应的chatbox页面更合适？带我确认之后，再继续
 - [x] 在visitorUniapp使用H5运行时可以正常监听消息，并打开订单详情和商品详情页面，但是在iOS模拟器App基座中运行时，没有打开订单或商品详情页面，请检查并修复
-- [] 修改thread会话列表list item，修改未读消息数位置，将未读消息数显示到头像右上角
+- [x] 修改thread会话列表list item，修改未读消息数位置，将未读消息数显示到头像右上角
+- [] 完善thread页面搜索，参考desktop中ThreadList页面搜索
